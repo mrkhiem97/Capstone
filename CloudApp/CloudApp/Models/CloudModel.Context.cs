@@ -13,10 +13,10 @@ namespace CloudApp.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class CloudDBEntities : DbContext
+    public partial class DbEntity : DbContext
     {
-        public CloudDBEntities()
-            : base("name=CloudDBEntities")
+        public DbEntity()
+            : base("name=DbEntity")
         {
         }
     

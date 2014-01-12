@@ -15,7 +15,7 @@ namespace CloudApp.Controllers
 {
     public class AccountController : Controller
     {
-        CloudDBEntities context = new CloudDBEntities();
+        DbEntity context = new DbEntity();
         //
         // GET: /Account/Login
 
