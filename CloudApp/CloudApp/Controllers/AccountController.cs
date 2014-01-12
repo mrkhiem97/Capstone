@@ -22,11 +22,7 @@ namespace CloudApp.Controllers
         [AllowAnonymous]
         public ActionResult Login()
         {
-            Account account = new Account();
-            account.Username = "khiem";
-            account.Password = "khiem";
-            context.Accounts.Add(account);
-            context.SaveChanges();
+
             return View();
         }
 
@@ -40,11 +36,11 @@ namespace CloudApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                //var acc = (from account in context.Accounts where (account.Username == model.UserName) select account).SingleOrDefault();
-                //if (acc != null)
-                //{
-                //    return RedirectToAction("Index", "Home");
-                //}
+                var acc = (from account in context.Accounts where (account.Username == model.UserName && account.Password == model.Password) select account).SingleOrDefault();
+                if (acc != null)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
                 return RedirectToAction("Index", "Home");
             }
 
@@ -72,6 +68,26 @@ namespace CloudApp.Controllers
         public ActionResult Register()
         {
             return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public ActionResult Register(RegisterModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                Account account = new Account();
+                account.Username = model.UserName;
+                account.Password = model.Password;
+                context.Accounts.Add(account);
+                context.SaveChanges();
+                return RedirectToAction("Index", "Home");
+            }
+
+            // If we got this far, something failed, redisplay form
+            ModelState.AddModelError("", "The user name or password provided is incorrect.");
+            return View(model);
         }
     }
 }
