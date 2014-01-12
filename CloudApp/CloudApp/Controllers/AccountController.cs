@@ -35,11 +35,12 @@ namespace CloudApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var acc = (from account in context.Accounts where (account.Username == model.UserName) select account).SingleOrDefault();
-                if (acc != null)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
+                //var acc = (from account in context.Accounts where (account.Username == model.UserName) select account).SingleOrDefault();
+                //if (acc != null)
+                //{
+                //    return RedirectToAction("Index", "Home");
+                //}
+                return RedirectToAction("Index", "Home");
             }
 
             // If we got this far, something failed, redisplay form
