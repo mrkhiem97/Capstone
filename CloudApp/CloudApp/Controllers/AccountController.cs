@@ -26,6 +26,7 @@ namespace CloudApp.Controllers
             account.Username = "khiem";
             account.Password = "khiem";
             context.Accounts.Add(account);
+            context.SaveChanges();
             return View();
         }
 
