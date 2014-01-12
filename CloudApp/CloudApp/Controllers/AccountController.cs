@@ -22,6 +22,10 @@ namespace CloudApp.Controllers
         [AllowAnonymous]
         public ActionResult Login()
         {
+            Account account = new Account();
+            account.Username = "khiem";
+            account.Password = "khiem";
+            context.Accounts.Add(account);
             return View();
         }
 
