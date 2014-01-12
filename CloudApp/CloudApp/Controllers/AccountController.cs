@@ -13,8 +13,6 @@ using CloudApp.Models;
 
 namespace CloudApp.Controllers
 {
-    [Authorize]
-    [InitializeSimpleMembership]
     public class AccountController : Controller
     {
         CloudDBEntities context = new CloudDBEntities();
