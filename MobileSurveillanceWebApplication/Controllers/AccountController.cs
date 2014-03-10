@@ -131,8 +131,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                         Email = model.Email,
                         Fullname = model.Fullname,
                         LastLogin = DateTime.Now,
-                        Avatar = "App_Data/DefaultAvatar/Avatar.jpg",
-                        IsActive = false,
+                        Avatar = "/DefaultUserData/Avatar/Avatar.png",
+                        IsActive = true,
                         RoleId = 2
                     };
                     context.Accounts.Add(account);
