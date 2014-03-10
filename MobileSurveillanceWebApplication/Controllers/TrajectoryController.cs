@@ -12,6 +12,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class TrajectoryController : Controller
     {
+        private const String USER_DATA_FOLDER = "/UserData/";
         //
         // GET: /Trajectory/
         private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
@@ -90,11 +91,13 @@ namespace MobileSurveillanceWebApplication.Controllers
             // Condition
             if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword) && !String.IsNullOrWhiteSpace(searchUserModel.SearchKeyword))
             {
-                listTraject = account.Trajectories.Where(x => x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword) || x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword)).ToList();
+                listTraject = account.Trajectories.Where(x => x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword) ||
+                    x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword))
+                    .OrderByDescending(x => x.CreatedDate).ToList();
             }
             else
             {
-                listTraject = account.Trajectories.ToList();
+                listTraject = account.Trajectories.OrderByDescending(x => x.CreatedDate).ToList();
             }
             searchUserModel.PageCount = listTraject.Count / pageSize;
             listTraject = listTraject.Skip((searchUserModel.PageNumber - 1) * pageSize).Take(pageSize).ToList();
@@ -123,16 +126,29 @@ namespace MobileSurveillanceWebApplication.Controllers
             ViewBag.SearchCriteriaViewModel = searchUserModel;
 
             // Get User
+            var userModel = GetUserViewModel(account);
+            model.UserViewModel = userModel;
+            return View(model);
+        }
+
+        private static UserViewModel GetUserViewModel(Account account)
+        {
             var userModel = new UserViewModel();
-            userModel.Avatar = account.Avatar;
+            if (String.IsNullOrEmpty(account.Avatar))
+            {
+                userModel.Avatar = "/DefaultUserData/Avatar/Avatar.png";
+            }
+            else
+            {
+                userModel.Avatar = account.Avatar;
+            }
             userModel.Email = account.Email;
             userModel.Fullname = account.Fullname;
             userModel.IsActive = account.IsActive.ToString();
             userModel.LastLogin = account.LastLogin;
             userModel.Username = account.Username;
             userModel.Id = account.Id;
-            model.UserViewModel = userModel;
-            return View(model);
+            return userModel;
         }
 
         public JsonResult GetLocationList(string trajectId)
@@ -163,7 +179,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             var img = locate.CapturedImages.ToList();
             foreach (var i in img)
             {
-                imgList.Add(i.ImageUrl);
+                imgList.Add(USER_DATA_FOLDER + i.ImageUrl);
             }
 
 
