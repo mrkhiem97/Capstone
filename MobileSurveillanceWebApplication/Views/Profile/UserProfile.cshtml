@@ -1,0 +1,41 @@
+﻿@{
+    ViewBag.Title = "UserProfile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="col-md-10">
+
+    <div class="page-header">
+    </div>
+    <div class="page-header">
+        <h1> User Profile</h1>
+    </div>
+    <div class="row">
+        <!--Avatar-->
+        <div class="col-sm-6 col-md-4">
+            <abbr title="Click here to change your avatar">
+                <a href="#" class="thumbnail">
+                    <img src="images/avatar.jpg" alt="Nang" class="img-thumbnail traject-thumb">
+                </a>
+            </abbr>
+        </div>
+        <!--Detail Information-->
+        <div class="col-sm-6 col-md-8">
+            <div class="alert alert-success">
+                <h3>Administrator</h3>
+                <address>
+                    <strong>Email: </strong>
+                    <a href="mailto:#">first.last@example.com</a><br />
+                    <strong>Last Login: </strong>
+                    <p>2012-06-18 10:34:09.000</p>
+                </address>
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <button type="button" class="btn btn-primary btn-lg">Edit Profile</button>
+        <button type="button" class="btn btn-primary btn-lg">Change Account</button>
+    </div>
+
+</div>

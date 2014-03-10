@@ -1,0 +1,26 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>RegisterSuccess</title>
+    @Scripts.Render("~/bundles/jquery")
+</head>
+<body>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnClose').click(function () {
+                Android.close('@ViewBag.Username');
+            });
+        });
+    </script>
+    <div>
+        <h1>Your account has been registered successfully</h1>
+        <input type="button" id="btnClose" value="Back to Login"/>
+    </div>
+</body>
+</html>
