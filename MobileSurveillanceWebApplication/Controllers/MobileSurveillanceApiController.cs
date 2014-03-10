@@ -192,7 +192,11 @@ namespace MobileSurveillanceWebApplication.Controllers
         public IEnumerable<AccountFriendApiModel> LoadFriends([FromBody]PagingApiModel pagingModel)
         {
             var list = new List<AccountFriendApiModel>();
-            pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8).ToLower();
+            if (!String.IsNullOrEmpty(pagingModel.SearchQuery))
+            {
+                pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8).ToLower();
+
+            }
             int page = int.Parse(pagingModel.Page);
             int pageSize = int.Parse(pagingModel.PageSize);
             if (User.Identity.IsAuthenticated)

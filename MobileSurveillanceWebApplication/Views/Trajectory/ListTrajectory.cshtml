@@ -1,14 +1,15 @@
 ﻿@model MobileSurveillanceWebApplication.Models.ViewModel.ListTrajectoryViewModel
 @{
     ViewBag.Title = "ListTrajectory";
-    var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.SearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+    var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectSearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+    var userViewModel = (MobileSurveillanceWebApplication.Models.ViewModel.UserViewModel)ViewBag.userViewModel;
 }
 
 <script>
     var currentTraject;
     $(document).ready(function () {
         $(".btn-edit").click(function () {
-            
+
             var id = $(this).parent().attr('id');
             currentTraject = id;
             $.getJSON("/Trajectory/GetTrajectory", { trajectId: id }, function (data) {
@@ -23,7 +24,7 @@
             var Tname = $("#name").val();
             var Tdescription = $("#description").val();
             var Tstatus = $('#status :selected').text();
-            $.getJSON("/Trajectory/SaveTrajectory", {trajectId: id, name: Tname, description: Tdescription, status: Tstatus}, function (data) {
+            $.getJSON("/Trajectory/SaveTrajectory", { trajectId: id, name: Tname, description: Tdescription, status: Tstatus }, function (data) {
                 alert(data);
             })
             $("#myModal").modal('hide');
@@ -43,25 +44,35 @@
     }
 </script>
 
+
+
 <div>
-    <h2>ListTrajectory</h2>
+
+    @{
+        Html.RenderPartial("~/Views/Profile/UserProfile.cshtml", Model.UserViewModel);
+    }
+            
     @using (Html.BeginForm("ListTrajectory", "Trajectory", FormMethod.Post, new { @role = "search" }))
-    {
+    {                       
         <div class="row">
             <div class="col-lg-6">
                 <div class="input-group">
                     <div class="form-group">
                         <input type="text" name="SearchKeyword" class="form-control" placeholder="Search" value="@searchUserModel.SearchKeyword">
+                        <input type="hidden" name="UserId" value="@searchUserModel.UserId" />
                         <input type="hidden" name="PageNumber" value="1" />
                         <input type="hidden" name="PageCount" value="0" />
+                        <input type="hidden" name="DateFrom" value="@searchUserModel.DateFrom" />
+                        <input type="hidden" name="DateTo" value="@searchUserModel.DateTo" />
                     </div>
-                    <button type="submit" class="btn btn-default">Search</button>
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">Search</button>
+                    </span>
                 </div><!-- /input-group -->
             </div><!-- /.col-lg-6 -->
         </div>
 
     }
-
     @foreach (var item in Model.ListTrajectory)
     {
         <div id="@item.Id">
@@ -74,7 +85,7 @@
             }
             Current: <span id="currentLocation"></span>
             <div style="height: 260px; width: 300px; padding: 5px; display: inline-block">
-                
+
                 Description: @item.Description <br />
                 Created date: @item.CreateDate <br />
                 Last updated: @item.LastUpdate <br />
@@ -91,7 +102,8 @@
             <!-- Button trigger modal -->
 
             <button class="btn btn-primary btn-md btn-edit" data-toggle="modal" data-target="#myModal">
-                Edit <span class="glyphicon glyphicon-pencil"></span></button>
+                Edit <span class="glyphicon glyphicon-pencil"></span>
+            </button>
 
             <!-- Modal -->
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -119,7 +131,7 @@
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             @Ajax.ActionLink("Save", "Save", new { trajectoryId = item.Id }, new AjaxOptions()
             {
-                
+
                 HttpMethod = "POST",
                 OnSuccess = "onProductSaveSuccess",
                 OnFailure = "onProductSaveFailure",
@@ -136,10 +148,10 @@
     <div class="row">
         <ul class="pagination">
 
-            <li>@Html.ActionLink("First", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount })</li>
+            <li>@Html.ActionLink("First", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
             @if (searchUserModel.PageNumber > 1)
             {
-                <li>@Html.ActionLink("<<", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount })</li>
+                <li>@Html.ActionLink("<<", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
             }
             @if (searchUserModel.PageCount > 5)
             {
@@ -159,12 +171,12 @@
 
                 for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
                 {
-                    <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                    <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
                 }
-                <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+                <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
                 for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
                 {
-                    <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                    <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
                 }
             }
             else
@@ -173,22 +185,22 @@
                 {
                     if (i == searchUserModel.PageNumber)
                     {
-                        <li class="active">@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+                        <li class="active">@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                        <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
                     }
                 }
             }
             @if (searchUserModel.PageNumber < searchUserModel.PageCount)
             {
-                <li>@Html.ActionLink(">>", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount })</li>
+                <li>@Html.ActionLink(">>", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
             }
-            <li>@Html.ActionLink("Last", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount })</li>
+            <li>@Html.ActionLink("Last", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
         </ul>
     </div>
-    
+
 </div>
 
 

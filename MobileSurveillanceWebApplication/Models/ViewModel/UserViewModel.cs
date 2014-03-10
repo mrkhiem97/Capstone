@@ -12,7 +12,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string Password { get; set; }
         public string Email { get; set; }
         public string Fullname { get; set; }
-        public  DateTime LastLogin { get; set; }
+        public  DateTime? LastLogin { get; set; }
         public string IsActive { get; set; }
         public string Avatar { get; set; }
         public string RoleId { get; set; }
@@ -45,6 +45,8 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
 
     public class TrajectSearchCriteriaViewModel : SearchCriteriaViewModel
     {
+
+        public long UserId { get; set; }
 
         public string DateFrom { get; set; }
 

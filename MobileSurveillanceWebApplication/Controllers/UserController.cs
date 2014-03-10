@@ -79,9 +79,9 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <param name="friendID"></param>
         /// <returns></returns>
-        public ActionResult ListFriendTrajectory( long friendID )
-        {               
-            return RedirectToAction("ListTrajectory", "Trajectory", new { FriendID = friendID });
+        public ActionResult ListFriendTrajectory( long friendId )
+        {
+            return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = friendId, DateFrom = " ", DateTo = " " });
         }
 
 

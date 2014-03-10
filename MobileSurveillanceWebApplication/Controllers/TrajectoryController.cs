@@ -62,31 +62,35 @@ namespace MobileSurveillanceWebApplication.Controllers
             return Json(new { message = Message, id = trajectoryId }, JsonRequestBehavior.AllowGet);
         }
 
+        [Authorize]
         public ActionResult ListTrajectories()
         {
-
-            return RedirectToAction("ListTrajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0 });
+            var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
+            return RedirectToAction("ListTrajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = account.Id, DateFrom = " ", DateTo = " " });
         }
 
-        [Authorize]
 
+        [Authorize]
         public ActionResult ListTrajectory(TrajectSearchCriteriaViewModel searchUserModel)
         {
             //page size
             int pageSize = 3;
 
+            if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword))
+            {
+                searchUserModel.SearchKeyword = searchUserModel.SearchKeyword.Trim().ToLower();
+            }
             // List trajectory
-            var listTrajectModel = new ListTrajectoryViewModel();
-            // Get username
-            var username = User.Identity.Name;
+            var model = new ListTrajectoryViewModel();
+
             // Get account
-            var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+            var account = this.context.Accounts.SingleOrDefault(x => x.Id == searchUserModel.UserId);
             // Get trajectory of the username
             var listTraject = new List<Trajectory>();
             // Condition
-            if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword.Trim()) && !String.IsNullOrWhiteSpace(searchUserModel.SearchKeyword.Trim()))
+            if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword) && !String.IsNullOrWhiteSpace(searchUserModel.SearchKeyword))
             {
-                listTraject = account.Trajectories.Where(x => x.TrajectoryName.Contains(searchUserModel.SearchKeyword.Trim()) || x.TrajectoryName.Contains(searchUserModel.SearchKeyword.Trim())).ToList();
+                listTraject = account.Trajectories.Where(x => x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword) || x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword)).ToList();
             }
             else
             {
@@ -95,8 +99,6 @@ namespace MobileSurveillanceWebApplication.Controllers
             searchUserModel.PageCount = listTraject.Count / pageSize;
             listTraject = listTraject.Skip((searchUserModel.PageNumber - 1) * pageSize).Take(pageSize).ToList();
 
-
-            
 
             foreach (var trajectory in listTraject)
             {
@@ -115,42 +117,23 @@ namespace MobileSurveillanceWebApplication.Controllers
                         trajectoryViewModel.locateList.Add(trajectory.Locations.ElementAt(i));
                     }
                 }
-                listTrajectModel.ListTrajectory.Add(trajectoryViewModel);
+                model.ListTrajectory.Add(trajectoryViewModel);
             }
 
             ViewBag.SearchCriteriaViewModel = searchUserModel;
-            return View(listTrajectModel);
-        }
 
-        [Authorize]
-        public ActionResult ListTrajectoryByUser(long userId)
-        {
-            var model = new ListTrajectoryViewModel();
-
-            var listTrajectory = this.context.Trajectories.Where(x => x.UserId == userId).OrderByDescending(x => x.CreatedDate);
-
-            foreach (var trajectory in listTrajectory)
-            {
-                var trajectoryViewModel = new TrajectoryViewModel();
-                trajectoryViewModel.Id = trajectory.Id;
-                trajectoryViewModel.TrajectoryName = trajectory.TrajectoryName;
-                trajectoryViewModel.Description = trajectory.Description;
-                trajectoryViewModel.Status = trajectory.Status;
-                trajectoryViewModel.CreateDate = trajectory.CreatedDate.ToString();
-                trajectoryViewModel.LastUpdate = trajectory.LastUpdated.ToString();
-                int count = trajectory.Locations.Count - 1;
-                if (trajectory.Locations.Count > 0)
-                {
-                    for (int i = count; i >= 0; i--)
-                    {
-                        trajectoryViewModel.locateList.Add(trajectory.Locations.ElementAt(i));
-                    }
-                }
-                model.ListTrajectory.Add(trajectoryViewModel);
-            }
+            // Get User
+            var userModel = new UserViewModel();
+            userModel.Avatar = account.Avatar;
+            userModel.Email = account.Email;
+            userModel.Fullname = account.Fullname;
+            userModel.IsActive = account.IsActive.ToString();
+            userModel.LastLogin = account.LastLogin;
+            userModel.Username = account.Username;
+            userModel.Id = account.Id;
+            model.UserViewModel = userModel;
             return View(model);
         }
-
 
         public JsonResult GetLocationList(string trajectId)
         {
@@ -215,7 +198,9 @@ namespace MobileSurveillanceWebApplication.Controllers
             if (result > 0)
             {
                 message = "Change saved.";
-            } else {
+            }
+            else
+            {
                 message = "Nothing changes.";
             }
 

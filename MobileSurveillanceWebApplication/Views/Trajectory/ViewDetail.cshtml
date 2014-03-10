@@ -6,36 +6,31 @@
 }
 
 @******************************@
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9aFiBetpU1mIBG65QpO8LzYslOhdQyXE&sensor=true">
-</script>
-<script src="/Scripts/markerwithlabel.js"></script>
+
+
 <script type="text/javascript">
-    var xxx;
+    var locationList;
     var poly;
     var map;
 
-    google.maps.visualRefresh = false;
+    
 
     $(document).ready(function () {
 
-
-
+        // Initialize the map.
         function initialize() {
-
+            // Center point
             var myLatLng = new google.maps.LatLng(10.820682, 106.661579);
+            // Map Opttions
             var mapOptions = {
                 center: myLatLng,
                 zoom: 16,
                 width: 900
             };
+            // The map
             map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
 
-            var infoWindow = new google.maps.InfoWindow(
-            {
-                maxWidth: 300
-            });
             var lineArr = [];
             var LngAvg;
             var SumLng = 0;
@@ -44,41 +39,70 @@
             var count = 0;
             var latlngbounds = new google.maps.LatLngBounds()
 
+            // Get location list 
             $.getJSON("/Trajectory/GetLocationList/", { trajectId: '@Model.Id' }, function (data) {
-                xxx = data;
+                locationList = data;
                 $.each(data, function (index, value) {
 
-                    var coordinate = new google.maps.LatLng(value.Latitude, value.Longitude);
-                    latlngbounds.extend(coordinate);
+                    var point = new google.maps.LatLng(value.Latitude, value.Longitude);
+                    latlngbounds.extend(point);
+
+                    // For calculating center point
                     SumLng += value.Longitude;
                     SumLat += value.Latitude;
                     count = index;
-                    lineArr.push(coordinate);
+
+                    lineArr.push(point);
 
                     var marker = new MarkerWithLabel({
-                        position: coordinate,
+                        position: point,
                         draggable: false,
                         map: map,
-                        labelText: "#" + (index + 1),
+                        labelText: (index + 1),
                         labelClass: "labels", // the CSS class for the label
-                        labelStyle: { top: "0px", left: "-21px", opacity: 0.75 },
+                        labelStyle: { opacity: 0.75 },
                         labelVisible: true,
-                        animation: google.maps.Animation.DROP,
+                        
                     });
+
+                    //var marker = new MarkerWithLabel({
+                    //    position: point,
+                    //    map: map,
+                    //    draggable: false,
+                    //    labelContent: value.CreatedDate,
+                    //    //labelAnchor: new google.maps.Point(0, 0),
+                    //    labelClass: "labels", // the CSS class for the label
+                    //    labelStyle: { opacity: 1 },
+                    //});
+
+                    var image = {
+                        url: '../Images/marker.png',
+                        size: new google.maps.Size(32, 32),
+                    }
+
+                    var marker = new google.maps.Marker({
+                        position: point,
+                        map: map,
+                        icon: '../Images/marker.png',
+                        title: value.CreatedDate
+                    });
+                    
 
                     var address = "";
-                    geocoder = new google.maps.Geocoder();
-                    geocoder.geocode({ 'latLng': coordinate }, function (results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            if (results[1]) {
-                                address = results[1].formatted_address;
-                            }
-                        } else {
-                            //alert("Geocoder failed due to: " + status);
-                        }
-                    });
+                    
 
                     google.maps.event.addListener(marker, 'click', (function (marker) {
+
+                        geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ 'latLng': point }, function (results, status) {
+                            if (status == google.maps.GeocoderStatus.OK) {
+                                if (results[1]) {
+                                    address = results[1].formatted_address;
+                                }
+                            } else {
+                                //alert("Geocoder failed due to: " + status);
+                            }
+                        });
                         var itemHtml = $("#slider-item").html();
                         var activeItemHtml = $("#slider-active-item").html();
                         var modalHtml = $("#modalbox1").html();
@@ -230,5 +254,8 @@
     <input type="checkbox" id="line" checked="checked" />
 </div>
 <div id="map-canvas" />
-
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9aFiBetpU1mIBG65QpO8LzYslOhdQyXE&sensor=true">
+</script>
+<script src="/Scripts/markerwithlabel.js"></script>
 
