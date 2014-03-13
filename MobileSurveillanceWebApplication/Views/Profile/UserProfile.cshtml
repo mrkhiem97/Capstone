@@ -2,7 +2,7 @@
 <div class="col-md-10">
 
     <div class="page-header">
-        <h1> User Profile</h1>
+        <h1> @Model.Fullname</h1>
     </div>
     <div class="row">
         <!--Avatar-->
@@ -18,19 +18,33 @@
             <div class="alert alert-success">
                 <h3>@Model.Fullname</h3>
                 <address>
-                    <strong>Email: </strong>
-                    <a href="mailto:#">@Model.Email</a><br />
-                    <strong>User name: </strong>
-                    <p>@Model.Username</p>
-                    <strong>ID: </strong>
-                    <p>@Model.Id</p>
+                    <p>
+                        <strong>User name: </strong>
+                        @Model.Username
+                    </p>
+                    <p>
+                        <strong>Email: </strong>
+                        <a href="mailto:#">@Model.Email</a><br />
+                    </p>
+                    <p>
+                        <strong>Birthday: </strong>
+                        @Model.Birthday
+                    </p>
+                    <p>
+                        <strong>Address: </strong>
+                        @Model.Address
+                    </p>
                 </address>
             </div>
         </div>
     </div>
-    <div class="row">
-        <a class="btn btn-primary btn-lg" data-toggle="modal" data-target="#editProfile" role="button">Account Setting</a>
-    </div>
+    @if (Model.Username == User.Identity.Name)
+    {
+        <div class="row">
+            <a class="btn btn-primary btn-lg" data-toggle="modal" data-target="#editProfile" role="button">Account Setting</a>
+        </div>
+    }
+
 
     <!--Edit Profile-->
     <div class="modal fade" id="editProfile" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

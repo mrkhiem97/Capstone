@@ -15,7 +15,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         private const String USER_DATA_FOLDER = "/UserData/";
         //
         // GET: /Trajectory/
-        private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
+        private readonly EntityContext context = new EntityContext();
         public ActionResult Index()
         {
             return View();
@@ -92,12 +92,12 @@ namespace MobileSurveillanceWebApplication.Controllers
             if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword) && !String.IsNullOrWhiteSpace(searchUserModel.SearchKeyword))
             {
                 listTraject = account.Trajectories.Where(x => x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword) ||
-                    x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword))
+                    x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword) && x.IsActive)
                     .OrderByDescending(x => x.CreatedDate).ToList();
             }
             else
             {
-                listTraject = account.Trajectories.OrderByDescending(x => x.CreatedDate).ToList();
+                listTraject = account.Trajectories.Where(x => x.IsActive).OrderByDescending(x => x.CreatedDate).ToList();
             }
             searchUserModel.PageCount = listTraject.Count / pageSize;
             listTraject = listTraject.Skip((searchUserModel.PageNumber - 1) * pageSize).Take(pageSize).ToList();
@@ -153,6 +153,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 
         public JsonResult GetLocationList(string trajectId)
         {
+            
             var locateList = new List<LocationViewModel>();
             var listLocation = this.context.Locations
                 .Where(x => x.TrajectoryId.Equals(trajectId))
@@ -160,11 +161,20 @@ namespace MobileSurveillanceWebApplication.Controllers
             for (int i = 0; i < listLocation.Count; i++)
             {
                 var model = new LocationViewModel();
-                model.id = listLocation[i].Id;
+                model.id = listLocation[i].Id.ToString();
                 model.Latitude = listLocation[i].Latitude;
                 model.Longitude = listLocation[i].Longitude;
-                model.CreatedDate = listLocation[i].CreatedDate.ToString();
+                //model.CreatedDate = listLocation[i].CreatedDate.ToString();
 
+                DateTime dt = listLocation[i].CreatedDate;
+                model.CreatedDate = String.Format("{0:f}", dt);
+
+                var imgList = this.context.CapturedImages.Where(x => x.LocationId == model.id).ToList();
+                foreach (var img in imgList)
+                {
+                    model.imgList.Add(img.ImageUrl);
+                }
+                
                 locateList.Add(model);
             }
 
@@ -197,7 +207,6 @@ namespace MobileSurveillanceWebApplication.Controllers
             model.Description = trajectory.Description;
             model.LastUpdate = trajectory.LastUpdated.ToString();
             model.Status = trajectory.Status;
-
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }

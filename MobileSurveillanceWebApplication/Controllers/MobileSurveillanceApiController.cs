@@ -21,7 +21,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class MobileSurveillanceApiController : ApiController
     {
-        private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
+        private readonly EntityContext context = new EntityContext();
 
         [HttpPost]
         [BasicAuthenticationFilter(true)]
@@ -318,6 +318,8 @@ namespace MobileSurveillanceWebApplication.Controllers
             captureImage.ImageUrl = imageLocationApiModel.ImageUrl;
             captureImage.CreatedDate = imageLocationApiModel.CreatedDate;
             captureImage.IsActive = true;
+            captureImage.Width = imageLocationApiModel.Width;
+            captureImage.Height = imageLocationApiModel.Height;
             bestLocation.CapturedImages.Add(captureImage);
 
             // Add location successfull
@@ -408,6 +410,8 @@ namespace MobileSurveillanceWebApplication.Controllers
             captureImage.ImageUrl = imageLocationApiModel.ImageUrl;
             captureImage.CreatedDate = imageLocationApiModel.CreatedDate;
             captureImage.IsActive = true;
+            captureImage.Width = imageLocationApiModel.Width;
+            captureImage.Height = imageLocationApiModel.Height;
             location.CapturedImages.Add(captureImage);
 
             this.context.Locations.Add(location);
@@ -464,6 +468,14 @@ namespace MobileSurveillanceWebApplication.Controllers
                     else if (key.Equals("compactdistance", StringComparison.InvariantCultureIgnoreCase))
                     {
                         imageLocationApiModel.CompactDistance = double.Parse(value);
+                    }
+                    else if (key.Equals("width", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        imageLocationApiModel.Width = int.Parse(value);
+                    }
+                    else if (key.Equals("height", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        imageLocationApiModel.Height = int.Parse(value);
                     }
                 }
             }

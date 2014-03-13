@@ -5,17 +5,122 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@******************************@
-
-
 <script type="text/javascript">
     var locationList;
     var poly;
     var map;
-
-    
-
+    var centerLat = 0;
+    var centerLong = 0;
+    var latlngbounds;
+    var currentLocate;
+    var markerList = [];
+    var infoWindowList = [];
+    var addressList = [];
     $(document).ready(function () {
+
+
+        function HomeControl(controlDiv, map) {
+            // Set CSS styles for the DIV containing the control
+            // Setting padding to 5 px will offset the control
+            // from the edge of the map
+            controlDiv.style.padding = '5px';
+            // Set CSS for the control border
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = 'white';
+            controlUI.style.borderStyle = 'solid';
+            controlUI.style.borderWidth = '2px';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to set the map to Home';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior
+            var controlText = document.createElement('div');
+            controlText.style.fontFamily = 'Arial,sans-serif';
+            controlText.style.fontSize = '12px';
+            controlText.style.paddingLeft = '4px';
+            controlText.style.paddingRight = '4px';
+            controlText.innerHTML = '<b>Home</b>';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to
+            // Chicago
+            google.maps.event.addDomListener(controlUI, 'click', function () {
+                map.setCenter(new google.maps.LatLng(centerLat, centerLong))
+                map.fitBounds(latlngbounds);
+                clearAnimation();
+                markerList[markerList.length - 1].setAnimation(google.maps.Animation.BOUNCE);
+                infoWindowList[markerList.length - 1].open(map, markerList[markerList.length - 1]);
+            });
+        }
+
+        function LineControl(controlDiv, map) {
+
+            // Set CSS styles for the DIV containing the control
+            // Setting padding to 5 px will offset the control
+            // from the edge of the map
+            controlDiv.style.padding = '5px';
+
+            // Set CSS for the control border
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = 'white';
+            controlUI.style.borderStyle = 'solid';
+            controlUI.style.borderWidth = '2px';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to toggle line between locations';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior
+            var controlText = document.createElement('div');
+            controlText.style.fontFamily = 'Arial,sans-serif';
+            controlText.style.fontSize = '12px';
+            controlText.style.paddingLeft = '4px';
+            controlText.style.paddingRight = '4px';
+            controlText.innerHTML = '<b>Line</b>';
+            controlUI.appendChild(controlText);
+
+            google.maps.event.addDomListener(controlUI, 'click', function () {
+                if (poly.map == null) {
+                    poly.setMap(map);
+                } else {
+                    poly.setMap(null);
+                }
+            });
+        }
+
+        function PlayControl(controlDiv, map) {
+
+            // Set CSS styles for the DIV containing the control
+            // Setting padding to 5 px will offset the control
+            // from the edge of the map
+            controlDiv.style.padding = '5px';
+            // Set CSS for the control border
+            var controlUI = document.createElement('div');
+            controlUI.style.backgroundColor = 'white';
+            controlUI.style.borderStyle = 'solid';
+            controlUI.style.borderWidth = '2px';
+            controlUI.style.cursor = 'pointer';
+            controlUI.style.textAlign = 'center';
+            controlUI.title = 'Click to play the animation';
+            controlDiv.appendChild(controlUI);
+
+            // Set CSS for the control interior
+            var controlText = document.createElement('div');
+            controlText.style.fontFamily = 'Arial,sans-serif';
+            controlText.style.fontSize = '12px';
+            controlText.style.paddingLeft = '4px';
+            controlText.style.paddingRight = '4px';
+            controlText.innerHTML = '<b>Play</b>';
+            controlUI.appendChild(controlText);
+
+            // Setup the click event listeners: simply set the map to
+            // Chicago
+            google.maps.event.addDomListener(controlUI, 'click', function () {
+                clearAnimation();
+                playSlideShow();
+            });
+        }
 
         // Initialize the map.
         function initialize() {
@@ -24,12 +129,33 @@
             // Map Opttions
             var mapOptions = {
                 center: myLatLng,
-                zoom: 16,
+                zoom: 13,
                 width: 900
             };
             // The map
             map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
+
+            // Create the DIV to hold the control and
+            // call the HomeControl() constructor passing
+            // in this DIV.
+            var homeControlDiv = document.createElement('div');
+            var homeControl = new HomeControl(homeControlDiv, map);
+
+            homeControlDiv.index = 1;
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(homeControlDiv);
+
+            var lineControlDiv = document.createElement('div');
+            var lineControl = new LineControl(lineControlDiv, map);
+
+            homeControlDiv.index = 1;
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(lineControlDiv);
+
+            var playControlDiv = document.createElement('div');
+            var playControl = new PlayControl(playControlDiv, map);
+
+            playControlDiv.index = 1;
+            map.controls[google.maps.ControlPosition.TOP_RIGHT].push(playControlDiv);
 
             var lineArr = [];
             var LngAvg;
@@ -37,23 +163,91 @@
             var LatAvg;
             var SumLat = 0;
             var count = 0;
-            var latlngbounds = new google.maps.LatLngBounds()
+            latlngbounds = new google.maps.LatLngBounds();
+            var locationListHtml = "";
 
-            // Get location list 
+            // Get location list
             $.getJSON("/Trajectory/GetLocationList/", { trajectId: '@Model.Id' }, function (data) {
                 locationList = data;
+                var lastLocate = data[data.length - 1];
+                var firstLocate = data[0];
+                var lastPoint = new google.maps.LatLng(lastLocate.Latitude, lastLocate.Longitude);
+                var firstPoint = new google.maps.LatLng(firstLocate.Latitude, lastLocate.Longitude);
+
+
+                // Get all location
+                geocoder = new google.maps.Geocoder();
+                for (var i = 0; i < locationList.length; i++) {
+                    setTimeout(Location(locationList[i]), 1);
+                };
+
+                function Location(locate) {
+                    var point = new google.maps.LatLng(locate.Latitude, locate.Longitude);
+                    geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({ 'latLng': point }, function (results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            if (results[1]) {
+                                addressList.push(results[1]);
+                            } else {
+                                alert("Geocode was not successful for the following reason: " + status);
+                            }
+                            
+                        }
+                    })
+                }
+
+
+                // Get Current location
+                geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ 'latLng': lastPoint }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        if (results[1]) {
+                            currentLocate = results[1].formatted_address;
+                            $("#currentLocate").html(currentLocate);
+                            $("#currentDate").html(lastLocate.CreatedDate);
+                        }
+                    }
+                });
+
+                // Get start location
+                
+                geocoder.geocode({ 'latLng': firstPoint }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        if (results[1]) {
+                            startLocate = results[1].formatted_address;
+                            $("#startLocate").html(startLocate);
+                            $("#startDate").html(firstLocate.CreatedDate);
+                        }
+                    }
+                });
+
+                for (var i = (data.length - 1); i >= 0; i--) {
+                    // Generate location list html
+                    var newRow = '<tr id="' + i + '"><td>' + (i + 1) + '</td><td> ' + data[i].CreatedDate + '</td></tr>';
+                    $('#myTable tr:last').after(newRow);
+                }
+
                 $.each(data, function (index, value) {
 
+                    // Coordinate of each location
                     var point = new google.maps.LatLng(value.Latitude, value.Longitude);
+
+                    // Get address for each point using Geocoder
+                    
+                    
+
+                    
+
+                    // Pust location to the bound of the map
                     latlngbounds.extend(point);
 
                     // For calculating center point
                     SumLng += value.Longitude;
                     SumLat += value.Latitude;
                     count = index;
-
                     lineArr.push(point);
-
+                    
+                    // New Marker with label
                     var marker = new MarkerWithLabel({
                         position: point,
                         draggable: false,
@@ -62,80 +256,118 @@
                         labelClass: "labels", // the CSS class for the label
                         labelStyle: { opacity: 0.75 },
                         labelVisible: true,
-                        
                     });
 
-                    //var marker = new MarkerWithLabel({
-                    //    position: point,
-                    //    map: map,
-                    //    draggable: false,
-                    //    labelContent: value.CreatedDate,
-                    //    //labelAnchor: new google.maps.Point(0, 0),
-                    //    labelClass: "labels", // the CSS class for the label
-                    //    labelStyle: { opacity: 1 },
-                    //});
-
+                    // Marker image
                     var image = {
                         url: '../Images/marker.png',
                         size: new google.maps.Size(32, 32),
                     }
 
-                    var marker = new google.maps.Marker({
-                        position: point,
-                        map: map,
-                        icon: '../Images/marker.png',
-                        title: value.CreatedDate
+                    // Infor window for each marker
+                    var infowindow = new google.maps.InfoWindow({
+                        content: value.CreatedDate + '</br>' + addressList[index],
                     });
-                    
 
-                    var address = "";
+                    // New marker only
+                    var marker;
+                    if (data.length == (index + 1)) {
+                        marker = new google.maps.Marker({
+                            position: point,
+                            map: map,
+                            icon: '../Images/marker-stop.png',
+                            title: 'Time: ' + value.CreatedDate,
+                            animation: google.maps.Animation.BOUNCE
+                        });
+                    } else if (index == 0) {
+                        marker = new google.maps.Marker({
+                            position: point,
+                            map: map,
+                            animation: google.maps.Animation.DROP,
+                            icon: '../Images/marker-start.png',
+                            title: 'Time: ' + value.CreatedDate
+                        });
+                    } else {
+                        marker = new google.maps.Marker({
+                            position: point,
+                            map: map,
+                            animation: google.maps.Animation.DROP,
+                            icon: '../Images/marker-next.png',
+                            title: 'Time: ' + value.CreatedDate
+                        });
+                    }
+                    infoWindowList.push(infowindow);
+                    markerList.push(marker);
                     
+                    var address = '';
+                    google.maps.event.addListener(marker, 'mouseover', function () {
+                        clearAnimation();
+                        infowindow.open(map, marker);
+                    });
 
+                    google.maps.event.addListener(marker, 'mouseout', function () {
+                        setTimeout(function () { infowindow.close(); }, 3000);
+                    });
+
+                    // Click event for markers
                     google.maps.event.addListener(marker, 'click', (function (marker) {
 
+                        // Get address for each point using Geocoder
+                        
                         geocoder = new google.maps.Geocoder();
                         geocoder.geocode({ 'latLng': point }, function (results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 if (results[1]) {
                                     address = results[1].formatted_address;
+                                    addressList[index] = results[1].formatted_address;
+                                    infoWindowsList[index].setContentHTML(addressList[index]);
                                 }
-                            } else {
-                                //alert("Geocoder failed due to: " + status);
-                            }
+                            } 
                         });
+
+                        // Generate modal with carousel inside
                         var itemHtml = $("#slider-item").html();
                         var activeItemHtml = $("#slider-active-item").html();
                         var modalHtml = $("#modalbox1").html();
                         var modal = $("#modalbox1");
 
                         return function () {
-
+                            
                             var collectionItems = "";
                             var contentString = "";
                             var modelContent = "";
+                            modalHtml = modalHtml.replace("{modal-title}", address);
+
+                            // Get all image of a point
                             $.getJSON("/Trajectory/GetImgList/", { locateId: value.id }, function (data) {
-                                var tempItem = activeItemHtml;
-                                tempItem = tempItem.replace("{item-link}", data[0]);
-                                collectionItems += tempItem;
-                                for (var i = 1; i < data.length; i++) {
-                                    var tempItem = itemHtml;
-                                    tempItem = tempItem.replace("{item-link}", data[i]);
+                                // Add modal if a point has image
+                                if (data.length > 0) {
+                                    var tempItem = activeItemHtml;
+                                    tempItem = tempItem.replace("{item-link}", data[0]);
                                     collectionItems += tempItem;
+                                    for (var i = 1; i < data.length; i++) {
+                                        var tempItem = itemHtml;
+                                        tempItem = tempItem.replace("{item-link}", data[i]);
+                                        collectionItems += tempItem;
+                                    }
+                                    modelContent = modalHtml.replace("{slider-item}", collectionItems);
+                                    modal.html(modelContent);
+                                    modal.modal("show");
                                 }
-                                modelContent = modalHtml.replace("{slider-item}", collectionItems);
-                                modal.html(modelContent);
                             })
-                            modal.modal("show");
                         }
                     })(marker));
                 });
 
+                // Option for the connection between point line
                 var polyOption = {
                     geodesic: true,
                     strokeColor: '#FF0000',
-                    strokeOpacity: 1.0,
-                    strokeWeight: 2
+                    strokeOpacity: 0.9,
+                    strokeWeight: 1.5
                 };
+
+                // Add the connection line
                 poly = new google.maps.Polyline(polyOption);
                 poly.setMap(map);
                 var path = poly.getPath();
@@ -143,86 +375,105 @@
                     path.push(lineArr[i]);
                 }
 
+                // Relocate the map to the proper position
+                centerLat = SumLat / (count + 1);
+                centerLong = SumLng / (count + 1);
+                // Set center of the map
                 map.setCenter(new google.maps.LatLng(SumLat / (count + 1), SumLng / (count + 1)));
+                // Make all point can be seen
                 map.fitBounds(latlngbounds);
+                markerList[markerList.length - 1].setAnimation(google.maps.Animation.BOUNCE);
+                infoWindowList[markerList.length - 1].open(map, markerList[markerList.length - 1]);
             });
-
-
-
-
-
         }
+        
         google.maps.event.addDomListener(window, 'load', initialize);
 
-        $("#line").click(function () {
-            var $this = $(this);
-            // $this will contain a reference to the checkbox
-            if ($this.is(':checked')) {
-                poly.setMap(map);
-            } else {
-                poly.setMap(null);
-            }
+        $('#myTable').on('click', 'tr', function (event) {
+            var a = $(this).attr('id');
+            clearAnimation();
+            markerList[a].setAnimation(google.maps.Animation.BOUNCE);
+            infoWindowList[a].open(map, markerList[a]);
+            $(this).toggleClass("info");
+            $(this).siblings("tr").removeClass("info");
         });
-        $("#test").click(function () {
-            var modal = $("#modalbox1");
-            modal.modal("show");
-        });
+        
 
+        function playSlideShow() {
+            map.setZoom(13);
+            map.setCenter(new google.maps.LatLng(locationList[0].Latitude, locationList[0].Longitude));
+            for (var i = 0; i < markerList.length; i++) {
+                slideShow(i);
+            }
+        }
+
+        function slideShow(i) {
+            setTimeout(function () {
+                if (i > 0) {
+                    markerList[i - 1].setAnimation(null);
+                    infoWindowList[i - 1].close();
+                }
+            }, 2000 * i);
+            
+            var marker = markerList[i];
+            var infoWindow = infoWindowList[i];
+            setTimeout(function () {
+                if (i > 0) {
+                    var bound = new google.maps.LatLngBounds();
+                    var point1 = new google.maps.LatLng(locationList[i].Latitude, locationList[i].Longitude);
+                    var point2 = new google.maps.LatLng(locationList[i - 1].Latitude, locationList[i - 1].Longitude);
+                    bound.extend(point1);
+                    bound.extend(point2);
+                    map.fitBounds(bound);
+                }
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                infoWindow.open(map, marker);
+            }, 2000*i);
+            
+        }
+
+        function clearAnimation() {
+            for (var i = 0; i < markerList.length; i++) {
+                markerList[i].setAnimation(null);
+                infoWindowList[i].close();
+            }
+        }
     });
 
-
-
 </script>
-@******************************@
 
-<h2>ViewDetail</h2>
+<table class="table table-condensed">
+    <tr class="warning h4" ><td colspan="2">Detail of trajectory: @Model.TrajectoryName</td></tr>
+    <tr class="active"><td>Start from: <span id="startLocate"></span></td><td> <span id="startDate"></span></td></tr>
+    <tr class="success"><td>Current location: <span id="currentLocate"></span></td><td> <span id="currentDate"></span></td></tr>
+</table>
 
 
-<style type="text/css">
-    #map-canvas {
-        height: 500px;
-        width: 900px;
-    }
 
-    /*#panel {
-        position: absolute;
-        top: 5px;
-        left: 50%;
-        margin-left: -180px;
-        z-index: 5;
-        background-color: #fff;
-        padding: 5px;
-        border: 1px solid #999;
-    }*/
-</style>
 
+<!-- Place holder div - for generate modal with carousel -->
 <div id="slider-active-item" style="display:none">
-
     <div class="item active">
         <img src="{item-link}" alt="item-alt" style="width: 560px; height:400px">
-        <div class="carousel-caption">
-        </div>
     </div>
-
 </div>
 
 <div id="slider-item" style="display:none">
     <div class="item">
         <img src="{item-link}" alt="item-alt" style="width: 560px; height:400px">
-        <div class="carousel-caption">
-        </div>
     </div>
-
 </div>
 
-
+<div id="location" style="display:none">
+    <ul>location-item</ul>
+</div>
 
 <div class="modal fade" id="modalbox1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Captured image</h4>
+                <h4 class="modal-title">Images captured at {modal-title}</h4>
             </div>
             <div class="modal-body">
                 <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
@@ -248,12 +499,21 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-<div id="panel">
-    Line
-    <input type="checkbox" id="line" checked="checked" />
+<!--div for the map-->
+<div class="row">
+    <div class="col-md-8" id="map-canvas">
+    </div>
+    
+    <div id="location-list" class="col-md-4">
+        <table id="myTable" class="table table-hover">
+        <tr>
+            
+        </tr>
+        </table>
+    </div>
 </div>
-<div id="map-canvas" />
+
+<!-- Javascript -->
 <script type="text/javascript"
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9aFiBetpU1mIBG65QpO8LzYslOhdQyXE&sensor=true">
 </script>

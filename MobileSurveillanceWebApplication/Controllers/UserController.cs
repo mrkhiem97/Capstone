@@ -10,9 +10,12 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class UserController : Controller
     {
+        string friend = "1";
+        string notFriend = "0";
+        string requestSent = "-1";
         //
         // GET: /User/
-        private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
+        private readonly EntityContext context = new EntityContext();
         public ActionResult Index()
         {
             return View();
@@ -33,7 +36,8 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <returns></returns>
         public ActionResult ListUser(SearchCriteriaViewModel searchUserModel)
-        {       
+        {
+           
             int pageSize = 3;
             var listUserModel = new ListUserViewModel();
             // get user name
@@ -46,11 +50,11 @@ namespace MobileSurveillanceWebApplication.Controllers
             // Condition
             if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword.Trim()) && !String.IsNullOrWhiteSpace(searchUserModel.SearchKeyword.Trim()))
             {
-                listUser = account.FriendShips1.Where(x => x.Account.Fullname.Contains(searchUserModel.SearchKeyword.Trim()) || x.Account.Username.Contains(searchUserModel.SearchKeyword.Trim()) && x.Status == "1").ToList();
+                listUser = account.FriendShips1.Where(x => x.Account.Fullname.Contains(searchUserModel.SearchKeyword.Trim()) || x.Account.Username.Contains(searchUserModel.SearchKeyword.Trim()) && x.Status == friend).ToList();
             }
             else
             {
-                listUser = account.FriendShips1.Where(x => x.Status == "1").ToList();
+                listUser = account.FriendShips1.Where(x => x.Status == friend).ToList();
             }
             // For Pagination
             searchUserModel.PageCount = listUser.Count / pageSize;
@@ -64,7 +68,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                 userViewModel.Username = user.Account.Username;
                 userViewModel.Avatar = user.Account.Avatar;
                 userViewModel.Fullname = user.Account.Fullname;
-                //userViewModel.LastLogin = user.Account.LastLogin;
+                userViewModel.Address = user.Account.Address;
+                userViewModel.Birthday = user.Account.Birthday;                
 
                 listUserModel.ListUser.Add(userViewModel);
             }
@@ -84,6 +89,27 @@ namespace MobileSurveillanceWebApplication.Controllers
             return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = friendId, DateFrom = " ", DateTo = " " });
         }
 
+        public JsonResult GetCountItems()
+        {
+            string username = User.Identity.Name;
+            var account = this.context.Accounts.SingleOrDefault(a => a.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+            var listUser = account.FriendShips1.Where(x => x.Status == friend).ToList();
+            var countItem = new 
+            {
+                countInbox = account.FriendShips1.Where(x => x.Status == requestSent).Count(),
+                countFriends = account.FriendShips1.Where(x => x.Status == friend).Count(),
+            };
+            return Json(countItem, JsonRequestBehavior.AllowGet);
+        }
 
+        /// <summary>
+        /// Make Friend Request
+        /// </summary>
+        /// <param name="friendId"></param>
+        /// <returns></returns>
+        public ActionResult MakeFriendRequest(long friendId)
+        {
+            return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = friendId, DateFrom = " ", DateTo = " " });
+        }
     }
 }

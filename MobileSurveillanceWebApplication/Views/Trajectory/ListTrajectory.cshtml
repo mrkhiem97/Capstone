@@ -11,7 +11,7 @@
 
             var id = $(this).parent().attr('id');
             currentTraject = id;
-            $.getJSON("/Trajectory/GetTrajectory", { trajectId: id }, function (data) {
+            $.getJSON("/User/GetCountItems", { }, function (data) {
                 $("#name").val(data.TrajectoryName);
                 $("#description").val(data.Description);
                 $("#status").val(data.Status);

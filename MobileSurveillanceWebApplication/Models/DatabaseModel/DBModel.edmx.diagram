@@ -15,8 +15,8 @@
         <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__FriendShip__MyId__0D2FE9C3" />
         <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Trajector__UserI__12E8C319" />
         <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Location__Trajec__17AD7836" />
-        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.CapturedImage" Width="1.5" PointX="9.75" PointY="4.25" />
-        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__CapturedI__Locat__5B638405" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.CapturedImage" Width="1.5" PointX="9.75" PointY="4" />
+        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__CapturedI__Locat__39CD8610" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -12,10 +12,17 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string Password { get; set; }
         public string Email { get; set; }
         public string Fullname { get; set; }
-        public  DateTime? LastLogin { get; set; }
+        public DateTime? LastLogin { get; set; }
         public string IsActive { get; set; }
         public string Avatar { get; set; }
         public string RoleId { get; set; }
+        public string Address { get; set; }
+        public DateTime Birthday { get; set; }
+    }
+
+    public class FriendViewModel : UserViewModel
+    {
+        public string FriendStatus { get; set; }
     }
 
     /// <summary>
@@ -28,6 +35,22 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public ListUserViewModel()
         {
             this.ListUser = new List<UserViewModel>();
+        }
+    }
+
+    /// <summary>
+    /// View model for List User
+    /// </summary>
+    public class ListFriendViewModel
+    {
+        public List<FriendViewModel> ListFriend { get; set; }
+
+        public SearchCriteriaViewModel SearchCriteriaViewModel { get; set; }
+
+        public ListFriendViewModel()
+        {
+            this.ListFriend = new List<FriendViewModel>();
+            this.SearchCriteriaViewModel = new SearchCriteriaViewModel();
         }
     }
 
@@ -53,5 +76,5 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string DateTo { get; set; }
     }
 
-   
+
 }

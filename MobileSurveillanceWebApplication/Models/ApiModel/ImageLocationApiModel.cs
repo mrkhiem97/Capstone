@@ -20,5 +20,9 @@ namespace MobileSurveillanceWebApplication.Models.ApiModel
         public String ImageUrl { get; set; }
 
         public double CompactDistance { get; set; }
+
+        public int Width { get; set;}
+
+        public int Height { get; set; }
     }
 }

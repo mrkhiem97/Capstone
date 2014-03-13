@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <title>@ViewBag.Title - Mobile Surveillance</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryval")
@@ -60,8 +59,8 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     @Html.Partial("_SearchPartial")
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="#">Friends <span class="badge">42</span></a></li>
-                        <li><a href="#">Inbox <span class="badge">3</span></a></li>
+                        <li><a href="@Url.Action("ListFriend", "User")">Friends <span id="countFriends" class="badge">3</span></a></li>
+                        <li><a href="#">Inbox <span id="countInbox" class="badge">3</span></a></li>
                         <li class="active">@Html.Partial("_LoginPartial")</li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle glyphicon glyphicon-cog" data-toggle="dropdown"><b class="caret"></b></a>
@@ -80,18 +79,7 @@
         <!-- End of Menu -->
         <!-- Main -->
         <div class="content-display" id="main">
-            <!-- Left navigator -->
-            @*<div class="body-content-left">
-                <div class="inside-left-menu">
-                    <ul class="nav nav-pills nav-stacked">
-                        <li>@Html.ActionLink("Trajectories", "ListTrajectory", "Trajectory")</li>
-                        <li>@Html.ActionLink("Friends", "ListFriend", "User")</li>
-                        <li><a href="#">Inbox</a></li>
-                        <li></li>
-                    </ul>
-                </div>
-            </div>*@
-            <!-- End of left navigator-->
+            
             <!-- Content Here-->
             <div class="body-content-right">
                 @RenderSection("featured", required: false)
@@ -106,15 +94,17 @@
     </div>
     <div class="content-display" id="footer">
         <p align="center"><input type="button" id="signalTest" name="Test" value="Test" />Copyright 2014 <br /> Mobile surveillance team</p>
-
     </div>
 
 
-    
-    
-    
     <!-- Javasript here -->
-    
-
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.getJSON("/User/GetCountItems", {}, function (data) {
+                $("#countFriends").text(data.countFriends);
+                $("#countInbox").text(data.countInbox);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -36,9 +36,7 @@
                 <div class="caption">
                     <h3>@item.Username</h3>
                     <p>
-
-                        @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
-                        @*<a class="btn btn-success" role="button"><span class="glyphicon glyphicon-eye-open"></span> Track User</a>*@
+                        @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })                       
                         <a class="btn btn-primary" data-toggle="modal" data-target="#@item.Id" role="button"><span class="glyphicon glyphicon-plus"></span> More Detail</a>
                     </p>
                 </div>

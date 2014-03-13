@@ -13,13 +13,11 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
 
         public string CreatedDate { get; set; }
 
-        public string ImageUrl { get; set; }
-
         public List<string> imgList { get; set; }
 
         public LocationViewModel()
         {
-
+            imgList = new List<String>();
         }
     }
 }

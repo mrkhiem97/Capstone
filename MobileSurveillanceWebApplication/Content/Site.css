@@ -67,8 +67,7 @@
     float: left;
     width: 100%;
     display: block;
-    margin-top: -30px;
-    margin-left: 200px;
+    margin-top: -35px;
 }
 
 .inside-left-menu {
@@ -205,10 +204,13 @@
     width: 650px;
 }
 
-#map-canvas {
-    height: 600px;
-    width: 900px;
+    #map-canvas {
+    height: 500px;
+    left: 10px;
+    
 }
+    
+
 
 .labels {
     font-size: 15px;
@@ -220,6 +222,17 @@
 .image-thumb {
     padding: 10px;
     float: left;
+}
+
+#location-list {
+    float:left;
+    overflow:auto;
+    height:250px;
+    
+}
+
+.red-cell {
+   background: #F00; /* Or some other color */
 }
 
 

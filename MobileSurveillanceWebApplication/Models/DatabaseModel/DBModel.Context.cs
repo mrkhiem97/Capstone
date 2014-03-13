@@ -13,9 +13,9 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class MobileSurveillanceEntities : DbContext
+    public partial class EntityContext : DbContext
     {
-        public MobileSurveillanceEntities()
+        public EntityContext()
             : base("name=MobileSurveillanceEntities")
         {
         }

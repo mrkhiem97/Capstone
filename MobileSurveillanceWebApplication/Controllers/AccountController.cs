@@ -21,7 +21,7 @@ namespace MobileSurveillanceWebApplication.Controllers
     public class AccountController : Controller
     {
         // GET: /Trajectory/
-        private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
+        private readonly EntityContext context = new EntityContext();
         //
         // GET: /Account/Login
 

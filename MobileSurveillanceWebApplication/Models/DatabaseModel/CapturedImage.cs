@@ -14,9 +14,11 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
     
     public partial class CapturedImage
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string ImageUrl { get; set; }
         public System.DateTime CreatedDate { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
         public bool IsActive { get; set; }
         public string LocationId { get; set; }
     

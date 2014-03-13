@@ -29,7 +29,7 @@ namespace MobileSurveillanceWebApplication.Filters
     public class BasicAuthenticationFilter : AuthorizationFilterAttribute
     {
         bool Active = true;
-        private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
+        private readonly EntityContext context = new EntityContext();
 
         public BasicAuthenticationFilter()
         { }

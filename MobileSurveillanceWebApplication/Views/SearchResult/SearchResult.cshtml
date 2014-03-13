@@ -1,0 +1,124 @@
+﻿@model MobileSurveillanceWebApplication.Models.ViewModel.ListFriendViewModel
+@{
+    ViewBag.Title = "SearchResult";
+    var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.SearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+}
+
+<h2>Search Result</h2>
+
+<!-- Nav tabs for User & Trajectory-->
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#usertab" data-toggle="tab">User <span class="badge">@ViewBag.SearchUserCount</span></a></li>
+    <li><a href="#trajectorytab" data-toggle="tab">Trajectories  <span class="badge">6</span></a></li>
+</ul>
+
+<!-- Tab Content-->
+<div class="tab-content">
+
+    <!-- User Tab Content-->
+    <div class="tab-pane active" id="usertab">
+        @foreach (var item in Model.ListFriend)
+        {
+    <!-- Listing User-->
+            <div class="col-sm-6 col-md-4">
+                <div class="thumbnail">
+                    <img src="Images/accent.png" alt="Nang" class="img-thumbnail traject-thumb">
+                    <div class="caption">
+                        <h3>@item.Username</h3>
+                        @switch (item.FriendStatus)
+                        {
+                            case "notFriend":
+                                <p>
+                                    @Html.ActionLink("Add Friend", "AddFriend", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
+                                    @Html.ActionLink("Show Profile", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
+                                </p>
+                                break;
+                            case "requestSent":
+                            <p>
+                                @Html.ActionLink("Request Sent", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
+                                @Html.ActionLink("Cancel Request", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
+                            </p>
+                                break;
+                            case "confirmNeed":
+                            <p>
+                                @Html.ActionLink("Confirm Request", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
+                            </p>
+                                break;
+                            default:
+                            <p>
+                                @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
+                            </p>
+                                break;
+                        }
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <!-- End User Tab Content-->
+    <!-- Trajectory Tab Content-->
+    <div class="tab-pane" id="trajectorytab">
+
+
+    </div>
+    <!-- End Trajectory Tab Content-->
+    <!-- Paging-->
+    <div class="row">
+        <ul class="pagination pagination-lg">
+
+            <li>@Html.ActionLink("First", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount })</li>
+            @if (searchUserModel.PageNumber > 1)
+            {
+                <li>@Html.ActionLink("<<", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount })</li>
+            }
+            @if (searchUserModel.PageCount > 5)
+            {
+                int firstSegmentLength = 3;
+                while (searchUserModel.PageNumber - firstSegmentLength < 0)
+                {
+                    firstSegmentLength--;
+                }
+
+                int lastSegment = searchUserModel.PageNumber + 3;
+
+
+                if (lastSegment > searchUserModel.PageCount)
+                {
+                    lastSegment = searchUserModel.PageCount;
+                }
+
+                for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
+                {
+                    <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                }
+                <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+                for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
+                {
+                    <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                }
+            }
+            else
+            {
+                for (int i = 1; i <= searchUserModel.PageCount; i++)
+                {
+                    if (i == searchUserModel.PageNumber)
+                    {
+                        <li class="active">@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                    }
+                }
+            }
+            @if (searchUserModel.PageNumber < searchUserModel.PageCount)
+            {
+                <li>@Html.ActionLink(">>", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount })</li>
+            }
+            <li>@Html.ActionLink("Last", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount })</li>
+        </ul>
+
+    </div>
+    <!-- Paging-->
+</div>

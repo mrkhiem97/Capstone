@@ -231,6 +231,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MobileSurveillanceApiController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\SearchResultController.cs" />
     <Compile Include="Controllers\TrajectoryController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Filters\BasicAuthenticationFilter.cs" />
@@ -356,7 +357,9 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>DBModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <Content Include="Images\marker.png" />
+    <Content Include="Images\marker-next.png" />
+    <Content Include="Images\marker-start.png" />
+    <Content Include="Images\marker-stop.png" />
     <Content Include="Models\DatabaseModel\DBModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>DBModel.edmx</DependentUpon>
@@ -440,6 +443,7 @@
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Shared\_SearchPartial.cshtml" />
     <Content Include="Views\User\ListUser.cshtml" />
+    <Content Include="Views\SearchResult\SearchResult.cshtml" />
     <Content Include="Views\Profile\UserProfile.cshtml" />
   </ItemGroup>
   <ItemGroup>

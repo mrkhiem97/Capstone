@@ -30,6 +30,8 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
         public bool IsActive { get; set; }
         public string Avatar { get; set; }
         public int RoleId { get; set; }
+        public System.DateTime Birthday { get; set; }
+        public string Address { get; set; }
     
         public virtual Role Role { get; set; }
         public virtual ICollection<FriendShip> FriendShips { get; set; }

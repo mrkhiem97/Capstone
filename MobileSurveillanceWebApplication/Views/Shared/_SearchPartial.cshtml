@@ -1,7 +1,9 @@
-﻿@using (Html.BeginForm("SearchUser", "User", FormMethod.Post, new { @role = "search", @class = "navbar-form navbar-left" }))
+﻿@using (Html.BeginForm("SearchResult", "SearchResult", FormMethod.Post, new { @role = "search", @class = "navbar-form navbar-left" }))
 {
     <div class="form-group">
-        <input type="text" class="form-control" placeholder="Search">
+        <input id="txtSearchAll" type="text" name="SearchKeyword" class="form-control" placeholder="Search" value=""/>
+        <input id="txtPageNumber" type="hidden" name="PageNumber" value="1" />
+        <input id="txtPageCount" type="hidden" name="PageCount" value="0" />
     </div>
     <button type="submit" class="btn btn-default">Search</button>
 }

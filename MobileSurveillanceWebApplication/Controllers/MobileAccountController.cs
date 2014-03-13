@@ -19,7 +19,7 @@ namespace MobileSurveillanceWebApplication.Controllers
     public class MobileAccountController : Controller
     {
         // GET: /Trajectory/
-        private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
+        private readonly EntityContext context = new EntityContext();
 
         [AllowAnonymous]
         public ActionResult RegisterSuccess(String username)

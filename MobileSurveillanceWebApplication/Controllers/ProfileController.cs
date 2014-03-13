@@ -10,7 +10,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class ProfileController : Controller
     {
-        private readonly MobileSurveillanceEntities context = new MobileSurveillanceEntities();
+        private readonly EntityContext context = new EntityContext();
         //
         // GET: /Profile/
 
