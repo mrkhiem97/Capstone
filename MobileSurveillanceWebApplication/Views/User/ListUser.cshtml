@@ -36,36 +36,12 @@
                 <div class="caption">
                     <h3>@item.Username</h3>
                     <p>
-                        @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })                       
-                        <a class="btn btn-primary" data-toggle="modal" data-target="#@item.Id" role="button"><span class="glyphicon glyphicon-plus"></span> More Detail</a>
+                        @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })                                               
                     </p>
                 </div>
             </div>
 
-        </div>
-    <!-- Detail Information User-->
-        <div class="modal fade" id="@item.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" id="myModalLabel">@item.Username</h4>
-                    </div>
-                    <div class="modal-body">
-                        <address>
-                            <strong>@item.Password</strong><br>
-                            <h1>@item.Fullname</h1>
-                            <h1>@item.Id</h1>
-
-                            <a href="mailto:#">@item.Email</a>
-                        </address>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </div>   
     }
 
 <!-- Pagination-->

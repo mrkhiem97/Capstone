@@ -18,6 +18,11 @@ namespace MobileSurveillanceWebApplication.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Show all User match searchKeyword
+        /// </summary>
+        /// <param name="searchCriteriaViewModel"></param>
+        /// <returns></returns>
         public ActionResult SearchResult(SearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
@@ -29,6 +34,11 @@ namespace MobileSurveillanceWebApplication.Controllers
             if (!String.IsNullOrEmpty(searchCriteriaViewModel.SearchKeyword.Trim()) && !String.IsNullOrWhiteSpace(searchCriteriaViewModel.SearchKeyword.Trim()))
             {
                 listUser = this.context.Accounts.Where(x => x.Username.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower()) || x.Fullname.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower())).ToList();
+                listUser.Remove(account);
+            }
+            else
+            {
+                listUser = this.context.Accounts.ToList();
                 listUser.Remove(account);
             }
             ViewBag.SearchUserCount = listUser.Count();
@@ -49,35 +59,32 @@ namespace MobileSurveillanceWebApplication.Controllers
                 friendViewModel.Birthday = user.Birthday;
                 friendViewModel.Address = user.Address;
 
-                //CHECKING STATUS OF FRIENDSHIP     
-                // if me (0) - you (0) or there is no account of friend or me --> not friend
-                if ((!account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() || !friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any())
-                  || (account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "0" && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "0"))
-                {
-                    friendViewModel.FriendStatus = "notFriend";
-                }
-                // if me (1) - you (0) --> request sent
-                else if (friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "1"
+                //CHECKING STATUS OF FRIENDSHIP                    
+                // if me (0) - you (1) --> confirmNeed
+                if (friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "1"
                     && (!account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() || account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "0"))
                 {
                     friendViewModel.FriendStatus = "confirmNeed";
                 }
-                // if me (0) - you (1) --> confirm need
+                // if me (1) - you (0) --> requestSent
                 else if ((!friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() || friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "0")
-                    && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "1")
+                    && account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "1")
                 {
                     friendViewModel.FriendStatus = "requestSent";
                 }
                 // if me (1) - you (1) --> friend
-                else
+                else if (account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "1"
+                    && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "1")
                 {
                     friendViewModel.FriendStatus = "friend";
                 }
-
-
+                // other cases is notFriend
+                else
+                {
+                    friendViewModel.FriendStatus = "notFriend";
+                }
 
                 listFriendViewModel.ListFriend.Add(friendViewModel);
-
             }
             ViewBag.SearchCriteriaViewModel = searchCriteriaViewModel;
             listFriendViewModel.SearchCriteriaViewModel = searchCriteriaViewModel;
@@ -88,27 +95,57 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// Add Friend function
         /// </summary>
         /// <returns></returns>
-        public ActionResult AddFriend()
+        public JsonResult AddFriend(long friendId)
         {
-            return View();
-        }
-
-        /// <summary>
-        /// Accept friend request
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult ConfirmRequest()
-        {
-            return View();
+            var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
+            //check if there are friendId
+            if (account.FriendShips1.Where(x => x.Account.Id == friendId).Any())
+            {
+                //change friendship status to 1
+                account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = "1";
+            }
+            else
+            {
+                //create new friendship
+                var frienship = new FriendShip();
+                frienship.MyFriendId = friendId;
+                frienship.MyId = account.Id;
+                frienship.Status = "1";
+                account.FriendShips1.Add(frienship);
+            }
+            int result = this.context.SaveChanges();
+            var message = "";
+            if (result > 0)
+            {
+                message = "Add Friend Succcessful";
+            }
+            else
+            {
+                message = "Nothing changes.";
+            }
+            return Json(message, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
         /// Cancel Friend Request
         /// </summary>
         /// <returns></returns>
-        public ActionResult CancelRequest()
+        public JsonResult CancelRequest(long friendId)
         {
-            return View();
+            var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
+            //change status to 0 
+            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = "0";
+            int result = this.context.SaveChanges();
+            var message = "";
+            if (result > 0)
+            {
+                message = "Add Friend Succcessful";
+            }
+            else
+            {
+                message = "Nothing changes.";
+            }
+            return Json(message, JsonRequestBehavior.AllowGet);
         }
 
     }

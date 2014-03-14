@@ -23,6 +23,8 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     public class FriendViewModel : UserViewModel
     {
         public string FriendStatus { get; set; }
+        public long MyId { get; set; }
+        public long MyFriendId { get; set; }
     }
 
     /// <summary>
