@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="MOBILESURVEILLANCEModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="MobileSurveillanceEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Accounts" EntityType="MOBILESURVEILLANCEModel.Account" />
+    <EntitySet Name="FriendShips" EntityType="MOBILESURVEILLANCEModel.FriendShip" />
+    <EntitySet Name="Roles" EntityType="MOBILESURVEILLANCEModel.Role" />
+    <EntitySet Name="Trajectories" EntityType="MOBILESURVEILLANCEModel.Trajectory" />
+    <AssociationSet Name="FK__Account__RoleId__086B34A6" Association="MOBILESURVEILLANCEModel.FK__Account__RoleId__086B34A6">
+      <End Role="Role" EntitySet="Roles" />
+      <End Role="Account" EntitySet="Accounts" />
+    </AssociationSet>
+    <AssociationSet Name="FK__FriendShi__MyFri__0E240DFC" Association="MOBILESURVEILLANCEModel.FK__FriendShi__MyFri__0E240DFC">
+      <End Role="Account" EntitySet="Accounts" />
+      <End Role="FriendShip" EntitySet="FriendShips" />
+    </AssociationSet>
+    <AssociationSet Name="FK__FriendShip__MyId__0D2FE9C3" Association="MOBILESURVEILLANCEModel.FK__FriendShip__MyId__0D2FE9C3">
+      <End Role="Account" EntitySet="Accounts" />
+      <End Role="FriendShip" EntitySet="FriendShips" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Trajector__UserI__12E8C319" Association="MOBILESURVEILLANCEModel.FK__Trajector__UserI__12E8C319">
+      <End Role="Account" EntitySet="Accounts" />
+      <End Role="Trajectory" EntitySet="Trajectories" />
+    </AssociationSet>
+    <EntitySet Name="CapturedImages" EntityType="MOBILESURVEILLANCEModel.CapturedImage" />
+    <EntitySet Name="Locations" EntityType="MOBILESURVEILLANCEModel.Location" />
+    <AssociationSet Name="FK__CapturedI__Locat__59463169" Association="MOBILESURVEILLANCEModel.FK__CapturedI__Locat__59463169">
+      <End Role="Location" EntitySet="Locations" />
+      <End Role="CapturedImage" EntitySet="CapturedImages" />
+    </AssociationSet>
+    <AssociationSet Name="FK__Location__Trajec__54817C4C" Association="MOBILESURVEILLANCEModel.FK__Location__Trajec__54817C4C">
+      <End Role="Trajectory" EntitySet="Trajectories" />
+      <End Role="Location" EntitySet="Locations" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Account">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Username" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="Password" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="Email" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="Fullname" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="LastLogin" Type="DateTime" Precision="3" />
+    <Property Name="IsActive" Type="Boolean" Nullable="false" />
+    <Property Name="Avatar" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="RoleId" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Role" Relationship="MOBILESURVEILLANCEModel.FK__Account__RoleId__086B34A6" FromRole="Account" ToRole="Role" />
+    <NavigationProperty Name="FriendShips" Relationship="MOBILESURVEILLANCEModel.FK__FriendShi__MyFri__0E240DFC" FromRole="Account" ToRole="FriendShip" />
+    <NavigationProperty Name="FriendShips1" Relationship="MOBILESURVEILLANCEModel.FK__FriendShip__MyId__0D2FE9C3" FromRole="Account" ToRole="FriendShip" />
+    <NavigationProperty Name="Trajectories" Relationship="MOBILESURVEILLANCEModel.FK__Trajector__UserI__12E8C319" FromRole="Account" ToRole="Trajectory" />
+    <Property Name="Birthday" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Address" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+  </EntityType>
+  <EntityType Name="FriendShip">
+    <Key>
+      <PropertyRef Name="MyId" />
+      <PropertyRef Name="MyFriendId" />
+    </Key>
+    <Property Name="MyId" Type="Int64" Nullable="false" />
+    <Property Name="MyFriendId" Type="Int64" Nullable="false" />
+    <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Account" Relationship="MOBILESURVEILLANCEModel.FK__FriendShi__MyFri__0E240DFC" FromRole="FriendShip" ToRole="Account" />
+    <NavigationProperty Name="Account1" Relationship="MOBILESURVEILLANCEModel.FK__FriendShip__MyId__0D2FE9C3" FromRole="FriendShip" ToRole="Account" />
+  </EntityType>
+  <EntityType Name="Role">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="RoleName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Accounts" Relationship="MOBILESURVEILLANCEModel.FK__Account__RoleId__086B34A6" FromRole="Role" ToRole="Account" />
+  </EntityType>
+  <EntityType Name="Trajectory">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="TrajectoryName" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="LastUpdated" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Status" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+    <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+    <Property Name="IsActive" Type="Boolean" Nullable="false" />
+    <Property Name="UserId" Type="Int64" Nullable="false" />
+    <NavigationProperty Name="Account" Relationship="MOBILESURVEILLANCEModel.FK__Trajector__UserI__12E8C319" FromRole="Trajectory" ToRole="Account" />
+    <NavigationProperty Name="Locations" Relationship="MOBILESURVEILLANCEModel.FK__Location__Trajec__54817C4C" FromRole="Trajectory" ToRole="Location" />
+  </EntityType>
+  <Association Name="FK__Account__RoleId__086B34A6">
+    <End Type="MOBILESURVEILLANCEModel.Role" Role="Role" Multiplicity="1" />
+    <End Type="MOBILESURVEILLANCEModel.Account" Role="Account" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Role">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Account">
+        <PropertyRef Name="RoleId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__FriendShi__MyFri__0E240DFC">
+    <End Type="MOBILESURVEILLANCEModel.Account" Role="Account" Multiplicity="1" />
+    <End Type="MOBILESURVEILLANCEModel.FriendShip" Role="FriendShip" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Account">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FriendShip">
+        <PropertyRef Name="MyFriendId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__FriendShip__MyId__0D2FE9C3">
+    <End Type="MOBILESURVEILLANCEModel.Account" Role="Account" Multiplicity="1" />
+    <End Type="MOBILESURVEILLANCEModel.FriendShip" Role="FriendShip" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Account">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FriendShip">
+        <PropertyRef Name="MyId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Trajector__UserI__12E8C319">
+    <End Type="MOBILESURVEILLANCEModel.Account" Role="Account" Multiplicity="1" />
+    <End Type="MOBILESURVEILLANCEModel.Trajectory" Role="Trajectory" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Account">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Trajectory">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="CapturedImage">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ImageUrl" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+    <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Width" Type="Int32" Nullable="false" />
+    <Property Name="Height" Type="Int32" Nullable="false" />
+    <Property Name="IsActive" Type="Boolean" Nullable="false" />
+    <Property Name="LocationId" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Location" Relationship="MOBILESURVEILLANCEModel.FK__CapturedI__Locat__59463169" FromRole="CapturedImage" ToRole="Location" />
+  </EntityType>
+  <EntityType Name="Location">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <Property Name="Latitude" Type="Double" Nullable="false" />
+    <Property Name="Longitude" Type="Double" Nullable="false" />
+    <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Address" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="IsActive" Type="Boolean" Nullable="false" />
+    <Property Name="TrajectoryId" Type="String" Nullable="false" MaxLength="300" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="CapturedImages" Relationship="MOBILESURVEILLANCEModel.FK__CapturedI__Locat__59463169" FromRole="Location" ToRole="CapturedImage" />
+    <NavigationProperty Name="Trajectory" Relationship="MOBILESURVEILLANCEModel.FK__Location__Trajec__54817C4C" FromRole="Location" ToRole="Trajectory" />
+  </EntityType>
+  <Association Name="FK__CapturedI__Locat__59463169">
+    <End Type="MOBILESURVEILLANCEModel.Location" Role="Location" Multiplicity="1" />
+    <End Type="MOBILESURVEILLANCEModel.CapturedImage" Role="CapturedImage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Location">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="CapturedImage">
+        <PropertyRef Name="LocationId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK__Location__Trajec__54817C4C">
+    <End Type="MOBILESURVEILLANCEModel.Trajectory" Role="Trajectory" Multiplicity="1" />
+    <End Type="MOBILESURVEILLANCEModel.Location" Role="Location" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Trajectory">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Location">
+        <PropertyRef Name="TrajectoryId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

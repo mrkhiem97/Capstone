@@ -1,0 +1,238 @@
+﻿div {
+    border: solid 0px;
+}
+
+#container {
+    margin-left: 0px;
+}
+
+.top-menu {
+    background-color: #266d97;
+}
+
+.navbar-form .form-control {
+    display: inline-block;
+    width: 400px;
+    vertical-align: middle;
+}
+
+
+/*.navbar-default .navbar-brand {
+    color: whitesmoke;
+    font-size: large;
+}
+
+.navbar-header .navbar-brand a:hover {
+    color: whitesmoke;
+    font-weight: bold;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: whitesmoke;
+}
+
+    .navbar-default .navbar-nav > li > a:hover {
+        color: white;
+    }
+
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+    color: #555;
+    background-color: #266d97;
+}*/
+
+.navbar-nav > li > a {
+    padding-top: 13px;
+    padding-bottom: 15px;
+}
+
+.content-display {
+    width: 100%;
+    height: auto;
+    display: block;
+    float: left;
+}
+
+#main {
+    margin-top: 80px;
+}
+
+.body-content-left {
+    float: left;
+    display: inline;
+    margin-top: -30px;
+    background-color: #fafafa;
+}
+
+.body-content-right {
+    float: left;
+    width: 100%;
+    display: block;
+    margin-top: -35px;
+}
+
+.inside-left-menu {
+    float: left;
+    display: inline;
+    position: fixed;
+    border-right: solid #cccccc 1.5px;
+    background-color: #fafafa;
+    font-size: 18px;
+    font-style: normal;
+    height: 1000px;
+    width: 170px;
+    margin-left:-10px;
+    padding: 5px;
+}
+
+#left-menu ul {
+    margin-top: 30px;
+}
+
+
+#footeredit {
+    align: center;
+}
+
+#right-content {
+    margin-left: 10px;
+}
+
+.top-menu {
+    height: 45px;
+}
+
+.wrap-menu {
+    height: 40px;
+    margin-top: 5px;
+}
+
+.user-request {
+    float: left;
+    border: solid 1px #cccccc;
+    height: 80px;
+    width: 250px;
+    margin: 5px;
+}
+
+    .user-request img {
+        display: inline;
+        width: 70px;
+        height: 70px;
+        padding: 5px;
+    }
+
+.user-name {
+    display: inline;
+}
+
+.pagination {
+    margin: 30px auto;
+    clear: both;
+}
+
+.search-result {
+    margin: 10px;
+}
+
+.search-form {
+    height: 45px;
+    margin-left: 300px;
+}
+
+.trajectory {
+    margin-top: 10px;
+    height: 150px;
+    border-bottom: solid #cccccc 1px;
+}
+
+.traject-thumb {
+    width: 140px;
+    height: 140px;
+}
+
+.editor-label {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+}
+
+.editor-field {
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+    .editor-field .field-validation-error {
+        color: red;
+    }
+
+.login-form {
+    border-radius: 2%;
+    border: solid 1px #cccccc;
+    padding: 15px;
+    background-color: #dbeaf9;
+}
+
+.register-form {
+    border-radius: 2%;
+    border: solid 1px #cccccc;
+    padding: 15px;
+    background-color: #dbeaf9;
+    min-width: 350px;
+}
+
+.retrievePass-form {
+    border-radius: 2%;
+    border: solid 1px #cccccc;
+    padding: 15px;
+    background-color: #dbeaf9;
+}
+
+.traject-info {
+    border: solid 1px #cccccc;
+    margin: 5px;
+    padding: 15px;
+}
+
+.traject-map {
+    border: solid 1px #cccccc;
+    margin: 5px;
+    padding: 15px;
+    width: 650px;
+}
+
+    #map-canvas {
+    height: 500px;
+    left: 10px;
+    
+}
+    
+
+
+.labels {
+    font-size: 15px;
+    font-weight: bold;
+    color: red;
+    background-color: yellow;
+}
+
+.image-thumb {
+    padding: 10px;
+    float: left;
+}
+
+#location-list {
+    float:left;
+    overflow:auto;
+    height:250px;
+    
+}
+
+.red-cell {
+   background: #F00; /* Or some other color */
+}
+
+

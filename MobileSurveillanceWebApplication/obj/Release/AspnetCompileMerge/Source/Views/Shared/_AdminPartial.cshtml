@@ -1,0 +1,6 @@
+﻿@if (Request.IsAuthenticated && Request.Cookies["Role"].Value.Equals("admin", StringComparison.InvariantCultureIgnoreCase))
+{
+    <text>
+        @Html.ActionLink("Admin", "Admin", "Account")
+    </text>
+}

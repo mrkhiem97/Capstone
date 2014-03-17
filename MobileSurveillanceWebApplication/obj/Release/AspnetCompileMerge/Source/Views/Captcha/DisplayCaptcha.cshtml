@@ -1,0 +1,6 @@
+﻿@model MobileSurveillanceWebApplication.Models.ViewModel.CaptchaViewModel
+<div class="editor-field">
+    <img src='@Url.Content("~/Captcha/DisplayCaptcha")' alt="" class="form-inline" style="margin-bottom: 3px; border-radius: 5%" />
+    @Html.TextBoxFor(m => m.CaptchaValue, new { @class = "form-inline form-control", placeholder = "Security code" })
+    @Html.ValidationMessageFor(model => model.CaptchaValue)
+</div>
