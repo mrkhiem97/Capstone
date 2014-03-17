@@ -1,7 +1,0 @@
-﻿@if (Request.IsAuthenticated)
-{
-
-    <text>
-        @Html.ActionLink(HttpContext.Current.Request.Cookies["FullName"].Value, "ListTrajectories", "Trajectory")
-    </text>
-}
