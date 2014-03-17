@@ -1,0 +1,7 @@
+﻿@model MobileSurveillanceWebApplication.Models.ViewModel.CaptchaViewModel
+<div class="editor-field">
+    <img src='@Url.Content("~/Captcha/DisplayCaptcha")' alt="" class="captcha_img" />
+    @Html.TextBoxFor(m => m.CaptchaValue, new { @class = "captcha_input" })
+    @Html.ValidationMessageFor(model => model.CaptchaValue)
+    <br class="clear" />
+</div>

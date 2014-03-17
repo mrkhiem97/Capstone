@@ -9,17 +9,23 @@
 
 <html>
 <head>
-    @*<link rel="stylesheet" href="~/Content/bootstrap.css" type="text/css">*@
-    @*  @Scripts.Render("~/bundles/jqueryui")*@
-    @*    @Scripts.Render("~/bundles/modernizr")*@
-    @*@Styles.Render("~/Content/themes/base/css")*@
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Mobile Surveillance - Register</title>
 
+    @Styles.Render("~/Content/themes/base/css")
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryval")
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <script src="~/Scripts/bootstrap.js"></script>
-    <title>Mobile Surveillance - Register</title>
+    @Scripts.Render("~/bundles/jqueryui")
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui.datepicker.validation.min.js")">
+    </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/DatePickerScript.js")">
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            datetimeController.initializeDatePicker("birthday", new Date(1930, 0, 1), new Date(2012, 11, 31), new Date(1990, 0, 1));
+        });
+    </script>
 </head>
 <body>
     <div class="container" id="container">
@@ -68,13 +74,26 @@
                             @Html.TextBoxFor(model => model.Fullname, new { @class = "form-control", @placeholder = "Fullname" })
                             @Html.ValidationMessageFor(model => model.Fullname)
                         </div>
-
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.Birthday)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.Birthday, new { @class = "form-control dpDate", @type = "text", @id = "birthday" })
+                            @Html.ValidationMessageFor(model => model.Birthday)
+                        </div>
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.Address)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.Address, new { @class = "form-control", @placeholder = "Address" })
+                            @Html.ValidationMessageFor(model => model.Address)
+                        </div>
+                        @Html.Partial("~/Views/Captcha/DisplayCaptcha.cshtml", new MobileSurveillanceWebApplication.Models.ViewModel.CaptchaViewModel())
                         <div style="float:right">
                             <input type="submit" value="Register" class="btn btn-primary" />
                         </div>
                     </fieldset>
                 }
-                <form role="form"></form>
             </div>
 
         </div>
@@ -85,7 +104,5 @@
         <!-- End of Footer -->
     </div>
     <!-- Javasript here -->
-    @Scripts.Render("~/bundles/jquery")
 </body>
 </html>
-

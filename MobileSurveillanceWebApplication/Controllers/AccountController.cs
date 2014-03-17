@@ -34,14 +34,12 @@ namespace MobileSurveillanceWebApplication.Controllers
             }
             else
             {
-                //return RedirectToAction("ListFriend", "User");
                 return RedirectToAction("ListTrajectories", "Trajectory");
             }
         }
 
         //
         // POST: /Account/Login
-
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -56,23 +54,29 @@ namespace MobileSurveillanceWebApplication.Controllers
                                select x).SingleOrDefault();
                 if (account != null)
                 {
-                    FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
-                    Response.Cookies["FullName"].Value = account.Fullname;
-                    Response.Cookies["FullName"].Expires = DateTime.Now.AddDays(30);
-                    Response.Cookies["Role"].Value = account.Role.RoleName;
-                    Response.Cookies["Role"].Expires = DateTime.Now.AddDays(30);
-                    return RedirectToAction("ListTrajectories", "Trajectory");
+                    if (account.IsActive)
+                    {
+                        FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
+                        Response.Cookies["FullName"].Value = account.Fullname;
+                        Response.Cookies["FullName"].Expires = DateTime.Now.AddDays(30);
+                        Response.Cookies["Role"].Value = account.Role.RoleName;
+                        Response.Cookies["Role"].Expires = DateTime.Now.AddDays(30);
+                        return RedirectToAction("ListTrajectories", "Trajectory");
+                    }
+                    else
+                    {
+                        ViewBag.ErrorMessage = "Your account has not been activated! Please check your email to activate your account";
+                    }
                 }
                 else
                 {
-                    ViewBag.ErrorMessage = "Username or Password provided is incorrect!";
+                    ViewBag.ErrorMessage = "The user name or password provided is incorrect!";
                     return View(model);
                 }
-
             }
 
             // If we got this far, something failed, redisplay form
-            ModelState.AddModelError("", "The user name or password provided is incorrect.");
+            ModelState.AddModelError("", "The user name or password provided is incorrect!");
             return View(model);
         }
 
@@ -106,7 +110,6 @@ namespace MobileSurveillanceWebApplication.Controllers
             return RedirectToAction("Login");
         }
 
-
         // GET: /Account/Register
         [AllowAnonymous]
         public ActionResult Register()
@@ -121,31 +124,64 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                var account = new Account
+                {
+                    Username = model.UserName,
+                    Password = model.Password,
+                    Email = model.Email,
+                    Fullname = model.Fullname,
+                    Birthday = model.Birthday,
+                    Address = model.Address,
+                    LastLogin = DateTime.Now,
+                    Avatar = "/DefaultUserData/Avatar/Avatar.png",
+                    IsActive = false,
+                    RoleId = 2
+                };
+                context.Accounts.Add(account);
                 try
                 {
-                    var account = new Account
-                    {
-                        Username = model.UserName,
-                        Password = model.Password,
-                        Email = model.Email,
-                        Fullname = model.Fullname,
-                        LastLogin = DateTime.Now,
-                        Avatar = "/DefaultUserData/Avatar/Avatar.png",
-                        IsActive = true,
-                        RoleId = 2
-                    };
-                    context.Accounts.Add(account);
                     context.SaveChanges();
-                    return RedirectToAction("Login", "Account");
+                    string validateAccountToken = KeyUltil.GenerateHashKey(account.Username);
+
+                    String url = Request.Url.AbsoluteUri;
+                    int index = url.IndexOf("Account");
+                    String host = url.Substring(0, index) + Url.Action("ValidateUserAccount", "Account", new { validateAccountToken = validateAccountToken, username = account.Username });
+                    String link = String.Format("<a href=\"{0}\">{0}</a>", host);
+                    string body = "Mobile Surveillance\r\n" + "Please click the link below to Activate your Account\r\n" + link;
+                    String subject = "Mobile surveillance - Activate Account";
+                    bool success = EmailUltil.SendMail("mobilesurveillance.group4@gmail.com", account.Email, account.Fullname, subject, body, true);
                 }
                 catch (Exception)
                 {
                     ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists, see your system administrator.");
                     throw;
                 }
+                return RedirectToAction("RegisterUserAccountSuccess", "Account", new { fullname = account.Fullname });
             }
             return View(model);
+        }
+
+        [AllowAnonymous]
+        public ActionResult RegisterUserAccountSuccess(String fullname)
+        {
+            ViewBag.Fullname = fullname;
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult ValidateUserAccount(String validateAccountToken, String username)
+        {
+            if (KeyUltil.GenerateHashKey(username).Equals(validateAccountToken))
+            {
+                var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase));
+                account.IsActive = true;
+                this.context.SaveChanges();
+                return RedirectToAction("Login");
+            }
+            else
+            {
+                return RedirectToAction("Register");
+            }
         }
 
         [AllowAnonymous]
@@ -162,39 +198,29 @@ namespace MobileSurveillanceWebApplication.Controllers
 
             if (ModelState.IsValid)
             {
-                
                 var account = this.context.Accounts.SingleOrDefault(x => x.Email.Equals(email.Trim(),
                               StringComparison.InvariantCultureIgnoreCase));
-
                 if (account != null)
                 {
-                    SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
-                    client.EnableSsl = true;
-                    MailAddress from = new MailAddress("mobilesurveillance.group4@gmail.com", "mobilesurveillance.group4@gmail.com");
-                    MailAddress to = new MailAddress(account.Email, account.Username);
-                    MailMessage message = new MailMessage(from, to);
                     string key = KeyUltil.GenerateNewKey();
-                    message.Body = "Here is your key from Mobile surveillance: " + key;
-                    message.Subject = "Mobile surveillance - Reset Password key";
-                    NetworkCredential myCreds = new NetworkCredential("mobilesurveillance.group4@gmail.com", "motnamchin", "");
-                    client.Credentials = myCreds;
-                    try
+                    string body = "Here is your key from Mobile Surveillance: " + key;
+                    String subject = "Mobile surveillance - Reset Password key";
+                    bool success = EmailUltil.SendMail("mobilesurveillance.group4@gmail.com", account.Email, account.Fullname, subject, body, false);
+
+                    if (success)
                     {
-                        client.Send(message);                        
                         Session["KeyPassword"] = key;
                         Session["Username"] = account.Username;
                         Session.Timeout = 30;
-                        if(Session!=null)
+                        if (Session != null)
                         {
                             return RedirectToAction("ResetPassword", "Account");
-                        }                   
-                        
+                        }
                     }
-                    catch (Exception e)
+                    else
                     {
-                        ModelState.AddModelError("", "Issue sending email: " + e.Message);
+                        ModelState.AddModelError("", "Issue sending email");
                     }
-
                 }
                 else // Email not found
                 {
@@ -221,17 +247,17 @@ namespace MobileSurveillanceWebApplication.Controllers
         public ActionResult ResetPassword(ResetPasswordModel model)
         {
             if (ModelState.IsValid)
-            {                
+            {
                 string username = (string)(Session["Username"]);
                 var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(username.Trim(),
                               StringComparison.InvariantCultureIgnoreCase));
-                if(account!=null)
+                if (account != null)
                 {
                     if ((String)model.key == (String)Session["KeyPassword"])
                     {
                         account.Password = model.Password;
-                        context.SaveChanges();                     
-                        
+                        context.SaveChanges();
+
                         return RedirectToAction("Login", "Account");
                     }
                     else
@@ -239,7 +265,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                         ViewBag.Message = "Something went horribly wrong!";
                     }
                 }
-                
+
             }
             return View(model);
         }

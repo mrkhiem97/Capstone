@@ -151,8 +151,8 @@
 }
 
 .editor-label {
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .error-message {
@@ -161,7 +161,7 @@
 }
 
 .editor-field {
-    margin-top: 20px;
+    margin-top: 5px;
     margin-bottom: 20px;
 }
 

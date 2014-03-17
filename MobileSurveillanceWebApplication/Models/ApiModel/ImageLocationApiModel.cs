@@ -24,5 +24,26 @@ namespace MobileSurveillanceWebApplication.Models.ApiModel
         public int Width { get; set;}
 
         public int Height { get; set; }
+
+        private String address;
+
+        public String Address
+        {
+            get
+            {
+                return address;
+            }
+            set
+            { 
+                if (value == null || value == "null")
+                {
+                    address = String.Empty;
+                }
+                else
+                {
+                    address = value;
+                }
+            }
+        }
     }
 }

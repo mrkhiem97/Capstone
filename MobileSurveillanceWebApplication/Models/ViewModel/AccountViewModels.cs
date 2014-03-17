@@ -76,6 +76,19 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         [DataType(DataType.Text)]
         [Display(Name = "Fullname")]
         public string Fullname { get; set; }
+
+        [Required(ErrorMessage = "Birthday is required")]
+        [Display(Name = "Birthday")]
+        [DataType(DataType.Text)]
+        public DateTime Birthday { get; set; }
+
+        [Display(Name = "Address")]
+        [DataType(DataType.Text)]
+        public String Address
+        {
+            get;
+            set;
+        }
     }
 
     public class RetrievePasswordViewModel

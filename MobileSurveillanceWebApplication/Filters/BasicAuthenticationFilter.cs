@@ -105,7 +105,7 @@ namespace MobileSurveillanceWebApplication.Filters
         /// <returns></returns>
         protected virtual bool OnAuthorizeUser(string username, string password, HttpActionContext actionContext)
         {
-            var account = context.Accounts.Where(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase) && x.Password.Equals(password)).SingleOrDefault();
+            var account = context.Accounts.Where(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase) && x.Password.Equals(password)).SingleOrDefault(x => x.IsActive);
             if (account != null)
             {
                 return true;

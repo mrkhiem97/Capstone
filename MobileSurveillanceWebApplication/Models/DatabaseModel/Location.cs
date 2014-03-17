@@ -23,10 +23,11 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public System.DateTime CreatedDate { get; set; }
+        public string Address { get; set; }
         public bool IsActive { get; set; }
         public string TrajectoryId { get; set; }
     
-        public virtual Trajectory Trajectory { get; set; }
         public virtual ICollection<CapturedImage> CapturedImages { get; set; }
+        public virtual Trajectory Trajectory { get; set; }
     }
 }

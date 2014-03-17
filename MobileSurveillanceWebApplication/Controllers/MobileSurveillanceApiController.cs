@@ -23,6 +23,11 @@ namespace MobileSurveillanceWebApplication.Controllers
     {
         private readonly EntityContext context = new EntityContext();
 
+        /// <summary>
+        /// Login into the system
+        /// </summary>
+        /// <param name="accountModel"></param>
+        /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
         public bool Login(AccountApiModel accountModel)
@@ -31,6 +36,11 @@ namespace MobileSurveillanceWebApplication.Controllers
             return retVal;
         }
 
+        /// <summary>
+        /// Update trajectory include add, edit, remove
+        /// </summary>
+        /// <param name="trajectoryModel"></param>
+        /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
         public TrajectoryApiModel UpdateTrajectory(TrajectoryApiModel trajectoryModel)
@@ -127,39 +137,67 @@ namespace MobileSurveillanceWebApplication.Controllers
             return retVal;
         }
 
+        /// <summary>
+        /// Load trajectories
+        /// </summary>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
         public IEnumerable<TrajectoryApiModel> LoadTrajectories([FromBody]PagingApiModel pagingModel)
         {
             var list = new List<TrajectoryApiModel>();
-            pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8);
-            int page = int.Parse(pagingModel.Page);
-            int pageSize = int.Parse(pagingModel.PageSize);
+            pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8).ToLower();
+            int page = pagingModel.Page;
+            int pageSize = pagingModel.PageSize;
             if (User.Identity.IsAuthenticated)
             {
-                long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
-                // Get user account
-                var account = (from x in this.context.Accounts where x.Id == accountId select x).Single();
+                var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(pagingModel.Username));
                 ICollection<Trajectory> listTrajectory = null;
                 if (String.IsNullOrEmpty(pagingModel.SearchQuery))
                 {
-                    listTrajectory = account.Trajectories.Where(x => x.IsActive).OrderByDescending(x => x.LastUpdated).OrderByDescending(x => x.CreatedDate).Skip(page * pageSize).Take(pageSize).ToList();
+                    if (!User.Identity.Name.Equals(pagingModel.Username, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        listTrajectory = account.Trajectories.Where(x => x.IsActive && x.Status.Equals("public", StringComparison.InvariantCultureIgnoreCase))
+                        .OrderByDescending(x => x.LastUpdated)
+                        .OrderByDescending(x => x.CreatedDate)
+                        .Skip(page * pageSize).Take(pageSize)
+                        .ToList();
+                    }
+                    else
+                    {
+                        listTrajectory = account.Trajectories.Where(x => x.IsActive)
+                        .OrderByDescending(x => x.LastUpdated)
+                        .OrderByDescending(x => x.CreatedDate)
+                        .Skip(page * pageSize).Take(pageSize)
+                        .ToList();
+                    }
+
                 }
                 else
                 {
-                    //listTrajectory = account.Trajectories.Skip(page * pageSize).Take(pageSize).ToList();
-                    listTrajectory = (from trajectory in account.Trajectories
-                                      where
-                                          trajectory.TrajectoryName.ToLower()
-                                          .Contains(pagingModel.SearchQuery.ToLower())
-                                      select trajectory)
-                                      .Where(x => x.IsActive)
-                                      .OrderByDescending(x => x.LastUpdated)
-                                      .OrderByDescending(x => x.CreatedDate)
-                                      .Skip(page * pageSize).Take(pageSize).ToList<Trajectory>();
+                    if (!User.Identity.Name.Equals(pagingModel.Username, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        listTrajectory = account.Trajectories
+                        .Where(x => x.IsActive && x.TrajectoryName.ToLower().Contains(pagingModel.SearchQuery)
+                            && x.Status.Equals("public", StringComparison.InvariantCultureIgnoreCase))
+                        .OrderByDescending(x => x.LastUpdated)
+                        .OrderByDescending(x => x.CreatedDate)
+                        .Skip(page * pageSize).Take(pageSize)
+                        .ToList();
+                    }
+                    else
+                    {
+                        listTrajectory = account.Trajectories
+                        .Where(x => x.IsActive && x.TrajectoryName.ToLower().Contains(pagingModel.SearchQuery))
+                        .OrderByDescending(x => x.LastUpdated)
+                        .OrderByDescending(x => x.CreatedDate)
+                        .Skip(page * pageSize).Take(pageSize)
+                        .ToList();
+                    }
                 }
 
-                if (listTrajectory.Count == 0 || listTrajectory == null)
+                if (listTrajectory.Count == 0)
                 {
                     list = null;
                 }
@@ -187,6 +225,11 @@ namespace MobileSurveillanceWebApplication.Controllers
         }
 
 
+        /// <summary>
+        /// Load Friends
+        /// </summary>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
         public IEnumerable<AccountFriendApiModel> LoadFriends([FromBody]PagingApiModel pagingModel)
@@ -195,10 +238,9 @@ namespace MobileSurveillanceWebApplication.Controllers
             if (!String.IsNullOrEmpty(pagingModel.SearchQuery))
             {
                 pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8).ToLower();
-
             }
-            int page = int.Parse(pagingModel.Page);
-            int pageSize = int.Parse(pagingModel.PageSize);
+            int page = pagingModel.Page;
+            int pageSize = pagingModel.PageSize;
             if (User.Identity.IsAuthenticated)
             {
                 long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
@@ -213,7 +255,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     //listTrajectory = account.Trajectories.Skip(page * pageSize).Take(pageSize).ToList();
                     listFriendShip = account.FriendShips1
-                                      .Where(x => x.Account.Username.Contains(pagingModel.SearchQuery) || x.Account.Fullname.Contains(pagingModel.SearchQuery))
+                                      .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
                                       .OrderByDescending(x => x.Account.Fullname)
                                       .OrderByDescending(x => x.Account.Username)
                                       .Skip(page * pageSize).Take(pageSize).ToList();
@@ -227,11 +269,15 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     for (int i = 0; i < listFriendShip.Count; i++)
                     {
+                        String url = Request.RequestUri.AbsoluteUri;
+                        int index = url.IndexOf("api");
+                        String host = url.Substring(0, index) + listFriendShip.ElementAt(i).Account.Avatar;
+
                         var accountFriendApiModel = new AccountFriendApiModel();
                         accountFriendApiModel.Id = listFriendShip.ElementAt(i).Account.Id;
                         accountFriendApiModel.Username = listFriendShip.ElementAt(i).Account.Username;
                         accountFriendApiModel.Fullname = listFriendShip.ElementAt(i).Account.Fullname;
-                        accountFriendApiModel.Avatar = listFriendShip.ElementAt(i).Account.Avatar;
+                        accountFriendApiModel.Avatar = host;
                         list.Add(accountFriendApiModel);
                     }
                 }
@@ -243,6 +289,10 @@ namespace MobileSurveillanceWebApplication.Controllers
             return list;
         }
 
+        /// <summary>
+        /// Upload multipart form data
+        /// </summary>
+        /// <returns></returns>
         [BasicAuthenticationFilter(true)]
         public async Task<bool> UploadMultiPartFormData()
         {
@@ -404,6 +454,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             location.Latitude = imageLocationApiModel.Latitude;
             location.Longitude = imageLocationApiModel.Longitude;
             location.CreatedDate = imageLocationApiModel.CreatedDate;
+            location.Address = imageLocationApiModel.Address;
             location.IsActive = true;
 
             var captureImage = new CapturedImage();
@@ -476,6 +527,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                     else if (key.Equals("height", StringComparison.InvariantCultureIgnoreCase))
                     {
                         imageLocationApiModel.Height = int.Parse(value);
+                    }
+                    else if (key.Equals("address", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        imageLocationApiModel.Address = value;
                     }
                 }
             }

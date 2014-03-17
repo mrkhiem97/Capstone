@@ -7,10 +7,34 @@ namespace MobileSurveillanceWebApplication.Models.ApiModel
 {
     public class PagingApiModel
     {
-        public String SearchQuery { get; set; }
+        private String searchQuery;
+        public String SearchQuery
+        {
+            get
+            {
+                return searchQuery;
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value))
+                {
+                    searchQuery = String.Empty;
+                }
+                else
+                {
+                    searchQuery = value;
+                }
+            }
+        }
 
-        public String Page { get; set; }
+        public String Username
+        {
+            get;
+            set;
+        }
 
-        public String PageSize { get; set; }
+        public int Page { get; set; }
+
+        public int PageSize { get; set; }
     }
 }
