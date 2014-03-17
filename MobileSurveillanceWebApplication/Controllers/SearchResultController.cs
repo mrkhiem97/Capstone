@@ -10,6 +10,8 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class SearchResultController : Controller
     {
+        private const string IS_FRIEND = "1";
+        private const string NOT_FRIEND = "0";
         //
         // GET: /SearchResult/
         private readonly EntityContext context = new EntityContext();
@@ -26,7 +28,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         public ActionResult SearchResult(SearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
-            int pageSize = 3;
+            int pageSize = 6;
             var listFriendViewModel = new ListFriendViewModel();
             var listUser = new List<Account>();
 
@@ -61,20 +63,20 @@ namespace MobileSurveillanceWebApplication.Controllers
 
                 //CHECKING STATUS OF FRIENDSHIP                    
                 // if me (0) - you (1) --> confirmNeed
-                if (friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "1"
-                    && (!account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() || account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "0"))
+                if (friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == IS_FRIEND
+                    && (!account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() || account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == NOT_FRIEND))
                 {
                     friendViewModel.FriendStatus = "confirmNeed";
                 }
                 // if me (1) - you (0) --> requestSent
-                else if ((!friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() || friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "0")
-                    && account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "1")
+                else if ((!friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() || friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == NOT_FRIEND)
+                    && account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == IS_FRIEND)
                 {
                     friendViewModel.FriendStatus = "requestSent";
                 }
                 // if me (1) - you (1) --> friend
-                else if (account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == "1"
-                    && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == "1")
+                else if (account.FriendShips1.Where(x => x.Account.Id == user.Id).Any() && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == IS_FRIEND
+                    && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() && friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == IS_FRIEND)
                 {
                     friendViewModel.FriendStatus = "friend";
                 }

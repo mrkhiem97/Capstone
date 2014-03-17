@@ -269,15 +269,11 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     for (int i = 0; i < listFriendShip.Count; i++)
                     {
-                        String url = Request.RequestUri.AbsoluteUri;
-                        int index = url.IndexOf("api");
-                        String host = url.Substring(0, index) + listFriendShip.ElementAt(i).Account.Avatar;
-
                         var accountFriendApiModel = new AccountFriendApiModel();
                         accountFriendApiModel.Id = listFriendShip.ElementAt(i).Account.Id;
                         accountFriendApiModel.Username = listFriendShip.ElementAt(i).Account.Username;
                         accountFriendApiModel.Fullname = listFriendShip.ElementAt(i).Account.Fullname;
-                        accountFriendApiModel.Avatar = host;
+                        accountFriendApiModel.Avatar = listFriendShip.ElementAt(i).Account.Avatar.Remove(0,1);
                         list.Add(accountFriendApiModel);
                     }
                 }

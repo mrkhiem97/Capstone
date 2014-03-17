@@ -4,9 +4,15 @@
     <meta charset="utf-8" />
     <title>@ViewBag.Title - Mobile Surveillance</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    @Styles.Render("~/Content/themes/base/css")
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryui")
+    <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-ui.datepicker.validation.min.js")">
+    </script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/DatePickerScript.js")">
+    </script>
     @RenderSection("scripts", required: false)
     @Scripts.Render("~/bundles/script")
 

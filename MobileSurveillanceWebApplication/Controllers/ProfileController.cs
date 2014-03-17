@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
+using System.IO;
 
 namespace MobileSurveillanceWebApplication.Controllers
 {
@@ -34,6 +35,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = account.Id, DateFrom = " ", DateTo = " " });
         }
 
+        [HttpPost]
         /// <summary>
         /// Modify information of Profile
         /// </summary>
@@ -41,11 +43,18 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <param name="fullname"></param>
         /// <param name="birthday"></param>
         /// <returns></returns>
-        public JsonResult SaveProfile(string address, string fullname)
+        public JsonResult SaveProfile(string address, string fullname, DateTime birthday, HttpPostedFileBase avatar)
         {
             var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase));
             account.Address = address;
             account.Fullname = fullname;
+            account.Birthday = birthday;
+            if (avatar.ContentLength > 0)
+            {
+                var name = Path.GetFileName(avatar.FileName);
+                var path = Path.Combine(Server.MapPath("~/DefaultUserData/Avatar"), name);
+                avatar.SaveAs(path);
+            }
          
 
             int result = this.context.SaveChanges();
