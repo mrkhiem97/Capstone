@@ -22,7 +22,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return View();
         }
 
-        [Authorize]
+
         public ActionResult ViewDetail(string trajectoryId)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectoryId)).SingleOrDefault();
@@ -46,7 +46,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         //    return RedirectToAction("ListTrajectory");
         //}
 
-        [Authorize]
+
         public JsonResult Delete(string trajectoryId)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectoryId)).SingleOrDefault();
@@ -64,7 +64,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return Json(new { message = Message, id = trajectoryId }, JsonRequestBehavior.AllowGet);
         }
 
-        [Authorize]
+
         public ActionResult ListTrajectories()
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
@@ -72,7 +72,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         }
 
 
-        [Authorize]
+
         public ActionResult ListTrajectory(TrajectSearchCriteriaViewModel searchUserModel)
         {
             //page size
