@@ -462,6 +462,7 @@
     <Content Include="Views\Account\RegisterUserAccountSuccess.cshtml" />
     <Content Include="Views\Captcha\Captcha.cshtml" />
     <Content Include="Views\Captcha\DisplayCaptcha.cshtml" />
+    <Content Include="Views\User\ListInbox.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

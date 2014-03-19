@@ -32,42 +32,39 @@ namespace MobileSurveillanceWebApplication.Controllers
             var user = new UserViewModel();
             username = User.Identity.Name;
             var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase));
-            return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = account.Id, DateFrom = " ", DateTo = " " });
+            return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = "", PageNumber = 1, PageCount = 0, UserId = account.Id, DateFrom = " ", DateTo = " " });
         }
 
-        [HttpPost]
         /// <summary>
         /// Modify information of Profile
         /// </summary>
-        /// <param name="address"></param>
-        /// <param name="fullname"></param>
-        /// <param name="birthday"></param>
+        /// <param name="model"></param>
+        /// <param name="avatar"></param>
         /// <returns></returns>
-        public JsonResult SaveProfile(string address, string fullname, DateTime birthday, HttpPostedFileBase avatar)
+        [HttpPost]
+        public ActionResult SaveProfile(UserViewModel model, HttpPostedFileBase avatar)
         {
             var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase));
-            account.Address = address;
-            account.Fullname = fullname;
-            account.Birthday = birthday;
-            if (avatar.ContentLength > 0)
+            if (ModelState.IsValid)
             {
-                var name = Path.GetFileName(avatar.FileName);
-                var path = Path.Combine(Server.MapPath("~/DefaultUserData/Avatar"), name);
-                avatar.SaveAs(path);
+                account.Address = model.Address;
+                account.Fullname = model.Fullname;
+                account.Birthday = model.Birthday;
+                if (avatar.ContentLength > 0)
+                {
+                    var name = Path.GetFileName(avatar.FileName);
+                    var path = Path.Combine(Server.MapPath("~/DefaultUserData/Avatar"), name);
+                    account.Avatar = Path.Combine("/DefaultUserData/Avatar", name);
+                    avatar.SaveAs(path);
+                }
+                else
+                {
+                    account.Avatar = "/DefaultUserData/Avatar/Avatar.png";
+                }
             }
-         
+            int result = this.context.SaveChanges();      
 
-            int result = this.context.SaveChanges();
-            var message = "";
-            if (result > 0)
-            {
-                message = "Change saved.";
-            }
-            else
-            {
-                message = "Nothing changes.";
-            }
-            return Json(message, JsonRequestBehavior.AllowGet);
+            return RedirectToAction("UserProfile");
         }
     }
 }

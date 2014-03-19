@@ -11,7 +11,7 @@
 
             var id = $(this).parent().attr('id');
             currentTraject = id;
-            $.getJSON("/User/GetCountItems", { }, function (data) {
+            $.getJSON("/User/GetCountItems", {}, function (data) {
                 $("#name").val(data.TrajectoryName);
                 $("#description").val(data.Description);
                 $("#status").val(data.Status);
@@ -50,9 +50,9 @@
     @{
         Html.RenderPartial("~/Views/Profile/UserProfile.cshtml", Model.UserViewModel);
     }
-            
+
     @using (Html.BeginForm("ListTrajectory", "Trajectory", FormMethod.Post, new { @role = "search" }))
-    {                       
+    {
         <div class="row">
             <div class="col-lg-6">
                 <div class="input-group">
@@ -74,35 +74,40 @@
     }
     @foreach (var item in Model.ListTrajectory)
     {
-        <div id="@item.Id">
-            <h3>@Html.ActionLink(@item.TrajectoryName, "ViewDetail", new { trajectoryId = item.Id })</h3>
-            @if (item.locateList.Count > 0)
-            {
-                <div style="height: 260px; width: 410px; border: solid #cccccc 1px; padding: 5px; display: inline-block;">
-                    <img src="http://maps.googleapis.com/maps/api/staticmap?center=@item.locateList.FirstOrDefault().Latitude,@item.locateList.FirstOrDefault().Longitude&markers=@item.locateList.FirstOrDefault().Latitude,@item.locateList.FirstOrDefault().Longitude&zoom=13&size=400x250&sensor=true" alt="Mobile Surveyllance">
-                </div>
-            }
-            Current: <span id="currentLocation"></span>
-            <div style="height: 260px; width: 300px; padding: 5px; display: inline-block">
+        <div class="row" id="@item.Id" style="border-bottom:solid 1px #cccccc; padding:15px 10px; float:left">
 
-                Description: @item.Description <br />
-                Created date: @item.CreateDate <br />
-                Last updated: @item.LastUpdate <br />
+
+            <div class="col-md-3" style="height: 260px; width: 410px; border: solid #cccccc 1px; padding: 5px; display: inline-block;">
+                <img src="http://maps.googleapis.com/maps/api/staticmap?center=@item.Latitude,@item.Longitude&markers=@item.Latitude,@item.Longitude&zoom=13&size=400x250&sensor=true" alt="Mobile Surveyllance">
             </div>
+            <div class="col-md-2" style="height: 260px; width: 300px; padding: 5px; display: inline-block; margin-left:20px">
+                <div class="row">
+                    <table class="table-condensed">
+                        <tr><td><h3>@Html.ActionLink(@item.TrajectoryName, "ViewDetail", new { trajectoryId = item.Id })</h3></td></tr>
+                        <tr><td>Description: @item.Description</td></tr>
+                        <tr><td>Created date: @item.CreateDate</td></tr>
+                        <tr><td>Last updated: @item.LastUpdate</td></tr>
+                    </table>
+                </div>
+                <div class="row" style="bottom:20px; height:20px; position:absolute">
 
-            @Ajax.ActionLink("Delete", "Delete", new { trajectoryId = item.Id }, new AjaxOptions()
+                    <!-- Button trigger modal -->
+                    <button class="btn btn-primary btn-md btn-edit" data-toggle="modal" data-target="#myModal">
+                        Edit <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+
+                    @Ajax.ActionLink("Delete", "Delete", new { trajectoryId = item.Id }, new AjaxOptions()
             {
                 Confirm = "Are you sure you want to delete this trajectory?",
                 HttpMethod = "DELETE",
                 OnSuccess = "onProductDeleteSuccess",
                 OnFailure = "onProductDeleteFailure",
             }, new { @class = "btn btn-danger" })
+                </div>
+            </div>
 
-            <!-- Button trigger modal -->
 
-            <button class="btn btn-primary btn-md btn-edit" data-toggle="modal" data-target="#myModal">
-                Edit <span class="glyphicon glyphicon-pencil"></span>
-            </button>
+
 
             <!-- Modal -->
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -144,62 +149,63 @@
     }
 
     <!-- Pagination-->
-    <div class="row">
-        <ul class="pagination">
+    <div class="row" style="text-align: center;clear:both">
+        <div style="text-align: left; display: inline-block; /* for ie6/7: */ *display: inline; zoom: 1;">
+            <ul class="pagination">
 
-            <li>@Html.ActionLink("First", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
-            @if (searchUserModel.PageNumber > 1)
-            {
-                <li>@Html.ActionLink("<<", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
-            }
-            @if (searchUserModel.PageCount > 5)
-            {
-                int firstSegmentLength = 3;
-                while (searchUserModel.PageNumber - firstSegmentLength < 0)
+                <li>@Html.ActionLink("First", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+                @if (searchUserModel.PageNumber > 1)
                 {
-                    firstSegmentLength--;
+                    <li>@Html.ActionLink("<<", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
                 }
-
-                int lastSegment = searchUserModel.PageNumber + 3;
-
-
-                if (lastSegment > searchUserModel.PageCount)
+                @if (searchUserModel.PageCount > 5)
                 {
-                    lastSegment = searchUserModel.PageCount;
-                }
-
-                for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
-                {
-                    <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
-                }
-                <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
-                for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
-                {
-                    <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
-                }
-            }
-            else
-            {
-                for (int i = 1; i <= searchUserModel.PageCount; i++)
-                {
-                    if (i == searchUserModel.PageNumber)
+                    int firstSegmentLength = 3;
+                    while (searchUserModel.PageNumber - firstSegmentLength < 0)
                     {
-                        <li class="active">@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+                        firstSegmentLength--;
                     }
-                    else
+
+                    int lastSegment = searchUserModel.PageNumber + 3;
+
+
+                    if (lastSegment > searchUserModel.PageCount)
+                    {
+                        lastSegment = searchUserModel.PageCount;
+                    }
+
+                    for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
+                    {
+                        <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+                    }
+                    <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+                    for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
                     {
                         <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
                     }
                 }
-            }
-            @if (searchUserModel.PageNumber < searchUserModel.PageCount)
-            {
-                <li>@Html.ActionLink(">>", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
-            }
-            <li>@Html.ActionLink("Last", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
-        </ul>
+                else
+                {
+                    for (int i = 1; i <= searchUserModel.PageCount; i++)
+                    {
+                        if (i == searchUserModel.PageNumber)
+                        {
+                            <li class="active">@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+                        }
+                        else
+                        {
+                            <li>@Html.ActionLink((i).ToString(), "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+                        }
+                    }
+                }
+                @if (searchUserModel.PageNumber < searchUserModel.PageCount)
+                {
+                    <li>@Html.ActionLink(">>", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+                }
+                <li>@Html.ActionLink("Last", "ListTrajectory", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo })</li>
+            </ul>
+        </div>
     </div>
-
 </div>
 
 

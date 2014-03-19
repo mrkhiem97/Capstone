@@ -61,7 +61,25 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     /// </summary>
     public class SearchCriteriaViewModel
     {
-        public string SearchKeyword { get; set; }
+        private String searchKeyword;
+        public String SearchKeyword
+        {
+            get
+            {
+                return searchKeyword;
+            }
+            set
+            {
+                if (String.IsNullOrEmpty(value))
+                {
+                    searchKeyword = String.Empty;
+                }
+                else
+                {
+                    searchKeyword = value;
+                }
+            }
+        }
 
         public int PageNumber { get; set; }
 

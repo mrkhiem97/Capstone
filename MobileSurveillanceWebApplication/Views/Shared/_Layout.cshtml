@@ -13,9 +13,9 @@
     </script>
     <script type="text/javascript" src="@Url.Content("~/Scripts/DatePickerScript.js")">
     </script>
-    @RenderSection("scripts", required: false)
+    
     @Scripts.Render("~/bundles/script")
-
+    @RenderSection("scripts", required: false)
     <!--Script references. -->
     <!--The jQuery library is required and is referenced by default in _Layout.cshtml. -->
     <!--Reference the SignalR library. -->
@@ -65,8 +65,8 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     @Html.Partial("_SearchPartial")
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="@Url.Action("ListFriend", "User")">Friends <span id="countFriends" class="badge">3</span></a></li>
-                        <li><a href="#">Inbox <span id="countInbox" class="badge">3</span></a></li>
+                        <li><a href="@Url.Action("ListFriend", "User")">Friends <span id="countFriends" class="badge"></span></a></li>
+                        <li><a href="@Url.Action("ListInbox", "User")">Inbox <span id="countInbox" class="badge"></span></a></li>
                         <li class="active">@Html.Partial("_LoginPartial")</li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle glyphicon glyphicon-cog" data-toggle="dropdown"><b class="caret"></b></a>
@@ -85,7 +85,7 @@
         <!-- End of Menu -->
         <!-- Main -->
         <div class="content-display" id="main">
-            
+
             <!-- Content Here-->
             <div class="body-content-right">
                 @RenderSection("featured", required: false)
@@ -98,8 +98,10 @@
         <!-- Footer -->
         <!-- End of Footer -->
     </div>
-    <div class="content-display" id="footer">
-        <p align="center"><input type="button" id="signalTest" name="Test" value="Test" />Copyright 2014 <br /> Mobile surveillance team</p>
+    <div style="text-align: center; margin-top:50px" id="footer">
+        <div style="text-align: left; display: inline-block; /* for ie6/7: */ *display: inline; zoom: 1;">
+            <p align="center"><input type="button" id="signalTest" name="Test" value="Test" /><br />&copy; 2014 <br /> The Mobile Surveillance Team</p>
+        </div>
     </div>
 
 

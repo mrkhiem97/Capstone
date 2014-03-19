@@ -9,6 +9,13 @@ namespace MobileSurveillanceWebApplication.Utility
     public class SupportUtility
     {
         public static String TIME_FORMAT = "yyyyMMddHHmmss";
+
+
+        public static bool CompareDate(DateTime d1, DateTime d2)
+        {
+            bool a = (d1.Day == d2.Day && d1.Month == d2.Month && d1.Year == d2.Year);
+            return a;
+        }
         public static DateTime ConvertFormattedStringToDateTime(String formattedString)
         {
             var retVal = DateTime.ParseExact(formattedString, TIME_FORMAT, CultureInfo.InvariantCulture);

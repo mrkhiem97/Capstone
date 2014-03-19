@@ -22,36 +22,35 @@
     <!-- Listing User-->
             <div class="col-sm-6 col-md-4">
                 <div class="thumbnail">
-                    <img src="Images/accent.png" alt="Nang" class="img-thumbnail traject-thumb">
+                    <img src="@item.Avatar" alt="Nang" class="img-thumbnail traject-thumb">
                     <div class="caption">
-                        <h3>@item.Fullname</h3>
+                        <h3>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h3>
                         @switch (item.FriendStatus)
                         {
                             case "notFriend":
-                                <p>                                    
+                                <p>
                                     @Ajax.ActionLink("Add Friend", "AddFriend", new { friendId = item.Id }, new AjaxOptions()
-                                        { 
+                                        {
                                             HttpMethod = "POST",
                                             OnSuccess = "",
                                             OnFailure = "",
-                                        }, new { @class = "btn btn-warning btn-addfriend" })
-                                    @Html.ActionLink("Show Profile", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-default" })
+                                        }, new { @class = "btn btn-warning btn-addfriend" })                                  
                                 </p>
                                 break;
-                                
+
                             case "requestSent":
                             <p>
                                 <span class="glyphicon glyphicon-ok"> RequestSent </span>
                                 @Ajax.ActionLink("Cancel Request", "CancelRequest", new { friendId = item.Id }, new AjaxOptions() { HttpMethod = "POST", }, new { @class = "btn btn-danger btn-cancelRequest" })
                             </p>
                                 break;
-                                
+
                             case "confirmNeed":
                             <p>
                                 @Ajax.ActionLink("ConfirmRequest", "AddFriend", new { friendId = item.Id }, new AjaxOptions() { HttpMethod = "POST", }, new { @class = "btn btn-primary btn-confirmRequest" })
                             </p>
                                 break;
-                                
+
                             default:
                             <p>
                                 @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })

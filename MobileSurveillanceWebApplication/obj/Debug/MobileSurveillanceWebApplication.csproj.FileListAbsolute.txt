@@ -1,5 +1,3 @@
-C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\obj\Debug\MobileSurveillanceWebApplication.csproj.App.config
-C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\obj\Debug\MobileSurveillanceWebApplication.csprojResolveAssemblyReference.cache
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\bin\MobileSurveillanceWebApplication.dll.config
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\bin\MobileSurveillanceWebApplication.dll
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\bin\MobileSurveillanceWebApplication.pdb
@@ -108,5 +106,6 @@ C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\Mo
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\bin\ru\System.Spatial.resources.dll
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\bin\zh-Hans\System.Spatial.resources.dll
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\bin\zh-Hant\System.Spatial.resources.dll
+C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\obj\Debug\MobileSurveillanceWebApplication.csproj.App.config
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\obj\Debug\MobileSurveillanceWebApplication.dll
 C:\Users\MRKHIEM\Desktop\Mobile Surveillance\MobileSurveillanceWebApplication\MobileSurveillanceWebApplication\obj\Debug\MobileSurveillanceWebApplication.pdb

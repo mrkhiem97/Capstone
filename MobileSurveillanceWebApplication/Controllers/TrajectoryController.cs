@@ -1,5 +1,6 @@
 ﻿using MobileSurveillanceWebApplication.Models.DatabaseModel;
 using MobileSurveillanceWebApplication.Models.ViewModel;
+using MobileSurveillanceWebApplication.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,7 +76,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         public ActionResult ListTrajectory(TrajectSearchCriteriaViewModel searchUserModel)
         {
             //page size
-            int pageSize = 3;
+            int pageSize = 7;
 
             if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword))
             {
@@ -99,7 +100,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 listTraject = account.Trajectories.Where(x => x.IsActive).OrderByDescending(x => x.CreatedDate).ToList();
             }
-            searchUserModel.PageCount = listTraject.Count / pageSize;
+            searchUserModel.PageCount = listTraject.Count / pageSize + 1;
             listTraject = listTraject.Skip((searchUserModel.PageNumber - 1) * pageSize).Take(pageSize).ToList();
 
 
@@ -112,14 +113,15 @@ namespace MobileSurveillanceWebApplication.Controllers
                 trajectoryViewModel.Status = trajectory.Status;
                 trajectoryViewModel.CreateDate = trajectory.CreatedDate.ToString();
                 trajectoryViewModel.LastUpdate = trajectory.LastUpdated.ToString();
-                int count = trajectory.Locations.Count - 1;
-                if (trajectory.Locations.Count > 0)
+
+                var locate = trajectory.Locations.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
+                if (locate != null)
                 {
-                    for (int i = count; i >= 0; i--)
-                    {
-                        trajectoryViewModel.locateList.Add(trajectory.Locations.ElementAt(i));
-                    }
+                    trajectoryViewModel.Longitude = locate.Longitude.ToString();
+                    trajectoryViewModel.Latitude = locate.Latitude.ToString();
                 }
+
+
                 model.ListTrajectory.Add(trajectoryViewModel);
             }
 
@@ -148,12 +150,14 @@ namespace MobileSurveillanceWebApplication.Controllers
             userModel.LastLogin = account.LastLogin;
             userModel.Username = account.Username;
             userModel.Id = account.Id;
+            userModel.Address = account.Address;
+            userModel.Birthday = account.Birthday;
             return userModel;
         }
 
         public JsonResult GetLocationList(string trajectId)
         {
-            
+
             var locateList = new List<LocationViewModel>();
             var listLocation = this.context.Locations
                 .Where(x => x.TrajectoryId.Equals(trajectId))
@@ -161,21 +165,49 @@ namespace MobileSurveillanceWebApplication.Controllers
             for (int i = 0; i < listLocation.Count; i++)
             {
                 var model = new LocationViewModel();
-                model.id = listLocation[i].Id.ToString();
+                model.Id = listLocation[i].Id.ToString();
                 model.Latitude = listLocation[i].Latitude;
                 model.Longitude = listLocation[i].Longitude;
+                model.Address = listLocation[i].Address;
+                model.Index = i + 1;
+                DateTime dt = listLocation[i].CreatedDate;
+                model.CreatedDate2 = String.Format("{0:MM/dd/yyyy}", dt);
+
+                model.CreatedDate = String.Format("{0:f}", dt);
+
+                locateList.Add(model);
+            }
+
+
+            return Json(locateList, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetLocationListByDate(string trajectId, string createdDate)
+        {
+            
+            DateTime date = Convert.ToDateTime(createdDate);
+            var locateList = new List<LocationViewModel>();
+            var listLocation = this.context.Locations
+                .Where(x => x.TrajectoryId.Equals(trajectId))
+                .OrderBy(x => x.CreatedDate).ToList();
+            for (int i = 0; i < listLocation.Count; i++)
+            {
+                var model = new LocationViewModel();
+                model.Id = listLocation[i].Id.ToString();
+                model.Latitude = listLocation[i].Latitude;
+                model.Longitude = listLocation[i].Longitude;
+                model.Index = i + 1;
                 //model.CreatedDate = listLocation[i].CreatedDate.ToString();
 
                 DateTime dt = listLocation[i].CreatedDate;
                 model.CreatedDate = String.Format("{0:f}", dt);
 
-                var imgList = this.context.CapturedImages.Where(x => x.LocationId == model.id).ToList();
-                foreach (var img in imgList)
-                {
-                    model.imgList.Add(img.ImageUrl);
-                }
                 
-                locateList.Add(model);
+                if (SupportUtility.CompareDate(date, listLocation[i].CreatedDate))
+                {
+                    locateList.Add(model);
+                }
+
             }
 
 

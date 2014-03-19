@@ -46,10 +46,6 @@
 }
 
 .content-display {
-    width: 100%;
-    height: auto;
-    display: block;
-    float: left;
 }
 
 #main {
@@ -80,7 +76,7 @@
     font-style: normal;
     height: 1000px;
     width: 170px;
-    margin-left:-10px;
+    margin-left: -10px;
     padding: 5px;
 }
 
@@ -204,12 +200,11 @@
     width: 650px;
 }
 
-    #map-canvas {
+#map-canvas {
     height: 500px;
     left: 10px;
-    
 }
-    
+
 
 
 .labels {
@@ -225,14 +220,33 @@
 }
 
 #location-list {
-    float:left;
-    overflow:auto;
-    height:250px;
-    
+    float: left;
+    overflow: auto;
+    height: 250px;
 }
 
 .red-cell {
-   background: #F00; /* Or some other color */
+    background: #F00; /* Or some other color */
 }
 
+.Highlighted a {
+    border-radius: 30%;
+        -webkit-border-radius: 30%;
+    -moz-border-radius: 30%;
+    background-color: Green !important;
+    background-image: none !important;
+    color: #FFF !important;
+    font-weight: bold !important;
+    font-size: 12pt;
+    background-color: #009900;
+    
 
+    border: solid 1px #006600;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -webkit-transition-duration: 0.2s;
+    -moz-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+}

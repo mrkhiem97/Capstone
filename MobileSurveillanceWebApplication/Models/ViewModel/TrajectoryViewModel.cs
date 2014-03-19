@@ -15,10 +15,11 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string Status { get; set; }
         public string Description { get; set; }
 
+        public string Latitude { get; set; }
+        public string Longitude { get; set; }
         public List<Location> locateList { get; set; }
 
-        public virtual string Latitude { get; set; }
-        public virtual string Longitude { get; set; }
+        
 
         public TrajectoryViewModel()
         {
