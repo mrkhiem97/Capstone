@@ -379,7 +379,6 @@
       <LastGenOutput>DBModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
     <Content Include="Images\login-box-backg.png" />
-    <Content Include="Images\login-btn.png" />
     <Content Include="Images\Map.jpg" />
     <Content Include="Images\marker-next.png" />
     <Content Include="Images\marker-start.png" />
