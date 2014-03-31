@@ -17,6 +17,7 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
         public long MyId { get; set; }
         public long MyFriendId { get; set; }
         public string Status { get; set; }
+        public Nullable<System.DateTime> FriendDate { get; set; }
     
         public virtual Account Account { get; set; }
         public virtual Account Account1 { get; set; }

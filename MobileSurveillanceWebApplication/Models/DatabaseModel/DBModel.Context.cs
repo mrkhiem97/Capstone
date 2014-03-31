@@ -26,10 +26,11 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
         }
     
         public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<CapturedImage> CapturedImages { get; set; }
         public virtual DbSet<FriendShip> FriendShips { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
+        public virtual DbSet<LocationRoute> LocationRoutes { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Trajectory> Trajectories { get; set; }
-        public virtual DbSet<CapturedImage> CapturedImages { get; set; }
-        public virtual DbSet<Location> Locations { get; set; }
     }
 }

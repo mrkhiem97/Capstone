@@ -133,6 +133,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                     Birthday = model.Birthday,
                     Address = model.Address,
                     LastLogin = DateTime.Now,
+                    Gender = model.Gender,
                     Avatar = "/DefaultUserData/Avatar/Avatar.png",
                     IsActive = false,
                     RoleId = 2
@@ -268,6 +269,41 @@ namespace MobileSurveillanceWebApplication.Controllers
 
             }
             return View(model);
+        }
+
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        // POST: /Account/ChangePassword
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+
+        public ActionResult ChangePassword(LocalPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(User.Identity.Name,
+                              StringComparison.InvariantCultureIgnoreCase));
+                    if (account.Password.Equals(model.OldPassword))
+                    {
+                        account.Password = model.NewPassword;
+                        this.context.SaveChanges();
+                        return View("Login");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Your old password does not match your current password");
+                        return View(model);
+                    }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Invalid input");
+                return View(model);
+            }
         }
     }
 }

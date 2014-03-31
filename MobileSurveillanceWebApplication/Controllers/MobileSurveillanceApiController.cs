@@ -16,11 +16,13 @@ using System.Web.Http.Filters;
 using MobileSurveillanceWebApplication.HttpSupportUtility;
 using IOManagerLibrary;
 using MobileSurveillanceWebApplication.Filters;
+using System.Drawing;
 
 namespace MobileSurveillanceWebApplication.Controllers
 {
     public class MobileSurveillanceApiController : ApiController
     {
+        private const String USER_DATA_FOLDER = "UserData";
         private readonly EntityContext context = new EntityContext();
 
         /// <summary>
@@ -30,9 +32,9 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
-        public bool Login(AccountApiModel accountModel)
+        public HttpResponseMessage Login(AccountApiModel accountModel)
         {
-            bool retVal = User.Identity.IsAuthenticated;
+            HttpResponseMessage retVal = Request.CreateResponse(HttpStatusCode.OK, User.Identity.IsAuthenticated, Configuration.Formatters.JsonFormatter);
             return retVal;
         }
 
@@ -43,96 +45,101 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
-        public TrajectoryApiModel UpdateTrajectory(TrajectoryApiModel trajectoryModel)
+        public HttpResponseMessage UpdateTrajectory(TrajectoryApiModel trajectoryModel)
         {
-            TrajectoryApiModel retVal = null;
-            if (User.Identity.IsAuthenticated)
-            {
-                long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
-                trajectoryModel.Id = HttpUtility.UrlDecode(trajectoryModel.Id, Encoding.UTF8);
-                trajectoryModel.Name = HttpUtility.UrlDecode(trajectoryModel.Name, Encoding.UTF8);
-                trajectoryModel.Description = HttpUtility.UrlDecode(trajectoryModel.Description, Encoding.UTF8);
+            HttpResponseMessage retVal = null;
+            TrajectoryApiModel trajectoryApiModel = null;
+            long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
+            trajectoryModel.Id = HttpUtility.UrlDecode(trajectoryModel.Id, Encoding.UTF8);
+            trajectoryModel.Name = HttpUtility.UrlDecode(trajectoryModel.Name, Encoding.UTF8);
+            trajectoryModel.Description = HttpUtility.UrlDecode(trajectoryModel.Description, Encoding.UTF8);
 
-                var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(trajectoryModel.Id, StringComparison.InvariantCultureIgnoreCase));
-                DateTime lastUpdated = SupportUtility.ConvertFormattedStringToDateTime(trajectoryModel.LastUpdated);
-                // If there is no trajectory in database then insert them
-                if (trajectory == null)
+            var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(trajectoryModel.Id, StringComparison.InvariantCultureIgnoreCase));
+            DateTime lastUpdated = SupportUtility.ConvertFormattedStringToDateTime(trajectoryModel.LastUpdated);
+            // If there is no trajectory in database then insert them
+            if (trajectory == null)
+            {
+                // Get user id in database
+                trajectory = new Trajectory();
+                trajectory.Id = trajectoryModel.Id;
+                trajectory.TrajectoryName = trajectoryModel.Name;
+                trajectory.CreatedDate = SupportUtility.ConvertFormattedStringToDateTime(trajectoryModel.CreatedDate);
+                trajectory.LastUpdated = lastUpdated;
+                trajectory.Description = trajectoryModel.Description;
+                trajectory.Status = trajectoryModel.Status;
+                trajectory.IsActive = trajectoryModel.IsActive;
+                trajectory.UserId = accountId;
+                this.context.Trajectories.Add(trajectory);
+                try
                 {
-                    // Get user id in database
-                    trajectory = new Trajectory();
-                    trajectory.Id = trajectoryModel.Id;
-                    trajectory.TrajectoryName = trajectoryModel.Name;
-                    trajectory.CreatedDate = SupportUtility.ConvertFormattedStringToDateTime(trajectoryModel.CreatedDate);
-                    trajectory.LastUpdated = lastUpdated;
-                    trajectory.Description = trajectoryModel.Description;
-                    trajectory.Status = trajectoryModel.Status;
-                    trajectory.IsActive = trajectoryModel.IsActive;
-                    trajectory.UserId = accountId;
-                    this.context.Trajectories.Add(trajectory);
-                    try
+                    if (this.context.SaveChanges() > 0)
                     {
-                        if (this.context.SaveChanges() > 0)
-                        {
-                            retVal = trajectoryModel;
-                        }
-                        else
-                        {
-                            retVal = null;
-                        }
-                    }
-                    catch (Exception)
-                    { }
-                }
-                else
-                {
-                    if (!trajectoryModel.IsActive)
-                    {
-                        trajectory.IsActive = false;
-                        this.context.SaveChanges();
-                        retVal = null;
+                        trajectoryApiModel = trajectoryModel;
                     }
                     else
                     {
-                        if (trajectory.IsActive)
-                        {
-                            // If last update time greater than databse last update time then this is new one to be edited
-                            if (lastUpdated > trajectory.LastUpdated)
-                            {
-                                trajectory.TrajectoryName = trajectoryModel.Name;
-
-                                trajectory.LastUpdated = lastUpdated;
-                                trajectory.Description = trajectoryModel.Description;
-                                trajectory.Status = trajectoryModel.Status;
-                                trajectory.IsActive = trajectoryModel.IsActive;
-                                if (this.context.SaveChanges() > 0)
-                                {
-                                    retVal = trajectoryModel;
-                                }
-                                else
-                                {
-                                    retVal = null;
-                                }
-                            }
-                            else if (lastUpdated == trajectory.LastUpdated)
-                            {
-                                retVal = trajectoryModel;
-                            }
-                            else
-                            {
-                                trajectoryModel.LastUpdated = trajectory.LastUpdated.ToString(SupportUtility.TIME_FORMAT);
-                                retVal = trajectoryModel;
-                            }
-                        }
-                        else
-                        {
-                            retVal = null;
-                        }
+                        trajectoryApiModel = null;
+                        retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
                     }
+                }
+                catch (Exception)
+                {
+                    retVal = new HttpResponseMessage(HttpStatusCode.BadRequest);
                 }
             }
             else
             {
-                retVal = null;
+                if (!trajectoryModel.IsActive)
+                {
+                    trajectory.IsActive = false;
+                    this.context.SaveChanges();
+                    trajectoryApiModel = null;
+                    // Update lại trajectory
+                    retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
+                }
+                else
+                {
+                    if (trajectory.IsActive)
+                    {
+                        // If last update time greater than databse last update time then this is new one to be edited
+                        if (lastUpdated > trajectory.LastUpdated)
+                        {
+                            trajectory.TrajectoryName = trajectoryModel.Name;
+
+                            trajectory.LastUpdated = lastUpdated;
+                            trajectory.Description = trajectoryModel.Description;
+                            trajectory.Status = trajectoryModel.Status;
+                            trajectory.IsActive = trajectoryModel.IsActive;
+                            if (this.context.SaveChanges() > 0)
+                            {
+                                trajectoryApiModel = trajectoryModel;
+                            }
+                            else
+                            {
+                                trajectoryApiModel = null;
+                                retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
+                            }
+                        }
+                        else if (lastUpdated == trajectory.LastUpdated)
+                        {
+                            trajectoryApiModel = trajectoryModel;
+                        }
+                        else
+                        {
+                            trajectoryModel.LastUpdated = trajectory.LastUpdated.ToString(SupportUtility.TIME_FORMAT);
+                            trajectoryApiModel = trajectoryModel;
+                        }
+                    }
+                    else
+                    {
+                        trajectoryApiModel = null;
+                        retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
+                    }
+                }
+            }
+            if (trajectoryApiModel != null)
+            {
+                retVal = Request.CreateResponse(HttpStatusCode.OK, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
             }
             return retVal;
         }
@@ -144,84 +151,88 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
-        public IEnumerable<TrajectoryApiModel> LoadTrajectories([FromBody]PagingApiModel pagingModel)
+        public HttpResponseMessage LoadTrajectories([FromBody]PagingApiModel pagingModel)
         {
+            HttpResponseMessage retVal = null;
             var list = new List<TrajectoryApiModel>();
             pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8).ToLower();
+            pagingModel.Username = HttpUtility.UrlDecode(pagingModel.Username, Encoding.UTF8).ToLower();
             int page = pagingModel.Page;
             int pageSize = pagingModel.PageSize;
-            if (User.Identity.IsAuthenticated)
+            var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(pagingModel.Username));
+            ICollection<Trajectory> listTrajectory = null;
+            if (String.IsNullOrEmpty(pagingModel.SearchQuery))
             {
-                var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(pagingModel.Username));
-                ICollection<Trajectory> listTrajectory = null;
-                if (String.IsNullOrEmpty(pagingModel.SearchQuery))
+                if (!User.Identity.Name.Equals(pagingModel.Username, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (!User.Identity.Name.Equals(pagingModel.Username, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        listTrajectory = account.Trajectories.Where(x => x.IsActive && x.Status.Equals("public", StringComparison.InvariantCultureIgnoreCase))
-                        .OrderByDescending(x => x.LastUpdated)
-                        .OrderByDescending(x => x.CreatedDate)
-                        .Skip(page * pageSize).Take(pageSize)
-                        .ToList();
-                    }
-                    else
-                    {
-                        listTrajectory = account.Trajectories.Where(x => x.IsActive)
-                        .OrderByDescending(x => x.LastUpdated)
-                        .OrderByDescending(x => x.CreatedDate)
-                        .Skip(page * pageSize).Take(pageSize)
-                        .ToList();
-                    }
-
+                    listTrajectory = account.Trajectories.Where(x => x.IsActive && x.Status.Equals("public", StringComparison.InvariantCultureIgnoreCase))
+                    .OrderByDescending(x => x.LastUpdated)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .Skip(page * pageSize).Take(pageSize)
+                    .ToList();
                 }
                 else
                 {
-                    if (!User.Identity.Name.Equals(pagingModel.Username, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        listTrajectory = account.Trajectories
-                        .Where(x => x.IsActive && x.TrajectoryName.ToLower().Contains(pagingModel.SearchQuery)
-                            && x.Status.Equals("public", StringComparison.InvariantCultureIgnoreCase))
+                    listTrajectory = account.Trajectories.Where(x => x.IsActive)
+                    .OrderByDescending(x => x.LastUpdated)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .Skip(page * pageSize).Take(pageSize)
+                    .ToList();
+                    var listNotActiveTrajectories = account.Trajectories.Where(x => !x.IsActive)
                         .OrderByDescending(x => x.LastUpdated)
-                        .OrderByDescending(x => x.CreatedDate)
-                        .Skip(page * pageSize).Take(pageSize)
-                        .ToList();
-                    }
-                    else
+                        .Take(20).ToList();
+                    for (int i = 0; i < listNotActiveTrajectories.Count; i++)
                     {
-                        listTrajectory = account.Trajectories
-                        .Where(x => x.IsActive && x.TrajectoryName.ToLower().Contains(pagingModel.SearchQuery))
-                        .OrderByDescending(x => x.LastUpdated)
-                        .OrderByDescending(x => x.CreatedDate)
-                        .Skip(page * pageSize).Take(pageSize)
-                        .ToList();
+                        listTrajectory.Add(listNotActiveTrajectories[i]);
                     }
                 }
 
-                if (listTrajectory.Count == 0)
-                {
-                    list = null;
-                }
-                else
-                {
-                    for (int i = 0; i < listTrajectory.Count; i++)
-                    {
-                        var trajectoryApiModel = new TrajectoryApiModel();
-                        trajectoryApiModel.Id = listTrajectory.ElementAt(i).Id.ToString();
-                        trajectoryApiModel.Name = listTrajectory.ElementAt(i).TrajectoryName;
-                        trajectoryApiModel.CreatedDate = listTrajectory.ElementAt(i).CreatedDate.ToString(SupportUtility.TIME_FORMAT);
-                        trajectoryApiModel.LastUpdated = listTrajectory.ElementAt(i).LastUpdated.ToString(SupportUtility.TIME_FORMAT);
-                        trajectoryApiModel.Description = listTrajectory.ElementAt(i).Description;
-                        trajectoryApiModel.Status = listTrajectory.ElementAt(i).Status;
-                        trajectoryApiModel.IsActive = listTrajectory.ElementAt(i).IsActive;
-                        list.Add(trajectoryApiModel);
-                    }
-                }
             }
             else
             {
-                list = null;
+                if (!User.Identity.Name.Equals(pagingModel.Username, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    listTrajectory = account.Trajectories
+                    .Where(x => x.IsActive && x.TrajectoryName.ToLower().Contains(pagingModel.SearchQuery)
+                        && x.Status.Equals("public", StringComparison.InvariantCultureIgnoreCase))
+                    .OrderByDescending(x => x.LastUpdated)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .Skip(page * pageSize).Take(pageSize)
+                    .ToList();
+                }
+                else
+                {
+                    listTrajectory = account.Trajectories
+                    .Where(x => x.IsActive && x.TrajectoryName.ToLower().Contains(pagingModel.SearchQuery))
+                    .OrderByDescending(x => x.LastUpdated)
+                    .OrderByDescending(x => x.CreatedDate)
+                    .Skip(page * pageSize).Take(pageSize)
+                    .ToList();
+                    var listNotActiveTrajectories = account.Trajectories.Where(x => !x.IsActive && x.TrajectoryName.ToLower()
+                        .Contains(pagingModel.SearchQuery))
+                        .OrderByDescending(x => x.LastUpdated)
+                        .Take(20).ToList();
+                    for (int i = 0; i < listNotActiveTrajectories.Count; i++)
+                    {
+                        listTrajectory.Add(listNotActiveTrajectories[i]);
+                    }
+                }
             }
-            return list;
+
+            for (int i = 0; i < listTrajectory.Count; i++)
+            {
+                var trajectoryApiModel = new TrajectoryApiModel();
+                trajectoryApiModel.Id = listTrajectory.ElementAt(i).Id.ToString();
+                trajectoryApiModel.Name = listTrajectory.ElementAt(i).TrajectoryName;
+                trajectoryApiModel.CreatedDate = listTrajectory.ElementAt(i).CreatedDate.ToString(SupportUtility.TIME_FORMAT);
+                trajectoryApiModel.LastUpdated = listTrajectory.ElementAt(i).LastUpdated.ToString(SupportUtility.TIME_FORMAT);
+                trajectoryApiModel.Description = listTrajectory.ElementAt(i).Description;
+                trajectoryApiModel.Status = listTrajectory.ElementAt(i).Status;
+                trajectoryApiModel.IsActive = listTrajectory.ElementAt(i).IsActive;
+                list.Add(trajectoryApiModel);
+            }
+            retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
+            return retVal;
         }
 
 
@@ -232,8 +243,9 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
-        public IEnumerable<AccountFriendApiModel> LoadFriends([FromBody]PagingApiModel pagingModel)
+        public HttpResponseMessage LoadFriends([FromBody]PagingApiModel pagingModel)
         {
+            HttpResponseMessage retVal = null;
             var list = new List<AccountFriendApiModel>();
             if (!String.IsNullOrEmpty(pagingModel.SearchQuery))
             {
@@ -241,48 +253,87 @@ namespace MobileSurveillanceWebApplication.Controllers
             }
             int page = pagingModel.Page;
             int pageSize = pagingModel.PageSize;
-            if (User.Identity.IsAuthenticated)
+            long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
+            // Get user account
+            var account = (from x in this.context.Accounts where x.Id == accountId select x).Single();
+            ICollection<FriendShip> listFriendShip = null;
+            if (String.IsNullOrEmpty(pagingModel.SearchQuery))
             {
-                long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
-                // Get user account
-                var account = (from x in this.context.Accounts where x.Id == accountId select x).Single();
-                ICollection<FriendShip> listFriendShip = null;
-                if (String.IsNullOrEmpty(pagingModel.SearchQuery))
-                {
-                    listFriendShip = account.FriendShips1.Where(x => x.Account.IsActive).OrderBy(x => x.Account.Fullname).OrderBy(x => x.Account.Username).Skip(page * pageSize).Take(pageSize).ToList();
-                }
-                else
-                {
-                    //listTrajectory = account.Trajectories.Skip(page * pageSize).Take(pageSize).ToList();
-                    listFriendShip = account.FriendShips1
-                                      .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
-                                      .OrderByDescending(x => x.Account.Fullname)
-                                      .OrderByDescending(x => x.Account.Username)
-                                      .Skip(page * pageSize).Take(pageSize).ToList();
-                }
-
-                if (listFriendShip.Count == 0 || listFriendShip == null)
-                {
-                    list = null;
-                }
-                else
-                {
-                    for (int i = 0; i < listFriendShip.Count; i++)
-                    {
-                        var accountFriendApiModel = new AccountFriendApiModel();
-                        accountFriendApiModel.Id = listFriendShip.ElementAt(i).Account.Id;
-                        accountFriendApiModel.Username = listFriendShip.ElementAt(i).Account.Username;
-                        accountFriendApiModel.Fullname = listFriendShip.ElementAt(i).Account.Fullname;
-                        accountFriendApiModel.Avatar = listFriendShip.ElementAt(i).Account.Avatar.Remove(0,1);
-                        list.Add(accountFriendApiModel);
-                    }
-                }
+                listFriendShip = account.FriendShips1.Where(x => x.Account.IsActive).OrderBy(x => x.Account.Fullname).OrderBy(x => x.Account.Username).Skip(page * pageSize).Take(pageSize).ToList();
             }
             else
             {
-                list = null;
+                //listTrajectory = account.Trajectories.Skip(page * pageSize).Take(pageSize).ToList();
+                listFriendShip = account.FriendShips1
+                                  .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
+                                  .OrderByDescending(x => x.Account.Fullname)
+                                  .OrderByDescending(x => x.Account.Username)
+                                  .Skip(page * pageSize).Take(pageSize).ToList();
             }
-            return list;
+
+            for (int i = 0; i < listFriendShip.Count; i++)
+            {
+                var accountFriendApiModel = new AccountFriendApiModel();
+                accountFriendApiModel.Id = listFriendShip.ElementAt(i).Account.Id;
+                accountFriendApiModel.Username = listFriendShip.ElementAt(i).Account.Username;
+                accountFriendApiModel.Fullname = listFriendShip.ElementAt(i).Account.Fullname;
+                accountFriendApiModel.Avatar = listFriendShip.ElementAt(i).Account.Avatar.Remove(0, 1);
+                list.Add(accountFriendApiModel);
+            }
+            retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
+            return retVal;
+        }
+
+
+        /// <summary>
+        /// Load Friends
+        /// </summary>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [BasicAuthenticationFilter(true)]
+        public HttpResponseMessage LoadImages([FromBody]LoadApiModel model)
+        {
+            HttpResponseMessage retVal = null;
+            var list = new List<ImageApiModel>();
+            var listImages = this.context.CapturedImages
+                .Where(x => x.LocationId.Equals(model.Id, StringComparison.InvariantCultureIgnoreCase) && x.IsActive)
+                .OrderBy(x => x.CreatedDate).ToList();
+            for (int i = 0; i < listImages.Count; i++)
+            {
+                var image = new ImageApiModel();
+                image.Id = listImages[i].Id;
+                image.ImageUrl = listImages[i].ImageUrl;
+                image.Address = listImages[i].Location.Address;
+                image.CreatedDate = listImages[i].CreatedDate.ToString(SupportUtility.TIME_FORMAT);
+                list.Add(image);
+            }
+            retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
+            return retVal;
+        }
+
+        [HttpPost]
+        [BasicAuthenticationFilter(true)]
+        public HttpResponseMessage LoadLocations([FromBody]LoadApiModel model)
+        {
+            HttpResponseMessage retVal = null;
+            var list = new List<LocationApiModel>();
+            var listLocations = this.context.Locations
+                .Where(x => x.TrajectoryId.Equals(model.Id, StringComparison.InvariantCultureIgnoreCase) && x.IsActive)
+                .OrderBy(x => x.CreatedDate).ToList();
+            for (int i = 0; i < listLocations.Count; i++)
+            {
+                var location = new LocationApiModel();
+                location.Id = listLocations[i].Id;
+                location.Latitude = listLocations[i].Latitude;
+                location.Longitude = listLocations[i].Longitude;
+                location.Address = listLocations[i].Address;
+                location.IsActive = listLocations[i].IsActive;
+                location.CreatedDate = listLocations[i].CreatedDate.ToString(SupportUtility.TIME_FORMAT);
+                list.Add(location);
+            }
+            retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
+            return retVal;
         }
 
         /// <summary>
@@ -290,49 +341,42 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <returns></returns>
         [BasicAuthenticationFilter(true)]
-        public async Task<bool> UploadMultiPartFormData()
+        public async Task<HttpResponseMessage> UploadMultiPartFormData()
         {
-            bool retVal = false;
-            if (User.Identity.IsAuthenticated)
+            HttpResponseMessage retVal = null;
+            long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
+
+
+            // Check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
             {
-                long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+            String path = String.Format("~/{0}/{1}/{2}", USER_DATA_FOLDER, ((BasicAuthenticationIdentity)User.Identity).Name, "Image");
 
-
-                // Check if the request contains multipart/form-data.
-                if (!Request.Content.IsMimeMultipartContent())
+            string root = HttpContext.Current.Server.MapPath(path);
+            if (!IOManager.IsDirectoryExisted(root))
+            {
+                IOManager.MakeDirectory(root);
+            }
+            var provider = new ExtendMultipartFormDataStreamProvider(root);
+            try
+            {
+                await Request.Content.ReadAsMultipartAsync(provider);
+                var imageLocationApiModel = GetImageLocation(provider, ((BasicAuthenticationIdentity)User.Identity).Name);
+                var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(imageLocationApiModel.TrajectoryId, StringComparison.InvariantCultureIgnoreCase));
+                if (trajectory != null && trajectory.IsActive)
                 {
-                    throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-                }
-                String path = String.Format("~/UserData/{0}/{1}", ((BasicAuthenticationIdentity)User.Identity).Name, "Image");
-
-                string root = HttpContext.Current.Server.MapPath(path);
-                if (!IOManager.IsDirectoryExisted(root))
-                {
-                    IOManager.MakeDirectory(root);
-                }
-                var provider = new ExtendMultipartFormDataStreamProvider(root);
-                try
-                {
-                    await Request.Content.ReadAsMultipartAsync(provider);
-                    var imageLocationApiModel = GetImageLocation(provider, ((BasicAuthenticationIdentity)User.Identity).Name);
-                    var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(imageLocationApiModel.TrajectoryId, StringComparison.InvariantCultureIgnoreCase));
-                    if (trajectory != null && trajectory.IsActive)
+                    // Check if any distance calculation
+                    // Get list location, sort by date
+                    // Note that checking active of location
+                    if (imageLocationApiModel.CompactDistance > 0)
                     {
-                        // Check if any distance calculation
-                        // Get list location, sort by date
-                        // Note that checking active of location
-                        if (imageLocationApiModel.CompactDistance > 0)
+                        Location bestLocation = this.FindBestLocation(imageLocationApiModel);
+                        // If cannot find best location, then just add new
+                        if (bestLocation != null)
                         {
-                            Location bestLocation = this.FindBestLocation(imageLocationApiModel);
-                            // If cannot find best location, then just add new
-                            if (bestLocation != null)
-                            {
-                                retVal = this.UpdateLocation(imageLocationApiModel, bestLocation);
-                            }
-                            else
-                            {
-                                retVal = this.RegisterNewLocation(imageLocationApiModel);
-                            }
+                            retVal = this.UpdateLocation(imageLocationApiModel, bestLocation);
                         }
                         else
                         {
@@ -341,31 +385,45 @@ namespace MobileSurveillanceWebApplication.Controllers
                     }
                     else
                     {
-                        retVal = true;
+                        retVal = this.RegisterNewLocation(imageLocationApiModel);
                     }
                 }
-                catch (Exception)
+                else
                 {
-                    retVal = false;
+                    var trajectoryApiModel = new TrajectoryApiModel()
+                    {
+                        Id = trajectory.Id,
+                        Description = trajectory.Description,
+                        Status = trajectory.Status,
+                        IsActive = trajectory.IsActive,
+                        Name = trajectory.TrajectoryName,
+                        CreatedDate = trajectory.CreatedDate.ToString(SupportUtility.TIME_FORMAT),
+                        LastUpdated = trajectory.LastUpdated.ToString(SupportUtility.TIME_FORMAT)
+                    };
+                    retVal = Request.CreateResponse(HttpStatusCode.Forbidden, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                 }
             }
-            else
+            catch (Exception)
             {
-                retVal = false;
+                retVal = new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
 
             return retVal;
         }
 
-        private bool UpdateLocation(ImageLocationApiModel imageLocationApiModel, Location bestLocation)
+        private HttpResponseMessage UpdateLocation(ImageLocationApiModel imageLocationApiModel, Location bestLocation)
         {
-            bool retVal = false;
+            HttpResponseMessage retVal = null;
             var captureImage = new CapturedImage();
             captureImage.ImageUrl = imageLocationApiModel.ImageUrl;
             captureImage.CreatedDate = imageLocationApiModel.CreatedDate;
             captureImage.IsActive = true;
             captureImage.Width = imageLocationApiModel.Width;
             captureImage.Height = imageLocationApiModel.Height;
+            if (String.IsNullOrEmpty(bestLocation.Address) || String.IsNullOrWhiteSpace(bestLocation.Address))
+            {
+                bestLocation.Address = imageLocationApiModel.Address;
+            }
             bestLocation.CapturedImages.Add(captureImage);
 
             // Add location successfull
@@ -373,16 +431,16 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 if (this.context.SaveChanges() > 0)
                 {
-                    retVal = true;
+                    retVal = new HttpResponseMessage(HttpStatusCode.OK);
                 }
                 else
                 {
-                    retVal = false;
+                    retVal = new HttpResponseMessage(HttpStatusCode.NotAcceptable);
                 }
             }
             catch (Exception)
             {
-                retVal = false;
+                retVal = new HttpResponseMessage(HttpStatusCode.NotAcceptable);
             }
             return retVal;
         }
@@ -407,9 +465,9 @@ namespace MobileSurveillanceWebApplication.Controllers
             return bestLocation;
         }
 
-        private bool RegisterNewLocation(ImageLocationApiModel imageLocationApiModel)
+        private HttpResponseMessage RegisterNewLocation(ImageLocationApiModel imageLocationApiModel)
         {
-            bool retVal = false;
+            HttpResponseMessage retVal = null;
             // Check for existed location
             var location = this.context.Locations
                 .Where(x => x.Id.Equals(imageLocationApiModel.LocationId, StringComparison.InvariantCultureIgnoreCase))
@@ -435,15 +493,15 @@ namespace MobileSurveillanceWebApplication.Controllers
                 }
                 else
                 {
-                    retVal = true;
+                    retVal = new HttpResponseMessage(HttpStatusCode.OK);
                 }
             }
             return retVal;
         }
 
-        private bool AddNewLocation(ImageLocationApiModel imageLocationApiModel)
+        private HttpResponseMessage AddNewLocation(ImageLocationApiModel imageLocationApiModel)
         {
-            bool retVal = false;
+            HttpResponseMessage retVal = null;
             var location = new Location();
             location.TrajectoryId = imageLocationApiModel.TrajectoryId;
             location.Id = imageLocationApiModel.LocationId;
@@ -468,16 +526,16 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 if (this.context.SaveChanges() > 0)
                 {
-                    retVal = true;
+                    retVal = new HttpResponseMessage(HttpStatusCode.OK);
                 }
                 else
                 {
-                    retVal = false;
+                    retVal = new HttpResponseMessage(HttpStatusCode.NotAcceptable);
                 }
             }
             catch (Exception)
             {
-                retVal = false;
+                retVal = new HttpResponseMessage(HttpStatusCode.NotAcceptable);
             }
             return retVal;
         }
@@ -494,11 +552,11 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     if (key.Equals("trajectoryid", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        imageLocationApiModel.TrajectoryId = value;
+                        imageLocationApiModel.TrajectoryId = HttpUtility.UrlDecode(value, Encoding.UTF8);
                     }
                     else if (key.Equals("locationid", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        imageLocationApiModel.LocationId = value;
+                        imageLocationApiModel.LocationId = HttpUtility.UrlDecode(value, Encoding.UTF8);
                     }
                     else if (key.Equals("latitude", StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -526,7 +584,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                     }
                     else if (key.Equals("address", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        imageLocationApiModel.Address = value;
+                        imageLocationApiModel.Address = HttpUtility.UrlDecode(value, Encoding.UTF8);
                     }
                 }
             }
@@ -536,8 +594,131 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 String imageUrl = String.Format("/{0}/{1}/{2}", username, "Image", provider.GetFilename());
                 imageLocationApiModel.ImageUrl = imageUrl;
+                var image = Image.FromFile(file.LocalFileName, true);
+                imageLocationApiModel.Width = image.Width;
+                imageLocationApiModel.Height = image.Height;
+                image.Dispose();
             }
             return imageLocationApiModel;
         }
+
+        [HttpPost]
+        //[BasicAuthenticationFilter(true)]
+        public HttpResponseMessage UpdateRoutingResult([FromBody] RoutingApiModel routingApiModel)
+        {
+            HttpResponseMessage retVal = null;
+            var locationRoute = this.context.LocationRoutes
+                .Where(x => x.StartLocationId.Equals(routingApiModel.StartLocationId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.DestinationLocationId.Equals(routingApiModel.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.TravelMode.Equals(routingApiModel.TravelMode, StringComparison.InvariantCultureIgnoreCase))
+                .SingleOrDefault();
+            var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(routingApiModel.StartLocationId, StringComparison.InvariantCultureIgnoreCase));
+            var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(routingApiModel.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase));
+            if (startLocation.IsActive && desLocation.IsActive)
+            {
+                if (retVal == null)
+                {
+                    locationRoute = new LocationRoute()
+                    {
+                        StartLocationId = routingApiModel.StartLocationId,
+                        DestinationLocationId = routingApiModel.DestinationLocationId,
+                        TravelMode = routingApiModel.TravelMode,
+                        RouteString = routingApiModel.RouteString,
+                        TrajectoryId = routingApiModel.TrajectoryId
+                    };
+
+                    this.context.LocationRoutes.Add(locationRoute);
+                }
+                else
+                {
+                    locationRoute.RouteString = routingApiModel.RouteString;
+                }
+
+                try
+                {
+                    // Save changed
+                    if (this.context.SaveChanges() > 0)
+                    {
+                        retVal = Request.CreateResponse(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        retVal = Request.CreateResponse(HttpStatusCode.NotAcceptable);
+                    }
+                }
+                catch (Exception)
+                {
+                    retVal = Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+            }
+            else
+            {
+                retVal = Request.CreateResponse(HttpStatusCode.NotAcceptable);
+            }
+
+            return retVal;
+        }
+
+        [HttpPost]
+        [BasicAuthenticationFilter(true)]
+        public HttpResponseMessage LoadListRouting([FromBody]LoadApiModel model)
+        {
+            HttpResponseMessage retVal = null;
+            var list = new List<RoutingApiModel>();
+            var listLocationRoute = this.context.LocationRoutes
+                .Where(x => x.TrajectoryId.Equals(model.Id, StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+            for (int i = 0; i < listLocationRoute.Count; i++)
+            {
+                var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(listLocationRoute[i].StartLocationId, StringComparison.InvariantCultureIgnoreCase));
+                var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(listLocationRoute[i].DestinationLocationId, StringComparison.InvariantCultureIgnoreCase));
+                if (startLocation.IsActive && desLocation.IsActive)
+                {
+                    var locationRoute = new RoutingApiModel();
+                    locationRoute.StartLocationId = listLocationRoute[i].StartLocationId;
+                    locationRoute.DestinationLocationId = listLocationRoute[i].DestinationLocationId;
+                    locationRoute.TravelMode = listLocationRoute[i].TravelMode;
+                    locationRoute.RouteString = listLocationRoute[i].RouteString;
+                    locationRoute.TrajectoryId = listLocationRoute[i].TrajectoryId;
+                    list.Add(locationRoute);
+                }
+            }
+            retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
+            return retVal;
+        }
+
+        [HttpPost]
+        //[BasicAuthenticationFilter(true)]
+        public HttpResponseMessage LoadRouting([FromBody]LoadRoutingApiModel model)
+        {
+            HttpResponseMessage retVal = null;
+            var locationRoute = this.context.LocationRoutes
+                .Where(x => x.StartLocationId.Equals(model.StartLocationId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.DestinationLocationId.Equals(model.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.TravelMode.Equals(model.TravelMode, StringComparison.InvariantCultureIgnoreCase))
+                .SingleOrDefault();
+
+            var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(model.StartLocationId, StringComparison.InvariantCultureIgnoreCase));
+            var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(model.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase));
+            if (startLocation.IsActive && desLocation.IsActive && locationRoute != null)
+            {
+                var routingApimodel = new RoutingApiModel()
+                {
+                    StartLocationId = locationRoute.StartLocationId,
+                    DestinationLocationId = locationRoute.DestinationLocationId,
+                    TravelMode = locationRoute.TravelMode,
+                    RouteString = locationRoute.RouteString,
+                    TrajectoryId = locationRoute.TrajectoryId
+                };
+                retVal = Request.CreateResponse(HttpStatusCode.OK, routingApimodel, Configuration.Formatters.JsonFormatter);
+            }
+            else
+            {
+                retVal = Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+            
+            return retVal;
+        }
+    
     }
 }

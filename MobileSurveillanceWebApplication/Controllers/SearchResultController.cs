@@ -1,8 +1,11 @@
-﻿using MobileSurveillanceWebApplication.Models.DatabaseModel;
+﻿using Microsoft.AspNet.SignalR;
+using MobileSurveillanceWebApplication.Hubs;
+using MobileSurveillanceWebApplication.Models.DatabaseModel;
 using MobileSurveillanceWebApplication.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Contexts;
 using System.Web;
 using System.Web.Mvc;
 
@@ -28,7 +31,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         public ActionResult SearchResult(SearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
-            int pageSize = 6;
+            int pageSize = 12;
             var listFriendViewModel = new ListFriendViewModel();
             var listUser = new List<Account>();
 
@@ -96,14 +99,17 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// Add Friend function/ ConfirmNeed function
         /// </summary>
         /// <returns></returns>
-        public JsonResult AddFriend(long friendId)
+        public JsonResult AddFriend(long friendId, string requestType, SearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
+
             //check if there are friendId
             if (account.FriendShips1.Where(x => x.Account.Id == friendId).Any())
             {
                 //change friendship status to 1
-                account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = "1";
+                account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = IS_FRIEND;
+                account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().FriendDate = DateTime.Now;
+
             }
             else
             {
@@ -111,35 +117,144 @@ namespace MobileSurveillanceWebApplication.Controllers
                 var frienship = new FriendShip();
                 frienship.MyFriendId = friendId;
                 frienship.MyId = account.Id;
-                frienship.Status = "1";
+                frienship.Status = IS_FRIEND;
+                frienship.FriendDate = DateTime.Now;
                 account.FriendShips1.Add(frienship);
             }
             int result = this.context.SaveChanges();
-            var message = "";
             if (result > 0)
             {
-                message = "Add Friend Succcessful";
+                string myName = User.Identity.Name;
+                var friendAccount = this.context.Accounts.Where(x => x.Id == friendId).SingleOrDefault();
+                foreach (var connectionId in NotificationHub.ConnectionMapper.GetConnections(friendAccount.Username))
+                {
+                    var signalRContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
+                    if (requestType.Equals("addFriend", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        signalRContext.Clients.Client(connectionId).notifyAddFriendRequest(account.Fullname + " has sent you friend request!");
+                    }
+                    else if (requestType.Equals("confirmRequest", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        signalRContext.Clients.Client(connectionId).notifyAcceptFriendRequest(account.Fullname + " has accepted you friend request!");
+                    }
+                }
+                return ReturnJsonResult(searchCriteriaViewModel);
             }
             else
             {
-                message = "Nothing changes.";
+                var message = "Nothing changes.";
+                return Json(message, JsonRequestBehavior.AllowGet);
             }
-            return Json(message, JsonRequestBehavior.AllowGet);
+
         }
+
+
 
         /// <summary>
         /// Cancel Friend Request
         /// </summary>
         /// <returns></returns>
-        public JsonResult CancelRequest(long friendId)
+        public JsonResult CancelRequest(long friendId, SearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             //change status to 0 
-            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = "0";
+            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = NOT_FRIEND;
             int result = this.context.SaveChanges();
-            var message = "";
-            return Json(message, JsonRequestBehavior.AllowGet);
+            if (result > 0)
+            {
+                var friendAccount = this.context.Accounts.Where(x => x.Id == friendId).SingleOrDefault();
+                foreach (var connectionId in NotificationHub.ConnectionMapper.GetConnections(friendAccount.Username))
+                {
+                    var signalRContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
+                    signalRContext.Clients.Client(connectionId).notifyCancelFriendRequest();
+                }
+                return ReturnJsonResult(searchCriteriaViewModel);
+            }
+            else
+            {
+                var message = "Nothing changes.";
+                return Json(message, JsonRequestBehavior.AllowGet);
+            }
         }
+
+        /// <summary>
+        /// Unfriend function
+        /// </summary>
+        /// <returns></returns>
+        public JsonResult Unfriend(long friendId, TrajectSearchCriteriaViewModel searchCriteriaViewModel)
+        {
+            var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
+            var friendAccount = this.context.Accounts.Where(x => x.Id == friendId).SingleOrDefault();
+            //change status to 0 
+            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = NOT_FRIEND;
+            friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status = NOT_FRIEND;
+            int result = this.context.SaveChanges();
+            if (result > 0)
+            {
+                var returnJson = new
+                {
+                    SearchKeyword = searchCriteriaViewModel.SearchKeyword,
+                    PageNumber = searchCriteriaViewModel.PageNumber,
+                    PageCount = searchCriteriaViewModel.PageCount,
+                    DateFrom = searchCriteriaViewModel.DateFrom,
+                    DateTo = searchCriteriaViewModel.DateTo,
+                    UserId = searchCriteriaViewModel.UserId
+                };
+                foreach (var connectionId in NotificationHub.ConnectionMapper.GetConnections(friendAccount.Username))
+                {
+                    var signalRContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
+                    signalRContext.Clients.Client(connectionId).notifyCancelFriendRequest();
+                }
+                return Json(returnJson, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                var message = "Nothing changes.";
+                return Json(message, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        /// <summary>
+        /// Deny Request friend
+        /// </summary>
+        /// <param name="friendId"></param>
+        /// <param name="searchCriteriaViewModel"></param>
+        /// <returns></returns>
+        public JsonResult DenyRequest(long friendId, TrajectSearchCriteriaViewModel searchCriteriaViewModel)
+        {
+            var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
+            var friendAccount = this.context.Accounts.Where(x => x.Id.Equals(friendId)).SingleOrDefault();
+            //change status to 0 
+            friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status = NOT_FRIEND;
+            int result = this.context.SaveChanges();
+            if (result > 0)
+            {
+                foreach (var connectionId in NotificationHub.ConnectionMapper.GetConnections(friendAccount.Username))
+                {
+                    var signalRContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
+                    signalRContext.Clients.Client(connectionId).notifyDenyFriendRequest();
+                }
+                return ReturnJsonResult(searchCriteriaViewModel);
+            }
+            else
+            {
+                var message = "Nothing changes.";
+                return Json(message, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        private JsonResult ReturnJsonResult(SearchCriteriaViewModel searchCriteriaViewModel)
+        {
+            var returnJson = new
+            {
+                SearchKeyword = searchCriteriaViewModel.SearchKeyword,
+                PageNumber = searchCriteriaViewModel.PageNumber,
+                PageCount = searchCriteriaViewModel.PageCount
+            };
+            return Json(returnJson, JsonRequestBehavior.AllowGet);
+        }
+
 
     }
 }

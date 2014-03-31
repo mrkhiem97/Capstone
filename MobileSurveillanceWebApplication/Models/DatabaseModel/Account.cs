@@ -29,9 +29,10 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
         public Nullable<System.DateTime> LastLogin { get; set; }
         public bool IsActive { get; set; }
         public string Avatar { get; set; }
-        public int RoleId { get; set; }
         public System.DateTime Birthday { get; set; }
         public string Address { get; set; }
+        public bool Gender { get; set; }
+        public int RoleId { get; set; }
     
         public virtual Role Role { get; set; }
         public virtual ICollection<FriendShip> FriendShips { get; set; }

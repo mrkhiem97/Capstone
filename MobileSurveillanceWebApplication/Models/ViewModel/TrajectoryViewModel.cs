@@ -31,11 +31,11 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     {
         public List<TrajectoryViewModel> ListTrajectory { get; set; }
 
-        public UserViewModel UserViewModel { get; set; }
+        public FriendViewModel FriendViewModel { get; set; }
         public ListTrajectoryViewModel()
         {
             this.ListTrajectory = new List<TrajectoryViewModel>();
-            this.UserViewModel = new UserViewModel();
+            this.FriendViewModel = new FriendViewModel();
         }
 
     }

@@ -1,30 +1,56 @@
-﻿@model MobileSurveillanceWebApplication.Models.ViewModel.UserViewModel
-
+﻿@model MobileSurveillanceWebApplication.Models.ViewModel.FriendViewModel
+@{
+    var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectSearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+}
 
 <script type="text/javascript">
     $(document).ready(function () {
-        datetimeController.initializeDatePicker("birthday", new Date(1930, 0, 1), new Date(2012, 11, 31), new Date(1990, 0, 1));
+        datetimeController.initializeDatePicker("birthday", new Date(1930, 0, 1), new Date(2012, 11, 31), new Date(@Model.Birthday.Year, @Model.Birthday.Month-1, @Model.Birthday.Day));
     });
 </script>
 
+<script>
+    function onSuccess(response, status, data) {
+        window.location = "?SearchKeyword=" + response.SearchKeyword + "&PageNumber=" + response.PageNumber + "&PageCount=" + response.PageCount + "&DateFrom=" + response.DateFrom + "&DateTo=" + response.DateTo + "&UserId=" + response.UserId;
+    }
 
 
-<div class="col-md-10">
+    function onFailure() {
+        alert('Something went wrong, please try again!');
+    }
+</script>
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 
     <div class="page-header">
-        <h1> @Model.Fullname</h1>
+        <h2>Profile</h2>
     </div>
     <div class="row">
-        <!--Avatar-->
-        <div class="col-sm-6 col-md-4">
-            <abbr title="Click here to change your avatar">
-                <a href="#" class="thumbnail">
-                    <img src="@Model.Avatar" alt="Nang" class="img-thumbnail traject-thumb">
-                </a>
-            </abbr>
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-6">
+            <!--Avatar-->
+
+            <a href="#" class="thumbnail">
+                <img src="@Model.Avatar" alt="MobileSurveillance" class="profile-thumbnail">
+            </a>
+
+            @if (Model.Username == User.Identity.Name)
+            {
+                <a class="btn btn-primary" data-toggle="modal" data-backdrop="static" data-target="#editProfile" role="button">Profile Setting</a>
+            }
+            @if (Model.FriendStatus == "1")
+            {
+                @Ajax.ActionLink("Unfriend", "Unfriend", "SearchResult", new { friendId = Model.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo }, new AjaxOptions()
+                {
+                    Confirm = "Are you sure you want to unfriend " + @Model.Fullname + " ?",
+                    HttpMethod = "POST",
+                    OnSuccess = "onSuccess",
+                    OnFailure = "",
+
+                }, new { @class = "btn btn-danger" })
+            }
         </div>
-        <!--Detail Information-->
-        <div class="col-sm-6 col-md-8">
+        <div class="col-lg-7 col-md-7 col-sm-6 col-xs-6">
+            <!--Detail Information-->
             <div class="alert alert-success">
                 <h3>@Model.Fullname</h3>
                 <address>
@@ -38,8 +64,18 @@
                     </p>
                     <p>
                         <strong>Birthday: </strong>
-                        @Model.Birthday
+                        @String.Format("{0:dd/MM/yyyy}", Model.Birthday)
                     </p>
+
+                    @if (Model.Gender)
+                    {
+                        <p><strong>Gender: </strong>Male</p>
+                    }
+                    else
+                    {
+                        <p><strong>Gender: </strong>Female</p>
+                    }
+
                     <p>
                         <strong>Address: </strong>
                         @Model.Address
@@ -47,83 +83,76 @@
                 </address>
             </div>
         </div>
-    </div>
-    @if (Model.Username == User.Identity.Name)
-    {
-        <div class="row">
-            <a class="btn btn-primary btn-lg" data-toggle="modal" data-backdrop="static" data-target="#editProfile" role="button">Account Setting</a>
-        </div>
-    }  
 
 
-    <!--Edit Profile-->
-    @using (Html.BeginForm("SaveProfile", "Profile", FormMethod.Post, new { EncType = "multipart/form-data" }))
-    {
-        @Html.AntiForgeryToken()
 
-        <div class="modal fade" id="editProfile" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4>Account Setting</h4>
-                    </div>
-                    <div class="modal-body">
-                        <fieldset>
-                            <div class="editor-label">
-                                @Html.LabelFor(model => model.Fullname)
-                            </div>
-                            <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Fullname, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.Fullname)
-                            </div>
 
-                            @*<div class="editor-label">
-                                    @Html.LabelFor(model => model.Password)
-                                </div>
-                                <div class="editor-field">
-                                    @Html.PasswordFor(model => model.Password, new { @class = "form-control", @placeholder = "Password" })
-                                    @Html.ValidationMessageFor(model => model.Password)
-                                </div>
+
+
+        <!--Edit Profile-->
+        @using (Html.BeginForm("SaveProfile", "Profile", FormMethod.Post, new { EncType = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="modal fade" id="editProfile" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4>Account Setting</h4>
+                        </div>
+                        <div class="modal-body">
+                            <fieldset>
                                 <div class="editor-label">
-                                    @Html.LabelFor(model => model.ConfirmPassword)
+                                    @Html.LabelFor(model => model.Fullname)
                                 </div>
                                 <div class="editor-field">
-                                    @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control", @placeholder = "Confirm password" })
-                                    @Html.ValidationMessageFor(model => model.ConfirmPassword)
-                                </div>*@
-                            <div class="editor-label">
-                                @Html.LabelFor(model => model.Address)
-                            </div>
-                            <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
-                                @Html.ValidationMessageFor(model => model.Address)
-                            </div>
+                                    @Html.TextBoxFor(model => model.Fullname, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Fullname)
+                                </div>
 
-                            <div class="editor-label">
-                                @Html.LabelFor(model => model.Birthday)
-                            </div>
-                            <div class="editor-field">
-                                @Html.TextBoxFor(model => model.Birthday, new { @class = "form-control dpDate", @type = "text", @id = "birthday" })
-                                @Html.ValidationMessageFor(model => model.Birthday)
-                            </div>
+                                <div class="editor-label">
+                                    @Html.LabelFor(model => model.Address)
+                                </div>
+                                <div class="editor-field">
+                                    @Html.TextBoxFor(model => model.Address, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(model => model.Address)
+                                </div>
 
-                            <div class="editor-label">
-                                @Html.LabelFor(model => model.Avatar)
-                            </div>
-                            <div class="editor-field">
-                                <input type="file" name="avatar" id="avatar">
-                            </div>
-                        </fieldset>
+                                <div class="editor-label">
+                                    @Html.LabelFor(model => model.Birthday)
+                                </div>
+                                <div class="editor-field">
+                                    @Html.TextBoxFor(model => model.Birthday, new { @class = "form-control dpDate", @type = "text", @id = "birthday" })
+                                    @Html.ValidationMessageFor(model => model.Birthday)
+                                </div>
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <input type="submit" value="Save" class="btn btn-primary" />
+                                <div class="editor-label">
+                                    @Html.LabelFor(model => model.Gender)
+                                </div>
+                                <div class="editor-field">
+                                    @Html.RadioButtonFor(model => model.Gender, "true") Male
+                                    @Html.RadioButtonFor(model => model.Gender, "false") Female
+                                </div>
+
+                                <div class="editor-label">
+                                    @Html.LabelFor(model => model.Avatar)
+                                </div>
+                                <div class="editor-field">
+                                    <input type="file" name="avatar" id="avatar">
+                                </div>
+                            </fieldset>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <input type="submit" value="Save" class="btn btn-primary" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     <!--End Edit Profile-->
-    }
+        }
+    </div>
+
 </div>

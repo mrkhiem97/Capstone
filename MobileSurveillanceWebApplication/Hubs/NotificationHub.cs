@@ -9,16 +9,17 @@ namespace MobileSurveillanceWebApplication.Hubs
 {
     public class NotificationHub : Hub
     {
-        private readonly static ConnectionMapping<string> connectionMapper =
+        public readonly static ConnectionMapping<string> ConnectionMapper =
             new ConnectionMapping<string>();
 
         public void Send(string message)
         {
             string name = Context.User.Identity.Name;
 
-            foreach (var connectionId in connectionMapper.GetConnections(name))
+            foreach (var connectionId in ConnectionMapper.GetConnections(name))
             {
                 Clients.Client(connectionId).addNewMessageToPage(name + ": " + message + " - Id: " + connectionId);
+                
             }
         }
 
@@ -26,7 +27,7 @@ namespace MobileSurveillanceWebApplication.Hubs
         {
             string name = Context.User.Identity.Name;
 
-            connectionMapper.Add(name, Context.ConnectionId);
+            ConnectionMapper.Add(name, Context.ConnectionId);
 
             return base.OnConnected();
         }
@@ -35,7 +36,7 @@ namespace MobileSurveillanceWebApplication.Hubs
         {
             string name = Context.User.Identity.Name;
 
-            connectionMapper.Remove(name, Context.ConnectionId);
+            ConnectionMapper.Remove(name, Context.ConnectionId);
 
             return base.OnDisconnected();
         }

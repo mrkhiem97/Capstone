@@ -63,27 +63,38 @@ namespace MobileSurveillanceWebApplication.Filters
                     };
                     return;
                 }
-                else if (!OnAuthorizeUser(basicAccount.Username, basicAccount.Password, actionContext))
-                {
-                    actionContext.Response = new HttpResponseMessage(HttpStatusCode.Unauthorized)
-                    {
-                        Content = new StringContent("UnAuthorize", System.Text.Encoding.UTF8)
-                    };
-                    return;
-                }
                 else
                 {
                     var account = context.Accounts.Where(x => x.Username.Equals(basicAccount.Username, StringComparison.OrdinalIgnoreCase) && x.Password.Equals(basicAccount.Password)).SingleOrDefault();
-                    var identity = new BasicAuthenticationIdentity(account.Id, account.Username, account.Password);
-                    var principal = new GenericPrincipal(identity, null);
+                    if (account == null)
+                    {
+                        actionContext.Response = new HttpResponseMessage(HttpStatusCode.Unauthorized)
+                        {
+                            Content = new StringContent("UnAuthorize", System.Text.Encoding.UTF8)
+                        };
+                        return;
+                    }
+                    else if (!account.IsActive)
+                    {
+                        actionContext.Response = new HttpResponseMessage(HttpStatusCode.NotAcceptable)
+                        {
+                            Content = new StringContent("NotAcceptable", System.Text.Encoding.UTF8)
+                        };
+                        return;
+                    }
+                    else
+                    {
+                        var identity = new BasicAuthenticationIdentity(account.Id, account.Username, account.Password);
+                        var principal = new GenericPrincipal(identity, null);
 
-                    Thread.CurrentPrincipal = principal;
+                        Thread.CurrentPrincipal = principal;
 
-                    // inside of ASP.NET this is required
-                    //if (HttpContext.Current != null)
-                    //    HttpContext.Current.User = principal;
+                        // inside of ASP.NET this is required
+                        //if (HttpContext.Current != null)
+                        //    HttpContext.Current.User = principal;
 
-                    base.OnAuthorization(actionContext);
+                        base.OnAuthorization(actionContext);
+                    }
                 }
             }
         }

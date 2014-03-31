@@ -1,12 +1,12 @@
 ﻿@model MobileSurveillanceWebApplication.Models.ViewModel.TrajectoryViewModel
 
 @{
-    ViewBag.Title = Model.TrajectoryName;
+    ViewBag.Title = "Detail trajectory " + Model.TrajectoryName;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<script type="text/javascript">
 
+<script type="text/javascript">
 
     // Active list
     var activeList;
@@ -19,15 +19,18 @@
     // The map
     var map;
     //For search location
-    var SelectedDates = {};
+    var SelectedDates = [];
     // For set center
     var centerLat = 0;
     var centerLong = 0;
     // For bounding
     var latlngbounds;
 
-    $(document).ready(function () {
+    // For direction service
+    var directionsDisplay;
+    var directionsService = new google.maps.DirectionsService();
 
+    $(document).ready(function () {
 
         function HomeControl(controlDiv, map) {
             // Set CSS styles for the DIV containing the control
@@ -65,7 +68,6 @@
         }
 
         function LineControl(controlDiv, map) {
-
             // Set CSS styles for the DIV containing the control
             // Setting padding to 5 px will offset the control
             // from the edge of the map
@@ -134,6 +136,8 @@
 
         // Initialize the map.
         function initialize() {
+            // Direction service
+            directionsDisplay = new google.maps.DirectionsRenderer();
             // Center point
             var myLatLng = new google.maps.LatLng(10.820682, 106.661579);
             // Map Opttions
@@ -145,6 +149,8 @@
             // The map
             map = new google.maps.Map(document.getElementById("map-canvas"),
                 mapOptions);
+            // Direction service
+            directionsDisplay.setMap(map);
 
             // Create the DIV to hold the control and
             // call the HomeControl() constructor passing
@@ -182,17 +188,29 @@
                 // Set location list for other use
                 locationList = data;
 
-
                 // For datepicker
                 for (var i = 0; i < locationList.length; i++) {
-                    SelectedDates[i] = new Date(locationList[i].CreatedDate2);
+                    SelectedDates.push(locationList[i].CreatedDate2);
                 }
+                // Fix Manage
+                //
+                //
+                //
+                //
+                $.getJSON("IsMyTrajectory", { userName: '@User.Identity.Name', locationId: locationList[0].Id }, function (data) {
+                    for (var i = (locationList.length - 1) ; i >= 0; i--) {
+                        // Generate location list html
+                        if (data) {
+                            var newRow = '<tr id="' + locationList[i].Id + '"><td>' + locationList[i].Index + '</td><td> ' + locationList[i].CreatedDate + '</td><td><a href="/Location/ManageLocationImages?locationId=' + locationList[i].Id + '&index=' + locationList[i].Index + '"><span class="glyphicon glyphicon-pencil"></span></a></td></tr>';
+                            $('#myTable tr:last').after(newRow);
+                        } else {
+                            var newRow = '<tr id="' + locationList[i].Id + '"><td>' + locationList[i].Index + '</td><td> ' + locationList[i].CreatedDate + '</td></tr>';
+                            $('#myTable tr:last').after(newRow);
+                        }
 
-                for (var i = (locationList.length - 1) ; i >= 0; i--) {
-                    // Generate location list html
-                    var newRow = '<tr id="' + locationList[i].Id + '"><td>' + locationList[i].Index + '</td><td> ' + locationList[i].CreatedDate + '</td></tr>';
-                    $('#myTable tr:last').after(newRow);
-                }
+                    }
+                })
+
 
                 $.each(locationList, function (index, value) {
 
@@ -260,7 +278,6 @@
                     locationList[index].infoWindow = infowindow;
                     locationList[index].marker = marker;
 
-
                     google.maps.event.addListener(marker, 'mouseover', function () {
                         clearAnimation();
                         infowindow.open(map, marker);
@@ -273,7 +290,6 @@
                     // Click event for markers
                     google.maps.event.addListener(marker, 'click', (function (marker) {
 
-
                         // Generate modal with carousel inside
                         var itemHtml = $("#slider-item").html();
                         var activeItemHtml = $("#slider-active-item").html();
@@ -281,12 +297,10 @@
                         var modal = $("#modalbox1");
 
                         return function () {
-
                             var collectionItems = "";
                             var contentString = "";
                             var modelContent = "";
                             modalHtml = modalHtml.replace("{modal-title}", locationList[index].Address ? locationList[index].Address : "");
-
                             // Get all image of a point
                             $.getJSON("/Trajectory/GetImgList/", { locateId: value.Id }, function (data) {
                                 var imageList = data;
@@ -294,15 +308,42 @@
                                 if (imageList.length > 0) {
                                     var tempItem = activeItemHtml;
                                     tempItem = tempItem.replace("{item-link}", imageList[0]);
+                                    var slides = new Array();
                                     collectionItems += tempItem;
-                                    for (var i = 1; i < imageList.length; i++) {
-                                        var tempItem = itemHtml;
-                                        tempItem = tempItem.replace("{item-link}", imageList[i]);
-                                        collectionItems += tempItem;
+                                    for (var i = 0; i < imageList.length; i++) {
+                                        var newItem = new Object();
+                                        newItem.url = imageList[i]
+                                        newItem.caption = "Captured on " + locationList[index].CreatedDate + " at " + locationList[index].Address
+                                        slides.push(newItem);
                                     }
-                                    modelContent = modalHtml.replace("{slider-item}", collectionItems);
-                                    modal.html(modelContent);
+                                    //modelContent = modalHtml.replace("{slider-item}", collectionItems);
+                                    //modal.html(modelContent);
+
+                                    var modalHtml = $("#modalbox1").html();
+                                    var modal = $("#modalbox1");
+                                    var modalboxHTML = modalHtml.replace("{modal-title}", locationList[index].Address ? locationList[index].Address : "")
+                                    modal.html(modalboxHTML);
+                                    var newHTML = $("#simple-slide").html();
+
+                                    $("#modalbody").html(newHTML);
+
                                     modal.modal("show");
+
+                                    $('#slideshow-2').rsfSlideshow({
+                                        slides: slides,
+                                        controls: {
+                                            playPause: { auto: true },
+                                            previousSlide: { auto: true },
+                                            nextSlide: { auto: true },
+                                            index: { auto: true }
+                                        },
+                                        interval: 3,
+                                        transition: 500,
+                                        effect: {
+                                            effects: Array('slideLeft', 'slideUp', 'slideRight', 'slideDown'),
+                                            iteration: 'random'
+                                        }
+                                    });
                                 }
                             })
                         }
@@ -336,17 +377,67 @@
                 locationList[locationList.length - 1].infoWindow.open(map, locationList[locationList.length - 1].marker);
                 activeList = locationList;
 
+                // Initiate calendar
                 datetimeController.selectDatePicker("calendar-1", new Date(locationList[0].CreatedDate2), new Date(locationList[locationList.length - 1].CreatedDate2), new Date(locationList[locationList.length - 1].CreatedDate2));
+                // Initiate Direction Service
+                calcRoute();
+                //locationFilter reset-filter
+                $("#location-filter").click(function () {
+                    var fromDate = $("#date1").val();
+                    var toDate = $("#date2").val();
+                    locationFilter(fromDate, toDate);
+                });
+
+                $("#reset-filter").click(function () {
+                    resetFilter();
+                });
+
+                $("#date1").datepicker({
+                    minDate: new Date(locationList[0].CreatedDate2),
+                    maxDate: new Date(locationList[(locationList.length - 1)].CreatedDate2)
+                });
+                $('#date1').datepicker('setDate', new Date(locationList[0].CreatedDate2));
+
+                $("#date2").datepicker({
+                    minDate: new Date(locationList[0].CreatedDate2),
+                    maxDate: new Date(locationList[(locationList.length - 1)].CreatedDate2)
+                });
+                $('#date2').datepicker('setDate', new Date(locationList[(locationList.length - 1)].CreatedDate2));
             });
 
         }
 
-        // Set active list - data working on
-
         google.maps.event.addDomListener(window, 'load', initialize);
 
-        $('#myTable').on('click', 'tr', function (event) {
+        // Direction service
+        function calcRoute() {
+            for (var i = 0; i < (locationList.length - 1) ; i++) {
+                var start = new google.maps.LatLng(locationList[i].Latitude, locationList[i].Longitude)
+                var end = new google.maps.LatLng(locationList[i + 1].Latitude, locationList[i + 1].Longitude);
+                var request = {
+                    origin: start,
+                    destination: end,
+                    travelMode: google.maps.TravelMode.DRIVING
+                };
+                var rendererOptions = {
+                    draggable: false,
+                    suppressMarkers: true,
+                    polylineOptions: { strokeColor: 'green', strokeOpacity: 0.8, strokeWeight: 3 }
+                    //end redererOptions
+                };
 
+                directionsService.route(request, function (result, status) {
+                    if (status == google.maps.DirectionsStatus.OK) {
+                        var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+                        directionsDisplay.setMap(map);
+                        directionsDisplay.setDirections(result);
+
+                    }
+                });
+            }
+        }
+
+        $('#myTable').on('click', 'tr', function (event) {
             var a = $(this).attr('id');
             clearAnimation();
             for (var i = 0; i < locationList.length; i++) {
@@ -359,7 +450,6 @@
             }
 
         });
-
 
         function playSlideShow() {
             map.setZoom(13);
@@ -400,45 +490,111 @@
                 activeList[i].infoWindow.close();
             }
         }
-
-        //SelectedDates[new Date('03/01/2014')] = new Date('03/01/2014');
-
     });
-
+    // Fix Manage
+    //
+    //
+    //
+    //
     function ajaxGetLocationListByDate(dateText) {
         $.getJSON("/Trajectory/GetLocationListByDate/", { trajectId: '@Model.Id', createdDate: dateText }, function (data) {
             locationSearchList = data;
-
             $('#myTable tr').remove();
-            for (var i = (locationSearchList.length - 1) ; i >= 0; i--) {
-                // Generate location list html
-                var newRow = '<tr id="' + locationSearchList[i].Id + '"><td>' + locationSearchList[i].Index + '</td><td> ' + locationSearchList[i].CreatedDate + '</td></tr>';
+            if (locationSearchList.length > 0) {
+                $.getJSON("IsMyTrajectory", { userName: '@User.Identity.Name', locationId: locationSearchList[0].Id }, function (data) {
+                    for (var i = (locationSearchList.length - 1) ; i >= 0; i--) {
+                        // Generate location list html
+                        if (data) {
+                            var newRow = '<tr id="' + locationSearchList[i].Id + '"><td>' + locationSearchList[i].Index + '</td><td> ' + locationSearchList[i].CreatedDate + '</td><td><a href="/Location/ManageLocationImages?locationId=' + locationSearchList[i].Id + '&index=' + locationSearchList[i].Index + '"><span class="glyphicon glyphicon-pencil"></span></a></td></tr>';
+                            $('#myTable').append(newRow);
+                        } else {
+                            var newRow = '<tr id="' + locationSearchList[i].Id + '"><td>' + locationSearchList[i].Index + '</td><td> ' + locationSearchList[i].CreatedDate + '</td></tr>';
+                            $('#myTable').append(newRow);
+                        }
+
+                    }
+                })
+            } else {
+                var newRow = '<tr id=""><td>No activity this day!</td></tr>';
+                $('#myTable').append(newRow);
+            }
+        })
+    }
+    // Fix Manage
+    //
+    //
+    //
+    //
+    function locationFilter(dateText1, dateText2) {
+        $.getJSON("/Trajectory/GetLocationListByDateRange/", { trajectId: '@Model.Id', fromDate: dateText1, toDate: dateText2 }, function (data) {
+            locationSearchList = data;
+            FlagArray = new Array();
+            $('#myTable tr').remove();
+            if (locationSearchList.length > 0) {
+                $.getJSON("IsMyTrajectory", { userName: '@User.Identity.Name', locationId: locationSearchList[0].Id }, function (data) {
+                    for (var i = (locationSearchList.length - 1) ; i >= 0; i--) {
+                        // Generate location list html
+                        if (data && $.inArray(locationSearchList[i], FlagArray) == -1) {
+                            var newRow = '<tr id="' + locationSearchList[i].Id + '"><td>' + locationSearchList[i].Index + '</td><td> ' + locationSearchList[i].CreatedDate + '</td><td><a href="/Location/ManageLocationImages?locationId=' + locationSearchList[i].Id + '&index=' + locationSearchList[i].Index + '"><span class="glyphicon glyphicon-pencil"></span></a></td></tr>';
+                            $('#myTable').append(newRow);
+                        } else {
+                            var newRow = '<tr id="' + locationSearchList[i].Id + '"><td>' + locationSearchList[i].Index + '</td><td> ' + locationSearchList[i].CreatedDate + '</td></tr>';
+                            $('#myTable').append(newRow);
+                        }
+                        FlagArray.push(locationSearchList[i]);
+                    }
+                })
+            } else {
+                var newRow = '<tr id=""><td>No activity this day!</td></tr>';
                 $('#myTable').append(newRow);
             }
         })
     }
 
+    // Fix Manage
+    //
+    //
+    //
+    //
+    function resetFilter() {
+        locationSearchList = locationList;
+        $('#myTable tr').remove();
+        if (locationSearchList.length > 0) {
+            $.getJSON("IsMyTrajectory", { userName: '@User.Identity.Name', locationId: locationSearchList[0].Id }, function (data) {
+                for (var i = (locationSearchList.length - 1) ; i >= 0; i--) {
+                    // Generate location list html
+                    if (data) {
+                        var newRow = '<tr id="' + locationSearchList[i].Id + '"><td>' + locationSearchList[i].Index + '</td><td> ' + locationSearchList[i].CreatedDate + '</td><td><a href="/Location/ManageLocationImages?locationId=' + locationSearchList[i].Id + '&index=' + locationSearchList[i].Index + '"><span class="glyphicon glyphicon-pencil"></span></a></td></tr>';
+                        $('#myTable').append(newRow);
+                    } else {
+                        var newRow = '<tr id="' + locationSearchList[i].Id + '"><td>' + locationSearchList[i].Index + '</td><td> ' + locationSearchList[i].CreatedDate + '</td></tr>';
+                        $('#myTable').append(newRow);
+                    }
+
+                }
+            })
+        } else {
+            var newRow = '<tr id=""><td>No activity this day!</td></tr>';
+            $('#myTable').append(newRow);
+        }
+        $('#date1').datepicker('setDate', new Date(locationList[0].CreatedDate2));
+        $('#date2').datepicker('setDate', new Date(locationList[(locationList.length - 1)].CreatedDate2));
+
+
+    }
+
 </script>
-
-@*<table class="table table-condensed">
-        <tr class="warning h4"><td colspan="2">Detail of trajectory: @Model.TrajectoryName</td></tr>
-        <tr class="active"><td>Start from: <span id="startLocate"></span></td><td> <span id="startDate"></span></td></tr>
-        <tr class="success"><td>Current location: <span id="currentLocate"></span></td><td> <span id="currentDate"></span></td></tr>
-    </table>*@
-
-
-
 
 <!-- Place holder div - for generate modal with carousel -->
 <div id="slider-active-item" style="display:none">
     <div class="item active">
-        <img src="{item-link}" alt="item-alt" style="width: 560px; height:400px">
+        <img data-src="{item-link}" alt="item-alt" style="width: 560px; height:400px">
     </div>
 </div>
 
 <div id="slider-item" style="display:none">
     <div class="item">
-        <img src="{item-link}" alt="item-alt" style="width: 560px; height:400px">
+        <img data-src="{item-link}" alt="item-alt" style="width: 560px; height:400px">
     </div>
 </div>
 
@@ -447,69 +603,97 @@
 </div>
 
 <div class="modal fade" id="modalbox1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-size">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Images captured at {modal-title}</h4>
             </div>
-            <div class="modal-body">
-                <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        <li data-target="#carousel-example-generic" data-slide-to="0" class=""></li>
-                        <li data-target="#carousel-example-generic" data-slide-to="1" class=""></li>
-                        <li data-target="#carousel-example-generic" data-slide-to="2" class="active"></li>
-                    </ol>
-                    <div class="carousel-inner">
-                        {slider-item}
-                    </div>
-                    <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
-                        <span class="glyphicon glyphicon-chevron-left"></span>
-                    </a>
-                    <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
-                        <span class="glyphicon glyphicon-chevron-right"></span>
-                    </a>
-                </div>
+            <div class="modal-body" id="modalbody">
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
+            @*<div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>*@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <!--div for the map-->
 <div class="row" style="margin-top:10px">
-    <div class="col-md-8" id="map-canvas" style="float: left;">
+    <div id="map-canvas" class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
     </div>
 
-    <div id="location-list" class="col-md-4" style="float:right;">
-        <table id="myTable" class="table table-hover">
-            <tr></tr>
-        </table>
+    <div id="locationPanel" class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="padding-left:5px">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="panel panel-primary">
+                <!-- Default panel contents -->
+                <div class="panel-heading">Location Filter</div>
+                <div id="filter-form">
+                    <table id="tb-filter" class="table-condensed">
+                        <tr>
+                            <td><span>Between</span></td>
+                            <td>
+                                <input type="text" id="date-picker1" style="display:none" />
+                                <input type="text" id="date1" class="col-lg-12 col-md-12 col-xs-12 form-control" />
+                            </td>
+                            <td><span>And</span></td>
+                            <td>
+                                <input type="text" id="date-picker2" style="display:none" />
+                                <input type="text" id="date2" class="col-lg-12 col-md-12 col-xs-12 form-control" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <button class="btn btn-success col-lg-4 col-md-4 col-xs-4" id="reset-filter"> Reset <span class="glyphicon glyphicon-remove"></span></button>
+                                <button class="btn btn-primary btn-default col-lg-4 col-md-4 col-xs-4" id="location-filter"> Filter <span class="glyphicon glyphicon-filter"></span></button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="panel panel-primary">
+                <!-- Default panel contents -->
+                <div class="panel-heading">Location Timeline</div>
+                <div id="location-list">
+                    <table id="myTable" class="table table-hover">
+                        <tr></tr>
+                    </table>
+                </div>
+                <!-- Table -->
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="width: 100%; text-align: center;">
+            <div id="calendar-1" style="margin: 0px; padding: 0px; display: inline-block; width:100%"></div>
+        </div>
     </div>
-
-    <div id="calendar-1" class="col-md-4" style="float: right; margin-top: 10px"></div>
 </div>
 
-<!-- Javascript -->
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9aFiBetpU1mIBG65QpO8LzYslOhdQyXE&sensor=true">
-</script>
-<script src="/Scripts/markerwithlabel.js"></script>
+<div class="rss-container" id="simple-slide" style="display:none">
+    <div id="slideshow-2" class="rs-slideshow">
+        <ol class="slides"></ol>
+    </div>
+</div>
 
-<span class='st_facebook_large' displaytext='Facebook'></span>
-<span class='st_fblike_large' displaytext='Facebook Like'></span>
-<span class='st_googleplus_large' displaytext='Google +'></span>
-<span class='st_plusone_large' displaytext='Google +1'></span>
-<span class='st_twitter_large' displaytext='Tweet'></span>
-<span class='st_linkedin_large' displaytext='LinkedIn'></span>
-<span class='st_pinterest_large' displaytext='Pinterest'></span>
-<span class='st_email_large' displaytext='Email'></span>
-
+<div class="row social-share">
+    @*Viết 1 hàm check friend để kiểmt tra nếu là friend của nhau thì mới thực hiệnch ức năng share*@
+    <span class='st_facebook_large' displaytext='Facebook'></span>
+    <span class='st_fblike_large' displaytext='Facebook Like'></span>
+    <span class='st_googleplus_large' displaytext='Google +'></span>
+    <span class='st_plusone_large' displaytext='Google +1'></span>
+    <span class='st_twitter_large' displaytext='Tweet'></span>
+    <span class='st_linkedin_large' displaytext='LinkedIn'></span>
+    <span class='st_pinterest_large' displaytext='Pinterest'></span>
+    <span class='st_email_large' displaytext='Email'></span>
+</div>
 @section scripts{
+    <!-- Javascript -->
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9aFiBetpU1mIBG65QpO8LzYslOhdQyXE&sensor=true">
+    </script>
+    <script src="/Scripts/markerwithlabel.js"></script>
+    <script src="/Scripts/jquery.rs.slideshow.js"></script>
     <script type="text/javascript">var switchTo5x = true;</script>
     <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
     <script type="text/javascript">stLight.options({ publisher: "130b538d-b972-4463-a794-cc455cf14bfb", doNotHash: false, doNotCopy: false, hashAddressBar: true });</script>
 }
-
-

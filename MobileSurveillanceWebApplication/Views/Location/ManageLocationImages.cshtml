@@ -1,0 +1,122 @@
+﻿@model IEnumerable<MobileSurveillanceWebApplication.Models.ViewModel.ImageViewModel>
+
+@{
+    ViewBag.Title = "ManageLocationImages";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var trajectoryViewModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectoryViewModel)ViewBag.TrajectoryViewModel;
+    var locationViewModel = (MobileSurveillanceWebApplication.Models.ViewModel.LocationViewModel)ViewBag.LocationViewModel;
+}
+
+
+<script>
+    function onLocationDeleteSuccess(response, status, data) {
+        window.location = "../Trajectory/ViewDetail?trajectoryId=" + response.TrajectoryId;
+    }
+
+    function onLocationDeleteFailure() {
+        alert('Something went wrong, please try again!');
+    }
+
+    function onImageDeleteSuccess(response, status, data) {
+        if (response.Count > 0) {
+            window.location = "?locationId=" + response.LocationId + "&index=" + response.Index;
+        } else {
+            window.location = "../Trajectory/ViewDetail?trajectoryId=" + response.TrajectoryId;
+        }
+    }
+
+    function onImageDeleteFailure() {
+        alert('Something went wrong, please try again!');
+    }
+</script>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+
+        <div class="page-header">
+            <h2>Manage Location Images</h2>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <!--Detail Information-->
+                <div class="alert alert-success">
+                    <h2>Trajectory @trajectoryViewModel.TrajectoryName</h2>
+                    <address>
+                        <p>
+                            <strong>Created date: </strong>
+                            @trajectoryViewModel.CreateDate
+                        </p>
+                    </address>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <!--Detail Information-->
+                <div class="alert alert-success">
+                    <h3>Location @locationViewModel.Index</h3>
+                    <address>
+                        <p>
+                            <strong>Recorded Date: </strong>
+                            @locationViewModel.CreatedDate
+                        </p>
+                        <p>
+                            <strong>Address: </strong>
+                            @locationViewModel.Address
+                        </p>
+                    </address>
+                    <h4>
+                        @Ajax.ActionLink("Delete Location", "DeleteLocation", new { locationId = @locationViewModel.Id }, new AjaxOptions()
+                                        {
+                                            Confirm = "Are you sure you want to delete this location?",
+                                            HttpMethod = "DELETE",
+                                            OnSuccess = "onLocationDeleteSuccess",
+                                            OnFailure = "onLocationDeleteFailure",
+                                        }, new { @class = "btn btn-danger" })
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="panel panel-primary">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Images at @locationViewModel.Address</div>
+            <div class="table-responsive">
+                <table id="myTable" class="table table-hover table-condensed">
+                    <thead>
+                        <tr class="tbl-header">
+                            <td>Images</td>
+                            <td>Captured Date</td>
+                            <td>Action</td>
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="location-thumbnail">
+                                    <img src="@item.ImageUrl" width="@item.Width" height="@item.Height" alt="MobileSurveillance" />
+                                </div>
+                            </td>
+                            <td>@item.CreatedDate</td>
+                            <td>
+                                @Ajax.ActionLink("Delete Image", "DeleteImage", new { imageId = item.Id, locationId = locationViewModel.Id, index = locationViewModel.Index }, new AjaxOptions()
+                                        {
+                                            Confirm = "Are you sure you want to delete this image?",
+                                            HttpMethod = "DELETE",
+                                            OnSuccess = "onImageDeleteSuccess",
+                                            OnFailure = "onImageDeleteFailure",
+                                        }, new { @class = "btn btn-danger" })
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

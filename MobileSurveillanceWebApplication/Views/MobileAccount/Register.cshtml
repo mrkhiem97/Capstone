@@ -76,6 +76,14 @@
                             @Html.ValidationMessageFor(model => model.Fullname)
                         </div>
                         <div class="editor-label">
+                            @Html.LabelFor(model => model.Gender)
+                        </div>
+                        <div class="editor-field">
+                            @Html.RadioButtonFor(x => x.Gender, "true") Male
+                            @Html.RadioButtonFor(x => x.Gender, "false") Female
+                            @Html.ValidationMessageFor(model => model.Gender)
+                        </div>
+                        <div class="editor-label">
                             @Html.LabelFor(model => model.Birthday)
                         </div>
                         <div class="editor-field">

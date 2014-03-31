@@ -54,6 +54,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                         Birthday = model.Birthday,
                         Address = model.Address,
                         LastLogin = DateTime.Now,
+                        Gender = model.Gender,
                         Avatar = "/DefaultUserData/Avatar/Avatar.png",
                         IsActive = false,
                         RoleId = 2

@@ -6,73 +6,90 @@
 
 <h2>Search Result</h2>
 
-<!-- Nav tabs for User & Trajectory-->
-<ul class="nav nav-tabs">
-    <li class="active"><a href="#usertab" data-toggle="tab">User <span class="badge">@ViewBag.SearchUserCount</span></a></li>
-    <li><a href="#trajectorytab" data-toggle="tab">Trajectories  <span class="badge">6</span></a></li>
-</ul>
+<script>
+    function onSuccess(response, status, data) {
+        window.location = "?SearchKeyword=" + response.SearchKeyword + "&PageNumber=" + response.PageNumber + "&PageCount=" + response.PageCount;
+    }
 
-<!-- Tab Content-->
-<div class="tab-content">
 
-    <!-- User Tab Content-->
-    <div class="tab-pane active" id="usertab">
-        @foreach (var item in Model.ListFriend)
-        {
+    function onFailure() {
+        alert('Something went wrong, please try again!');
+    }
+</script>
+
+
+
+<div class="row">
+    @foreach (var item in Model.ListFriend)
+    {
     <!-- Listing User-->
-            <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                    <img src="@item.Avatar" alt="Nang" class="img-thumbnail traject-thumb">
-                    <div class="caption">
-                        <h3>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h3>
-                        @switch (item.FriendStatus)
-                        {
-                            case "notFriend":
-                                <p>
-                                    @Ajax.ActionLink("Add Friend", "AddFriend", new { friendId = item.Id }, new AjaxOptions()
-                                        {
-                                            HttpMethod = "POST",
-                                            OnSuccess = "",
-                                            OnFailure = "",
-                                        }, new { @class = "btn btn-warning btn-addfriend" })                                  
-                                </p>
-                                break;
+        <div class="col-lg-3 col-md-4 col-sm-6 col-xs-6">
+            <div class="list-thumb">
+                <div class="row" align="center">
+                    <img src="@item.Avatar" alt="Mobile Surveillance" class="avatar-thumbnail">
+                </div>
+                <div class="row" align="center">
+                    <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
+                </div>
+                <div class="row" align="center">
+                    @switch (item.FriendStatus)
+                    {
+                        case "notFriend":
+                            <h4>
+                                @Ajax.ActionLink("Add Friend", "AddFriend", new { friendId = item.Id, requestType = "addFriend", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                                    {
+                                        HttpMethod = "POST",
+                                        OnSuccess = "onSuccess",
+                                        OnFailure = "",
+                                    }, new { @class = "label label-primary" })
+                            </h4>
+                            break;
 
-                            case "requestSent":
-                            <p>
-                                <span class="glyphicon glyphicon-ok"> RequestSent </span>
-                                @Ajax.ActionLink("Cancel Request", "CancelRequest", new { friendId = item.Id }, new AjaxOptions() { HttpMethod = "POST", }, new { @class = "btn btn-danger btn-cancelRequest" })
-                            </p>
-                                break;
+                        case "requestSent":
+                        <h4>
+                            <span class="glyphicon glyphicon-ok"><span style="padding-left:3px">RequestSent</span></span>
+                            @Ajax.ActionLink("Cancel Request", "CancelRequest", new { friendId = item.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                                    {
+                                        HttpMethod = "POST",
+                                        OnSuccess = "onSuccess",
+                                        OnFailure = "",
+                                    }, new { @class = "label label-danger" })
+                        </h4>
+                            break;
 
-                            case "confirmNeed":
-                            <p>
-                                @Ajax.ActionLink("ConfirmRequest", "AddFriend", new { friendId = item.Id }, new AjaxOptions() { HttpMethod = "POST", }, new { @class = "btn btn-primary btn-confirmRequest" })
-                            </p>
-                                break;
+                        case "confirmNeed":
+                        <h4>
+                            @Ajax.ActionLink("Accept Request", "AddFriend", new { friendId = item.Id, requestType = "confirmRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                                   {
+                                       HttpMethod = "POST",
+                                       OnSuccess = "onSuccess",
+                                       OnFailure = "",
+                                   }, new { @class = "label label-primary" })
 
-                            default:
-                            <p>
-                                @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "btn btn-success" })
-                            </p>
-                                break;
-                        }
+                            @Ajax.ActionLink("Deny Request", "DenyRequest", "SearchResult", new { friendId = @item.Id, requestType = "denyRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                                   {
+                                       HttpMethod = "POST",
+                                       OnSuccess = "onSuccess",
+                                       OnFailure = "",
+                                   }, new { @class = "label label-warning" })
+                        </h4>
+                            break;
 
-                    </div>
+                        default:
+                        <h4>
+                            @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-success" })
+                        </h4>
+                            break;
+                    }
                 </div>
             </div>
-        }
-    </div>
-    <!-- End User Tab Content-->
-    <!-- Trajectory Tab Content-->
-    <div class="tab-pane" id="trajectorytab">
-
-
-    </div>
-    <!-- End Trajectory Tab Content-->
-    <!-- Paging-->
-    <div class="row">
-        <ul class="pagination pagination-lg">
+        </div>
+    }
+</div>
+<!-- Paging-->
+<div class="row" style="text-align: center;clear:both">
+    <div style="text-align: left; display: inline-block; /* for ie6/7: */ *display: inline; zoom: 1;">
+        <ul class="pagination">
 
             <li>@Html.ActionLink("First", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount })</li>
             @if (searchUserModel.PageNumber > 1)
@@ -125,7 +142,6 @@
             }
             <li>@Html.ActionLink("Last", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount })</li>
         </ul>
-
     </div>
-    <!-- Paging-->
 </div>
+<!-- Paging-->

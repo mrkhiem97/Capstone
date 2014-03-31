@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.ComponentModel.DataAnnotations;
 
 namespace MobileSurveillanceWebApplication.Models.ViewModel
 {
@@ -11,13 +12,29 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
+        public bool Gender { get; set; }
+
+        [Required(ErrorMessage = "Fullname is required")]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Text)]
+        [Display(Name = "Fullname")]
         public string Fullname { get; set; }
         public DateTime? LastLogin { get; set; }
         public string IsActive { get; set; }
         public string Avatar { get; set; }
         public string RoleId { get; set; }
+
+        [Display(Name = "Address")]
+        [DataType(DataType.Text)]
         public string Address { get; set; }
+
+        [Required(ErrorMessage = "Birthday is required")]
+        [Display(Name = "Birthday")]
+        [DataType(DataType.Text)]
         public DateTime Birthday { get; set; }
+        public int CountMutualFriend { get; set; }
+
+        public int CountTrajectory { get; set; }
     }
 
     public class FriendViewModel : UserViewModel
@@ -33,10 +50,14 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     public class ListUserViewModel
     {
         public List<UserViewModel> ListUser { get; set; }
+        public List<FriendViewModel> ListNotFriend { get; set; }
+        public List<FriendViewModel> ListMutualFriend { get; set; }
 
         public ListUserViewModel()
         {
             this.ListUser = new List<UserViewModel>();
+            this.ListNotFriend = new List<FriendViewModel>();
+            this.ListMutualFriend = new List<FriendViewModel>();
         }
     }
 
@@ -61,16 +82,23 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     /// </summary>
     public class SearchCriteriaViewModel
     {
-        private String searchKeyword;
+        private String searchKeyword = String.Empty;
         public String SearchKeyword
         {
             get
             {
-                return searchKeyword;
+                if (String.IsNullOrEmpty(searchKeyword) || String.IsNullOrWhiteSpace(searchKeyword) || String.Equals(searchKeyword, "null"))
+                {
+                    return String.Empty;
+                }
+                else
+                {
+                    return searchKeyword;
+                }
             }
             set
             {
-                if (String.IsNullOrEmpty(value))
+                if (String.IsNullOrEmpty(value) || String.IsNullOrWhiteSpace(value) || String.Equals(value, "null"))
                 {
                     searchKeyword = String.Empty;
                 }

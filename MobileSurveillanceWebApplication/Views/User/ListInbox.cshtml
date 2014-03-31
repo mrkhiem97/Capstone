@@ -1,103 +1,60 @@
 ﻿@model MobileSurveillanceWebApplication.Models.ViewModel.ListUserViewModel
 
 @{
-    ViewBag.Title = "Inbox";
-    
+    ViewBag.Title = "Notification";
+    var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.SearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
 }
 
-<h2>Inbox</h2>
-@using (Html.BeginForm("ListInbox", "User", FormMethod.Post, new { @role = "search" }))
-{
-    @*<div class="row">
-        <div class="col-lg-6">
-            <div class="input-group">
-                <div class="form-group">
-                    <input type="text" name="SearchKeyword" class="form-control" placeholder="Search" value=" ">
-                    <input type="hidden" name="PageNumber" value="1" />
-                    <input type="hidden" name="PageCount" value="0" />
-                </div>
-                <span class="input-group-btn">
-                    <button type="submit" class="btn btn-default">Search</button>
-                </span>
-            </div><!-- /input-group -->
-        </div><!-- /.col-lg-6 -->
-    </div>*@
+<script>
+    function onSuccess(response, status, data) {
+        window.location = "?SearchKeyword=" + response.SearchKeyword + "&PageNumber=" + response.PageNumber + "&PageCount=" + response.PageCount;
+    }
 
-}
+
+    function onFailure() {
+        alert('Something went wrong, please try again!');
+    }
+</script>
+
+<h2>Notification</h2>
 
 
 @foreach (var item in Model.ListUser)
 {
     <!-- Thumbnail User-->
 
-    <div class="col-sm-6 col-md-4">
-        <div class="thumbnail">
-            <img src="@item.Avatar" alt="Nang" class="img-thumbnail traject-thumb">
-            <div class="caption">
-                <h3>@item.Fullname</h3>
-                <p>
-                    @Ajax.ActionLink("Confirm Request", "AddFriend", "SearchResult", new { friendId = item.Id }, new AjaxOptions() { HttpMethod = "POST", }, new { @class = "btn btn-primary" })
-                </p>
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-6">
+        <div class="list-thumb">
+            <div class="row" align="center">
+                <img src="@item.Avatar" alt="MobileSurveillance" class="avatar-thumbnail">
+            </div>
+            <div class="row" align="center">
+                <h4>@item.LastLogin</h4>
+            </div>
+            <div class="row" align="center">
+                <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
+            </div>
+            <div class="row" align="center">
+                <h4>
+                    @Ajax.ActionLink("Accept Request", "AddFriend", "SearchResult", new { friendId = @item.Id, requestType = "confirmRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+               {
+                   HttpMethod = "POST",
+                   OnSuccess = "onSuccess",
+                   OnFailure = "",
+               }
+        , new { @class = "label label-primary" })
+                
+                    @Ajax.ActionLink("Deny Request", "DenyRequest", "SearchResult", new { friendId = @item.Id, requestType = "denyRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+               {
+                   HttpMethod = "POST",
+                   OnSuccess = "onSuccess",
+                   OnFailure = "",
+               }
+        , new { @class = "label label-warning" })
+                </h4>
             </div>
         </div>
-
     </div>
 }
 
-<!-- Pagination-->
-@*<div class="row">
-        <ul class="pagination pagination-lg">
 
-            <li>@Html.ActionLink("First", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount })</li>
-            @if (searchUserModel.PageNumber > 1)
-            {
-                <li>@Html.ActionLink("<<", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount })</li>
-            }
-            @if (searchUserModel.PageCount > 5)
-            {
-                int firstSegmentLength = 3;
-                while (searchUserModel.PageNumber - firstSegmentLength < 0)
-                {
-                    firstSegmentLength--;
-                }
-
-                int lastSegment = searchUserModel.PageNumber + 3;
-
-
-                if (lastSegment > searchUserModel.PageCount)
-                {
-                    lastSegment = searchUserModel.PageCount;
-                }
-
-                for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
-                {
-                    <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
-                }
-                <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
-                for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
-                {
-                    <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
-                }
-            }
-            else
-            {
-                for (int i = 1; i <= searchUserModel.PageCount; i++)
-                {
-                    if (i == searchUserModel.PageNumber)
-                    {
-                        <li class="active">@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
-                    }
-                    else
-                    {
-                        <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
-                    }
-                }
-            }
-            @if (searchUserModel.PageNumber < searchUserModel.PageCount)
-            {
-                <li>@Html.ActionLink(">>", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount })</li>
-            }
-            <li>@Html.ActionLink("Last", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount })</li>
-        </ul>
-
-    </div>*@

@@ -5,18 +5,19 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="99c657205220436c8a40fe3e20b9a4c4" Name="Diagram1">
-        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Account" Width="1.5" PointX="3" PointY="2.125" />
-        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.FriendShip" Width="1.5" PointX="5.25" PointY="1.125" />
-        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Role" Width="1.5" PointX="0.75" PointY="3.125" />
-        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Trajectory" Width="1.5" PointX="5.25" PointY="3.875" />
-        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Account__RoleId__086B34A6" />
-        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__FriendShi__MyFri__0E240DFC" />
-        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__FriendShip__MyId__0D2FE9C3" />
-        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Trajector__UserI__12E8C319" />
-        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.CapturedImage" Width="1.5" PointX="9.75" PointY="4" />
-        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Location" Width="1.5" PointX="7.5" PointY="4" />
-        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__CapturedI__Locat__59463169" />
-        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Location__Trajec__54817C4C" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Account" Width="1.5" PointX="3" PointY="1.875" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.CapturedImage" Width="1.5" PointX="9.75" PointY="1.25" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.FriendShip" Width="1.5" PointX="5.25" PointY="4.375" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Location" Width="1.5" PointX="7.5" PointY="1.125" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.LocationRoute" Width="1.5" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Role" Width="1.5" PointX="0.75" PointY="3" />
+        <EntityTypeShape EntityType="MOBILESURVEILLANCEModel.Trajectory" Width="1.5" PointX="5.25" PointY="1.125" />
+        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Account__RoleId__2E7BCEF5" />
+        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__FriendShi__MyFri__3434A84B" />
+        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__FriendShip__MyId__33408412" />
+        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Trajector__UserI__38F95D68" />
+        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__CapturedI__Locat__4282C7A2" />
+        <AssociationConnector Association="MOBILESURVEILLANCEModel.FK__Location__Trajec__3DBE1285" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

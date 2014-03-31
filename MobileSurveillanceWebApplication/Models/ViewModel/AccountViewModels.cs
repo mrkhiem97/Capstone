@@ -64,7 +64,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [StringLength(255, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [Remote("ValidateUserEmail", "Account", ErrorMessage = "This user has already existed")]
         [DataType(DataType.EmailAddress)]
         [RegularExpression(@"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", ErrorMessage = "Invalid email pattern")]
@@ -83,8 +83,17 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public DateTime Birthday { get; set; }
 
         [Display(Name = "Address")]
+        [StringLength(1000)]
         [DataType(DataType.Text)]
         public String Address
+        {
+            get;
+            set;
+        }
+
+        [Display(Name = "Gender")]
+        [Required(ErrorMessage = "Gender is required")]
+        public bool Gender
         {
             get;
             set;
@@ -97,7 +106,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         [Display(Name = "User name")]
         public string UserName { get; set; }
 
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [StringLength(255, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.EmailAddress)]
         [RegularExpression(@"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", ErrorMessage = "Invalid email pattern")]
         [Display(Name = "Email")]
