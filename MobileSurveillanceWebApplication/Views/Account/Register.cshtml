@@ -27,13 +27,12 @@
         });
     </script>
 </head>
-<body>
+<body id="login-body">
     <div class="container" id="container">
         <!-- Main -->
-        <div class="row" id="main">
-            <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 col-md-offset-4 register-form">
+        <div style="padding: 50px 0 ;">
+            <div id="login-box" style="border: solid 1px #cccccc; border-radius: 2%; background-color: #4F6EC3; width: 470px; height: 916px; background-image: none; margin: 0 auto;">
                 <h2>Register</h2>
-
                 @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @role = "form" }))
                 {
                     @Html.AntiForgeryToken()
@@ -98,7 +97,8 @@
                         </div>
                         @Html.Partial("~/Views/Captcha/DisplayCaptcha.cshtml", new MobileSurveillanceWebApplication.Models.ViewModel.CaptchaViewModel())
                         <div style="float:right">
-                            <input type="submit" value="Register" class="btn btn-primary" />
+                            @Html.ActionLink("Already has account. Sign in", "Login", "Account", null, htmlAttributes: new { @class = "btn btn-primary" })
+                            <input type="submit" value="Register" class="btn btn-default" />
                         </div>
                     </fieldset>
                 }

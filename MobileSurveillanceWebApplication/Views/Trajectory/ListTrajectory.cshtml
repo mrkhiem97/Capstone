@@ -2,7 +2,11 @@
 @{
     ViewBag.Title = "ListTrajectory";
     var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectSearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+    int count = 0;
+    int count1 = 0;
+
 }
+
 
 <script>
     var currentTraject;
@@ -17,35 +21,9 @@
             })
         });
 
-        $(".btn-save").click(function () {
-            var id = currentTraject;
-            var Tname = $("#name").val();
-            var Tdescription = $("#description").val();
-            var Tstatus = $('#status :selected').text();
-            $.getJSON("/Trajectory/SaveTrajectory", { trajectId: id, name: Tname, description: Tdescription, status: Tstatus }, function (data) {
-                alert(data);
-            })
-            $("#myModal").modal('hide');
-            setTimeout(function () {
-                window.location.reload();
-            },500)
-            
-        });
-
     });
 
-    function onProductDeleteSuccess(response, status, data) {
-        var id = "#" + response.id;
-        $(id).hide(500, function () {
-            $(id).remove();
-        });
-    }
-
-    function onProductDeleteFailure() {
-        alert('Something went wrong, please try again!');
-    }
 </script>
-
 
 
 <div>
@@ -53,34 +31,34 @@
     @{
         Html.RenderPartial("~/Views/Profile/UserProfile.cshtml", Model.FriendViewModel);
     }
+
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 filter-trajectory-form">
+        @using (Html.BeginForm("ListTrajectory", "Trajectory", FormMethod.Post, new { @role = "search" }))
+        {
+            <div class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
+                <div class="input-group">
+                    <div class="form-group">
+                        <input type="text" name="SearchKeyword" class="form-control" placeholder="Search your trajectory" value="@searchUserModel.SearchKeyword">
+                        <input type="hidden" name="UserId" value="@searchUserModel.UserId" />
+                        <input type="hidden" name="PageNumber" value="1" />
+                        <input type="hidden" name="PageCount" value="0" />
+                        <input type="hidden" name="DateFrom" value="@searchUserModel.DateFrom" />
+                        <input type="hidden" name="DateTo" value="@searchUserModel.DateTo" />
+                    </div>
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">Search</button>
+                    </span>
+                </div><!-- /input-group -->
+            </div><!-- /.col-lg-6 -->
+        }
+
+    </div>
     @if (Model.ListTrajectory.Any())
     {
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-            <div class="row filter-trajectory-form">
-                @using (Html.BeginForm("ListTrajectory", "Trajectory", FormMethod.Post, new { @role = "search" }))
-                {
-                    <div class="col-lg-6 col-md-8 col-sm-10 col-xs-12">
-                        <div class="input-group">
-                            <div class="form-group">
-                                <input type="text" name="SearchKeyword" class="form-control" placeholder="Search your trajectory" value="@searchUserModel.SearchKeyword">
-                                <input type="hidden" name="UserId" value="@searchUserModel.UserId" />
-                                <input type="hidden" name="PageNumber" value="1" />
-                                <input type="hidden" name="PageCount" value="0" />
-                                <input type="hidden" name="DateFrom" value="@searchUserModel.DateFrom" />
-                                <input type="hidden" name="DateTo" value="@searchUserModel.DateTo" />
-                            </div>
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-default">Search</button>
-                            </span>
-                        </div><!-- /input-group -->
-                    </div><!-- /.col-lg-6 -->
-                }
-
-            </div>
-
             <div class="panel panel-primary">
                 <!-- Default panel contents -->
-                <div class="panel-heading">@(ViewBag.FriendStatus == null?"My":"") Trajectories</div>
+                <div class="panel-heading">@(ViewBag.FriendStatus == null ? "My" : "") Trajectories</div>
 
                 @foreach (var item in Model.ListTrajectory)
                 {
@@ -88,80 +66,102 @@
                     {
                         <div class="row trajectory-list-item" id="@item.Id">
 
-                            <div class="trajectory-thumail col-lg-6 col-md-8 col-sm-10 col-xs-12">
-                                <img src="http://maps.googleapis.com/maps/api/staticmap?center=@item.Latitude,@item.Longitude&markers=@item.Latitude,@item.Longitude&zoom=13&size=400x280&sensor=true" alt="Mobile Surveillance">
+                            <div class="trajectory-thumail col-lg-5 col-md-6 col-sm-12 col-xs-12">
+                                <img src="http://maps.googleapis.com/maps/api/staticmap?center=@item.StartLatitude,@item.StartLongitude&markers=@item.StartLatitude,@item.StartLongitude&zoom=13&size=400x280&sensor=true" alt="Mobile Surveillance">
                             </div>
-                            <div class="col-lg-6 col-md-8 col-sm-10 col-xs-12" style="height: 300px; padding: 5px; display: inline-block; margin-left:20px">
+                            <div class="col-lg-7 col-md-6 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; margin-left:20px">
                                 <div class="row">
-                                    <table class="table-condensed">
-                                        <tr><td><h4>@Html.ActionLink(@item.TrajectoryName, "ViewDetail", new { trajectoryId = item.Id })</h4></td></tr>
-                                        <tr><td><b><u>Description:</u></b> <div style="height: 60px;overflow-y: auto; overflow-x: hidden;">@item.Description</div></td></tr>
-                                        <tr><td><b><u>Created date:</u></b> @item.CreateDate</td></tr>
-                                        <tr><td><b><u>Last updated:</u></b> @item.LastUpdate</td></tr>
-                                    </table>
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail " style="font-size: 25px">
+                                        @Html.ActionLink(@item.TrajectoryName, "ViewDetail", new { trajectoryId = item.Id })
+                                    </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
+                                            <b><u>Created on:</u></b> @item.CreateDate
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
+                                            <b><u>Start from:</u></b> @item.StartAddress at @item.StartTime
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
+                                            <b><u>Current address:</u></b> @item.EndAddress at @item.EndTime
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
+                                            <b><u>Last updated:</u></b> @item.LastUpdate
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 ">
+                                        <div class="traject-detail">
+                                            <b>
+                                                <u>
+                                                    Description
+                                                </u>
+                                            </b>
+                                            <p style="height: 180px;overflow-y: auto; overflow-x: hidden; padding: 5px;">
+                                                @item.Description
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
                                 @if (ViewBag.FriendStatus == null)
                                 {
-                                    <div class="row" style="bottom:35px; height:13px; position:absolute">
+                                    var modalDeleteId = "delete-modal-" + count.ToString();
+                                    count++;
+                                    var modalEditId = "edit-modal-" + count1.ToString();
+                                    count1++;
+                                    item.ModalEditId = modalEditId;
+
+                                    <div class="row" style="margin-left:0px;">
 
                                         <!-- Button trigger modal -->
-                                        <button class="btn btn-primary btn-md btn-edit" data-toggle="modal" data-target="#myModal">
-                                            Edit <span class="glyphicon glyphicon-pencil"></span>
+                                        <button class="btn btn-primary btn-md btn-edit" data-toggle="modal" data-target="#@modalEditId">
+                                            <span class="glyphicon glyphicon-pencil"></span> Edit
+                                        </button>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#@modalDeleteId">
+                                            <span class="glyphicon glyphicon-remove"></span> Delete
                                         </button>
 
-                                        @Ajax.ActionLink("Delete", "Delete", new { trajectoryId = item.Id }, new AjaxOptions()
-                                        {
-                                            Confirm = "Are you sure you want to delete this trajectory?",
-                                            HttpMethod = "DELETE",
-                                            OnSuccess = "onProductDeleteSuccess",
-                                            OnFailure = "onProductDeleteFailure",
-                                        }, new { @class = "btn btn-danger" })
+                                        @{
+                                    Html.RenderPartial("~/Views/Trajectory/_EditTrajectory.cshtml", item);
+                                        }
+                                        <div class="modal fade" id="@modalDeleteId">
+                                            <div class=" modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                        <h3 class="modal-title">Alert</h3>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="modal-delete-alert">Delete "@item.TrajectoryName" trajectory?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                                        @Ajax.ActionLink("Delete", "Delete", new { trajectoryId = item.Id }, new AjaxOptions()
+                                                        {
+                                                            HttpMethod = "DELETE",
+                                                            OnSuccess = "onProductDeleteSuccess",
+                                                            OnFailure = "onProductDeleteFailure",
+                                                        }, new { @class = "btn btn-primary" })
+                                                    </div>
+                                                </div><!-- /.modal-content -->
+                                            </div><!-- /.modal-dialog -->
+                                        </div><!-- /.modal -->
+
                                     </div>
                                 }
+
+
                             </div>
 
 
+                            @{
+
+                            }
 
 
-                            <!-- Modal -->
-                            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                            <h4 class="modal-title" id="myModalLabel">Modify trajectory</h4>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form>
-                                                <span class="label label-info">Name: </span><input type="text" class="form-control" id="name" /> <br />
-                                                <span class="label label-info">
-                                                    Description: </span><textarea class="form-control" id="description" rows="4"></textarea> <br />
-                                                <span class="label label-info">
-                                                    Status: </span><select id="status" class="form-control">
-                                                        <option value="Public">
-                                                            Public
-                                                        </option>
-                                                        <option value="Private">
-                                                            Private
-                                                        </option>
-                                                    </select>
-</form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            
-                                            @Ajax.ActionLink("Save", "Save", new { trajectoryId = item.Id }, new AjaxOptions()
-                                       
-            {
-
-                HttpMethod = "POST",
-                OnSuccess = "onProductSaveSuccess",
-                OnFailure = "onProductSaveFailure",
-            }, new { @class = "btn btn-primary btn-save" })
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
                         </div>
                     }

@@ -39,14 +39,30 @@
             }
             @if (Model.FriendStatus == "1")
             {
-                @Ajax.ActionLink("Unfriend", "Unfriend", "SearchResult", new { friendId = Model.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo }, new AjaxOptions()
-                {
-                    Confirm = "Are you sure you want to unfriend " + @Model.Fullname + " ?",
-                    HttpMethod = "POST",
-                    OnSuccess = "onSuccess",
-                    OnFailure = "",
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete-modal">Unfriend</button>
+                <div class="modal fade" id="delete-modal">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h3 class="modal-title">Alert</h3>
+                            </div>
+                            <div class="modal-body">
+                                <p class="modal-delete-alert">Are you sure want to unfriend with @Model.Fullname ?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                @Ajax.ActionLink("Unfriend", "Unfriend", "SearchResult", new { friendId = Model.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo }, new AjaxOptions()
+                                {
+                                    HttpMethod = "POST",
+                                    OnSuccess = "onSuccess",
+                                    OnFailure = "",
 
-                }, new { @class = "btn btn-danger" })
+                                }, new { @class = "btn btn-primary" })
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
             }
         </div>
         <div class="col-lg-7 col-md-7 col-sm-6 col-xs-6">

@@ -15,6 +15,28 @@
     function onFailure() {
         alert('Something went wrong, please try again!');
     }
+
+    function onLoadMutualFriendSuccess(response, status, data) {
+        // Generate modal with carousel inside
+        var itemHtml = $("#track-user-pattern").html();
+        
+        
+        var fullResult = "";
+        for (var i = 0; i < response.length; i++) {
+            var item = itemHtml;
+            item = item.replace("{avatar}", response[i].Avatar)
+                .replace("{fullname}", response[i].Fullname)
+                .replace("{friend-id}", response[i].Id).replace("{friend-id}", response[i].Id);
+            fullResult += item;
+        }
+        $("#modal-mutual-friend-body").html(fullResult);
+        $("#modal-mutual-friend").modal();
+    }
+
+
+    function onLoadMutualFriendFail() {
+        alert('Something went wrong, please try again!');
+    }
 </script>
 
 <h2>Friend List</h2>
@@ -122,7 +144,7 @@
     <!-- Suggest Friends-->
     <div class="col-md-3">
         <blockquote>
-            <p><span class="glyphicon glyphicon-pencil"></span> May you know these people</p>
+            <p><span class="glyphicon glyphicon-pencil"></span> You may know these people</p>
         </blockquote>
         <!-- List of Suggest-->
         @foreach (var item in Model.ListNotFriend)
@@ -148,7 +170,15 @@
                     @if (item.CountMutualFriend != 0)
                     {
                         <div class="row" style="margin-left: 67px">
-                            <p><span class="glyphicon glyphicon-user"></span>@Html.ActionLink(" " + item.CountMutualFriend + " mutual friends", "ListMutualFriend", "User", new { friendId = item.Id }, new { data_target = "#" + item.Id, data_toggle = "modal" })</p>
+                            <p>
+                                <span class="glyphicon glyphicon-user"></span>
+                                @Ajax.ActionLink(" " + item.CountMutualFriend + " mutual friends", "LoadMutualFriend", "User", new { friendId = item.Id }, new AjaxOptions()
+                                    {
+                                        HttpMethod = "POST",
+                                        OnSuccess = "onLoadMutualFriendSuccess",
+                                        OnFailure = "onLoadMutualFriendFail",
+                                    })
+                            </p>
                         </div>
                     }
                     @if (item.CountTrajectory != 0)
@@ -158,28 +188,44 @@
                         </div>
                     }
                 </div>
-
-
-                <div class="modal fade" id=@item.Id tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title" id="myModalLabel">Mutual Friends</h4>
-                            </div>
-                            <div class="modal-body">
-                                @{
-            Html.RenderPartial("~/Views/User/ListMutualFriend.cshtml", Model);
-                                }
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         }
     </div>
     <!-- End of Suggest Friends-->
 </div>
+
+<div id="track-user-pattern" style="display: none">
+    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12" style="margin-top: 20px">
+        <div class="list-thumb">
+            <div class="row" align="center">
+                <img src="{avatar}" alt="MobileSurveillance" class="avatar-thumbnail">
+            </div>
+            <div class="row" align="center">
+                <h4><a href="../User/ListFriendTrajectory?friendId={friend-id}">{fullname}</a></h4>
+            </div>
+            <div class="row" align="center">
+                <h4><a href="../User/ListFriendTrajectory?friendId={friend-id}" class="label label-primary">Track User</a></h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- List of Mutual Friends-->
+<div class="modal fade" id="modal-mutual-friend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Mutual Friends</h4>
+            </div>
+            <div class="modal-body mutual-friend" id="modal-mutual-friend-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End List of Mutual Friends-->

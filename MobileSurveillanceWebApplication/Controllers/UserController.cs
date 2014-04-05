@@ -6,16 +6,16 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+
 namespace MobileSurveillanceWebApplication.Controllers
 {
     public class UserController : Controller
     {
         private const string IS_FRIEND = "1";
-        private const string NOT_FRIEND = "0";
-        private long fId;
+        private const string NOT_FRIEND = "0";        
         //
         // GET: /User/
-        private readonly EntityContext context = new EntityContext();
+        private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
         public ActionResult Index()
         {
             return View();
@@ -37,7 +37,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <returns></returns>
         public ActionResult ListUser(SearchCriteriaViewModel searchUserModel)
         {
-            int pageSize = 8;
+            int pageSize = 12;
             var listUserModel = new ListUserViewModel();
             // get User
             var account = this.context.Accounts.SingleOrDefault(a => a.Username.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase));
@@ -83,11 +83,11 @@ namespace MobileSurveillanceWebApplication.Controllers
 
                 listUserModel.ListUser.Add(userViewModel);
             }
+            listUserModel.ListUser = listUserModel.ListUser.OrderBy(x => x.Fullname).ToList();
 
             //add searchUserModel to ViewBag
             ViewBag.SearchCriteriaViewModel = searchUserModel;
-            listUserModel.ListNotFriend = LoadSuggestFriend();
-            //listUserModel.ListMutualFriend = ListMutualFriend()
+            listUserModel.ListNotFriend = LoadSuggestFriend();            
             return View(listUserModel);
         }
 
@@ -155,7 +155,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             var listUserModel = new ListUserViewModel();
             // get User
-            var account = this.context.Accounts.SingleOrDefault(a => a.Username == User.Identity.Name);                   
+            var account = this.context.Accounts.SingleOrDefault(a => a.Username == User.Identity.Name);
             var listInbox = new List<FriendShip>();
             var listFriendShip = account.FriendShips.Where(x => x.Status == IS_FRIEND).ToList();
 
@@ -252,16 +252,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                         }
                     }
 
-
-
-                    //Comparison for MutualFriend
-                    foreach (var peopleFriend in listPeopleFriend)
-                    {
-                        if (listMyFriend.Contains(peopleFriend))
-                        {
-                            friendViewModel.CountMutualFriend++;
-                        }
-                    }
+                    //Comparison for MutualFriend                  
+                    friendViewModel.CountMutualFriend = listPeopleFriend.Intersect(listMyFriend).Count();
                 }
             }
             return listNotFriend.Take(5).OrderByDescending(x => x.CountMutualFriend).ToList();
@@ -272,13 +264,12 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <param name="friendId"></param>
         /// <returns></returns>
-        public ActionResult ListMutualFriend(long friendId)
-        {
-            fId = friendId;
+        public JsonResult LoadMutualFriend(long friendId)
+        {            
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             var friendAccount = this.context.Accounts.Where(x => x.Id.Equals(friendId)).SingleOrDefault();
 
-            var listMutualFriendViewModel = new ListUserViewModel();
+            var listMutualFriendViewModel = new List<FriendViewModel>();
 
             //Create PeopleFriendList
             var listPeopleFriend = new List<Account>();
@@ -305,17 +296,12 @@ namespace MobileSurveillanceWebApplication.Controllers
                 }
             }
 
-            var listMutualFriend = new List<Account>();
+            var listMutualFriend = new List<Account>();                  
 
             //Comparison for MutualFriend
-            foreach (var peopleFriend in listPeopleFriend)
-            {
-                if (listMyFriend.Contains(peopleFriend))
-                {
-                    listMutualFriend.Add(peopleFriend);
-                }
-            }
+            listMutualFriend = listPeopleFriend.Intersect(listMyFriend).ToList();
 
+            
             //Create List of Mutual Friend
             foreach (var mutualFriend in listMutualFriend)
             {
@@ -324,9 +310,11 @@ namespace MobileSurveillanceWebApplication.Controllers
                 mutualFriendViewModel.Avatar = mutualFriend.Avatar;
                 mutualFriendViewModel.Id = mutualFriend.Id;
                 mutualFriendViewModel.Username = mutualFriend.Username;
-                listMutualFriendViewModel.ListMutualFriend.Add(mutualFriendViewModel);
+
+                listMutualFriendViewModel.Add(mutualFriendViewModel);           
             }
-            return View(listMutualFriendViewModel);
+            listMutualFriendViewModel = listMutualFriendViewModel.OrderBy(x => x.Fullname).ToList();
+            return Json(listMutualFriendViewModel, JsonRequestBehavior.AllowGet);
         }
 
     }

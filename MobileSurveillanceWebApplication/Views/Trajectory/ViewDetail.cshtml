@@ -27,10 +27,17 @@
     var latlngbounds;
 
     // For direction service
+    var directionList = [];
     var directionsDisplay;
     var directionsService = new google.maps.DirectionsService();
+    
 
     $(document).ready(function () {
+
+        $.ajaxSetup({
+            async: false
+        });
+
 
         function HomeControl(controlDiv, map) {
             // Set CSS styles for the DIV containing the control
@@ -192,11 +199,7 @@
                 for (var i = 0; i < locationList.length; i++) {
                     SelectedDates.push(locationList[i].CreatedDate2);
                 }
-                // Fix Manage
-                //
-                //
-                //
-                //
+
                 $.getJSON("IsMyTrajectory", { userName: '@User.Identity.Name', locationId: locationList[0].Id }, function (data) {
                     for (var i = (locationList.length - 1) ; i >= 0; i--) {
                         // Generate location list html
@@ -210,7 +213,6 @@
 
                     }
                 })
-
 
                 $.each(locationList, function (index, value) {
 
@@ -409,34 +411,6 @@
 
         google.maps.event.addDomListener(window, 'load', initialize);
 
-        // Direction service
-        function calcRoute() {
-            for (var i = 0; i < (locationList.length - 1) ; i++) {
-                var start = new google.maps.LatLng(locationList[i].Latitude, locationList[i].Longitude)
-                var end = new google.maps.LatLng(locationList[i + 1].Latitude, locationList[i + 1].Longitude);
-                var request = {
-                    origin: start,
-                    destination: end,
-                    travelMode: google.maps.TravelMode.DRIVING
-                };
-                var rendererOptions = {
-                    draggable: false,
-                    suppressMarkers: true,
-                    polylineOptions: { strokeColor: 'green', strokeOpacity: 0.8, strokeWeight: 3 }
-                    //end redererOptions
-                };
-
-                directionsService.route(request, function (result, status) {
-                    if (status == google.maps.DirectionsStatus.OK) {
-                        var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-                        directionsDisplay.setMap(map);
-                        directionsDisplay.setDirections(result);
-
-                    }
-                });
-            }
-        }
-
         $('#myTable').on('click', 'tr', function (event) {
             var a = $(this).attr('id');
             clearAnimation();
@@ -484,12 +458,7 @@
 
         }
 
-        function clearAnimation() {
-            for (var i = 0; i < activeList.length; i++) {
-                activeList[i].marker.setAnimation(null);
-                activeList[i].infoWindow.close();
-            }
-        }
+
     });
     // Fix Manage
     //
@@ -520,11 +489,7 @@
             }
         })
     }
-    // Fix Manage
-    //
-    //
-    //
-    //
+
     function locationFilter(dateText1, dateText2) {
         $.getJSON("/Trajectory/GetLocationListByDateRange/", { trajectId: '@Model.Id', fromDate: dateText1, toDate: dateText2 }, function (data) {
             locationSearchList = data;
@@ -551,11 +516,70 @@
         })
     }
 
-    // Fix Manage
-    //
-    //
-    //
-    //
+    function clearAnimation() {
+        for (var i = 0; i < activeList.length; i++) {
+            activeList[i].marker.setAnimation(null);
+            activeList[i].infoWindow.close();
+        }
+    }
+
+    function setHome() {
+        map.setCenter(new google.maps.LatLng(centerLat, centerLong))
+        map.fitBounds(latlngbounds);
+        clearAnimation();
+        activeList[activeList.length - 1].marker.setAnimation(google.maps.Animation.BOUNCE);
+        activeList[activeList.length - 1].infoWindow.open(map, activeList[activeList.length - 1].marker);
+    }
+
+    function clearRoute() {
+        for (var i = 0; i < directionList.length; i++) {
+            directionList[i].setMap(null);
+        }
+    }
+
+    function fuck(i, request, rendererOptions) {
+        setTimeout(function () {
+            directionsService.route(request, function (result, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    var directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+                    directionsDisplay.setMap(map);
+                    directionsDisplay.setDirections(result);
+                    directionList.push(directionsDisplay);
+                }
+            });
+        }, i * 500);
+    }
+
+    // Direction service
+    function calcRoute() {
+        var selectedMode = document.getElementById('mode').value;
+        if (selectedMode != "NONE") {
+            clearRoute();
+            for (var i = 0; i < (locationList.length - 1) ; i++) {
+                var start = new google.maps.LatLng(locationList[i].Latitude, locationList[i].Longitude)
+                var end = new google.maps.LatLng(locationList[i + 1].Latitude, locationList[i + 1].Longitude);
+
+                var request = {
+                    origin: start,
+                    destination: end,
+                    travelMode: google.maps.TravelMode[selectedMode]
+                };
+                var rendererOptions = {
+                    draggable: false,
+                    suppressMarkers: true,
+                    polylineOptions: { strokeColor: 'green', strokeOpacity: 0.8, strokeWeight: 3 },
+                    preserveViewport: true
+                    //end redererOptions
+                };
+                fuck(i, request, rendererOptions);
+            }
+        } else {
+            for (var i = 0; i < directionList.length; i++) {
+                directionList[i].setMap(null);
+            }
+        }
+    }
+
     function resetFilter() {
         locationSearchList = locationList;
         $('#myTable tr').remove();
@@ -675,6 +699,8 @@
     </div>
 </div>
 
+
+
 <div class="row social-share">
     @*Viết 1 hàm check friend để kiểmt tra nếu là friend của nhau thì mới thực hiệnch ức năng share*@
     <span class='st_facebook_large' displaytext='Facebook'></span>
@@ -685,6 +711,17 @@
     <span class='st_linkedin_large' displaytext='LinkedIn'></span>
     <span class='st_pinterest_large' displaytext='Pinterest'></span>
     <span class='st_email_large' displaytext='Email'></span>
+</div>
+
+<div id="panel">
+    <b>Suggestion: </b>
+    <select id="mode" onchange="calcRoute();">
+        <option value="NONE">None</option>
+        <option value="DRIVING">Driving</option>
+        <option value="WALKING">Walking</option>
+        <option value="BICYCLING">Bicycling</option>
+        <option value="TRANSIT">Transit</option>
+    </select>
 </div>
 @section scripts{
     <!-- Javascript -->

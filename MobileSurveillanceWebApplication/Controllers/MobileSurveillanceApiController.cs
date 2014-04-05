@@ -23,7 +23,7 @@ namespace MobileSurveillanceWebApplication.Controllers
     public class MobileSurveillanceApiController : ApiController
     {
         private const String USER_DATA_FOLDER = "UserData";
-        private readonly EntityContext context = new EntityContext();
+        private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
 
         /// <summary>
         /// Login into the system
@@ -32,9 +32,9 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <returns></returns>
         [HttpPost]
         [BasicAuthenticationFilter(true)]
-        public HttpResponseMessage Login(AccountApiModel accountModel)
+        public HttpResponseMessage Login()
         {
-            HttpResponseMessage retVal = Request.CreateResponse(HttpStatusCode.OK, User.Identity.IsAuthenticated, Configuration.Formatters.JsonFormatter);
+            HttpResponseMessage retVal = Request.CreateResponse(HttpStatusCode.OK, ((BasicAuthenticationIdentity)User.Identity).Id, Configuration.Formatters.JsonFormatter);
             return retVal;
         }
 
@@ -50,9 +50,6 @@ namespace MobileSurveillanceWebApplication.Controllers
             HttpResponseMessage retVal = null;
             TrajectoryApiModel trajectoryApiModel = null;
             long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
-            trajectoryModel.Id = HttpUtility.UrlDecode(trajectoryModel.Id, Encoding.UTF8);
-            trajectoryModel.Name = HttpUtility.UrlDecode(trajectoryModel.Name, Encoding.UTF8);
-            trajectoryModel.Description = HttpUtility.UrlDecode(trajectoryModel.Description, Encoding.UTF8);
 
             var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(trajectoryModel.Id, StringComparison.InvariantCultureIgnoreCase));
             DateTime lastUpdated = SupportUtility.ConvertFormattedStringToDateTime(trajectoryModel.LastUpdated);
@@ -155,8 +152,6 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             HttpResponseMessage retVal = null;
             var list = new List<TrajectoryApiModel>();
-            pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8).ToLower();
-            pagingModel.Username = HttpUtility.UrlDecode(pagingModel.Username, Encoding.UTF8).ToLower();
             int page = pagingModel.Page;
             int pageSize = pagingModel.PageSize;
             var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(pagingModel.Username));
@@ -247,10 +242,6 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             HttpResponseMessage retVal = null;
             var list = new List<AccountFriendApiModel>();
-            if (!String.IsNullOrEmpty(pagingModel.SearchQuery))
-            {
-                pagingModel.SearchQuery = HttpUtility.UrlDecode(pagingModel.SearchQuery, Encoding.UTF8).ToLower();
-            }
             int page = pagingModel.Page;
             int pageSize = pagingModel.PageSize;
             long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
@@ -611,12 +602,13 @@ namespace MobileSurveillanceWebApplication.Controllers
                 .Where(x => x.StartLocationId.Equals(routingApiModel.StartLocationId, StringComparison.InvariantCultureIgnoreCase))
                 .Where(x => x.DestinationLocationId.Equals(routingApiModel.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase))
                 .Where(x => x.TravelMode.Equals(routingApiModel.TravelMode, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.Type == false)
                 .SingleOrDefault();
             var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(routingApiModel.StartLocationId, StringComparison.InvariantCultureIgnoreCase));
             var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(routingApiModel.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase));
             if (startLocation.IsActive && desLocation.IsActive)
             {
-                if (retVal == null)
+                if (locationRoute == null)
                 {
                     locationRoute = new LocationRoute()
                     {
@@ -624,7 +616,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                         DestinationLocationId = routingApiModel.DestinationLocationId,
                         TravelMode = routingApiModel.TravelMode,
                         RouteString = routingApiModel.RouteString,
-                        TrajectoryId = routingApiModel.TrajectoryId
+                        TrajectoryId = routingApiModel.TrajectoryId,
+                        Type = false
                     };
 
                     this.context.LocationRoutes.Add(locationRoute);
@@ -660,31 +653,86 @@ namespace MobileSurveillanceWebApplication.Controllers
         }
 
         [HttpPost]
-        [BasicAuthenticationFilter(true)]
-        public HttpResponseMessage LoadListRouting([FromBody]LoadApiModel model)
+        //[BasicAuthenticationFilter(true)]
+        public HttpResponseMessage LoadListRouting()
         {
             HttpResponseMessage retVal = null;
+            List<LoadRoutingApiModel> model = GetListLoadRoutingApiModel();
+            
+            
             var list = new List<RoutingApiModel>();
-            var listLocationRoute = this.context.LocationRoutes
-                .Where(x => x.TrajectoryId.Equals(model.Id, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-            for (int i = 0; i < listLocationRoute.Count; i++)
+            for (int i = 0; i < model.Count; i++)
             {
-                var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(listLocationRoute[i].StartLocationId, StringComparison.InvariantCultureIgnoreCase));
-                var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(listLocationRoute[i].DestinationLocationId, StringComparison.InvariantCultureIgnoreCase));
+                var loadRoutingApiModel = model.ElementAt(i);
+                var locationRoute = this.context.LocationRoutes
+                                        .Where(x => x.StartLocationId.Equals(loadRoutingApiModel.StartLocationId, StringComparison.InvariantCultureIgnoreCase))
+                                        .Where(x => x.DestinationLocationId.Equals(loadRoutingApiModel.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase))
+                                        .Where(x => x.TravelMode.Equals(loadRoutingApiModel.TravelMode, StringComparison.InvariantCultureIgnoreCase))
+                                        .Where(x => x.Type == false)
+                                        .SingleOrDefault();
+
+                var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(loadRoutingApiModel.StartLocationId, StringComparison.InvariantCultureIgnoreCase));
+                var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(loadRoutingApiModel.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase));
                 if (startLocation.IsActive && desLocation.IsActive)
                 {
-                    var locationRoute = new RoutingApiModel();
-                    locationRoute.StartLocationId = listLocationRoute[i].StartLocationId;
-                    locationRoute.DestinationLocationId = listLocationRoute[i].DestinationLocationId;
-                    locationRoute.TravelMode = listLocationRoute[i].TravelMode;
-                    locationRoute.RouteString = listLocationRoute[i].RouteString;
-                    locationRoute.TrajectoryId = listLocationRoute[i].TrajectoryId;
-                    list.Add(locationRoute);
+                    if (locationRoute != null)
+                    {
+                        var routingApimodel = new RoutingApiModel()
+                        {
+                            StartLocationId = locationRoute.StartLocationId,
+                            DestinationLocationId = locationRoute.DestinationLocationId,
+                            TravelMode = locationRoute.TravelMode,
+                            RouteString = locationRoute.RouteString,
+                            TrajectoryId = locationRoute.TrajectoryId,
+                            Index = loadRoutingApiModel.Index
+                        };
+                        list.Add(routingApimodel);
+                    }
+                    else
+                    {
+                        var routingApimodel = new RoutingApiModel()
+                        {
+                            StartLocationId = loadRoutingApiModel.StartLocationId,
+                            DestinationLocationId = loadRoutingApiModel.DestinationLocationId,
+                            TravelMode = loadRoutingApiModel.TravelMode,
+                            RouteString = "Empty",
+                            TrajectoryId = "Empty",
+                            Index = loadRoutingApiModel.Index
+                        };
+                        list.Add(routingApimodel);
+                    }
+                }
+                else
+                {
+                    retVal = Request.CreateResponse(HttpStatusCode.NotFound);
+                    return retVal;
                 }
             }
+
             retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
             return retVal;
+        }
+
+        private List<LoadRoutingApiModel> GetListLoadRoutingApiModel()
+        {
+            List<LoadRoutingApiModel> model = new List<LoadRoutingApiModel>();
+
+            var message = Request.Content.ReadAsFormDataAsync().Result;
+            var arrStartLocationId = message.GetValues("StartLocationId").ToList<String>();
+            var arrDesLocationId = message.GetValues("DestinationLocationId").ToList<String>();
+            var arrTravelMode = message.GetValues("TravelMode").ToList<String>();
+            var arrIndex = message.GetValues("Index").ToList<String>();
+
+            for (int i = 0; i < arrStartLocationId.Count; i++)
+            {
+                var loadRoutingApiModel = new LoadRoutingApiModel();
+                loadRoutingApiModel.StartLocationId = arrStartLocationId[i];
+                loadRoutingApiModel.DestinationLocationId = arrDesLocationId[i];
+                loadRoutingApiModel.TravelMode = arrTravelMode[i];
+                loadRoutingApiModel.Index = int.Parse(arrIndex[i]);
+                model.Add(loadRoutingApiModel);
+            }
+            return model;
         }
 
         [HttpPost]
@@ -696,6 +744,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 .Where(x => x.StartLocationId.Equals(model.StartLocationId, StringComparison.InvariantCultureIgnoreCase))
                 .Where(x => x.DestinationLocationId.Equals(model.DestinationLocationId, StringComparison.InvariantCultureIgnoreCase))
                 .Where(x => x.TravelMode.Equals(model.TravelMode, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.Type == false)
                 .SingleOrDefault();
 
             var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(model.StartLocationId, StringComparison.InvariantCultureIgnoreCase));
@@ -708,7 +757,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                     DestinationLocationId = locationRoute.DestinationLocationId,
                     TravelMode = locationRoute.TravelMode,
                     RouteString = locationRoute.RouteString,
-                    TrajectoryId = locationRoute.TrajectoryId
+                    TrajectoryId = locationRoute.TrajectoryId,
+                    Index = model.Index
                 };
                 retVal = Request.CreateResponse(HttpStatusCode.OK, routingApimodel, Configuration.Formatters.JsonFormatter);
             }
@@ -716,9 +766,9 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 retVal = Request.CreateResponse(HttpStatusCode.NotFound);
             }
-            
+
             return retVal;
         }
-    
+
     }
 }

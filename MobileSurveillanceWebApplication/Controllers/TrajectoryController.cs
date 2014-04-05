@@ -1,9 +1,11 @@
-﻿using MobileSurveillanceWebApplication.Models.DatabaseModel;
+﻿using MobileSurveillanceWebApplication.Models.ApiModel;
+using MobileSurveillanceWebApplication.Models.DatabaseModel;
 using MobileSurveillanceWebApplication.Models.ViewModel;
 using MobileSurveillanceWebApplication.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -18,7 +20,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         private const String USER_DATA_FOLDER = "/UserData/";
         //
         // GET: /Trajectory/
-        private readonly EntityContext context = new EntityContext();
+        private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
         public ActionResult Index()
         {
             return View();
@@ -128,11 +130,16 @@ namespace MobileSurveillanceWebApplication.Controllers
                 trajectoryViewModel.Status = trajectory.Status;
                 trajectoryViewModel.CreateDate = trajectory.CreatedDate.ToString();
                 trajectoryViewModel.LastUpdate = trajectory.LastUpdated.ToString();
-                var locate = trajectory.Locations.OrderByDescending(x => x.CreatedDate).FirstOrDefault();
-                if (locate != null)
+                var startLocation = trajectory.Locations.Where(x => x.IsActive).OrderByDescending(x => x.CreatedDate).FirstOrDefault();
+                var endLocation = trajectory.Locations.Where(x => x.IsActive).OrderByDescending(x => x.CreatedDate).LastOrDefault();
+                if (startLocation != null)
                 {
-                    trajectoryViewModel.Longitude = locate.Longitude.ToString();
-                    trajectoryViewModel.Latitude = locate.Latitude.ToString();
+                    trajectoryViewModel.StartLongitude = startLocation.Longitude.ToString();
+                    trajectoryViewModel.StartLatitude = startLocation.Latitude.ToString();
+                    trajectoryViewModel.StartAddress = startLocation.Address;
+                    trajectoryViewModel.EndAddress = endLocation.Address;
+                    trajectoryViewModel.StartTime = startLocation.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
+                    trajectoryViewModel.EndTime = endLocation.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
                 }
                 model.ListTrajectory.Add(trajectoryViewModel);
             }
@@ -313,26 +320,17 @@ namespace MobileSurveillanceWebApplication.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult SaveTrajectory(string trajectId, string name, string description, string status)
+        public ActionResult SaveTrajectory(TrajectoryViewModel model, TrajectSearchCriteriaViewModel searchUserModel)
         {
-            var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectId)).SingleOrDefault();
-            trajectory.TrajectoryName = name;
-            trajectory.Description = description;
-            trajectory.Status = status.Trim();
+            var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(model.Id)).SingleOrDefault();
+            trajectory.TrajectoryName = model.TrajectoryName;
+            trajectory.Description = model.Description;
+            trajectory.Status = model.Status.Trim();
             trajectory.LastUpdated = DateTime.Now;
 
             int result = this.context.SaveChanges();
-            var message = "";
-            if (result > 0)
-            {
-                message = "Change saved.";
-            }
-            else
-            {
-                message = "Nothing changes.";
-            }
 
-            return Json(message, JsonRequestBehavior.AllowGet);
+            return RedirectToAction("ListTrajectory", new { UserId = searchUserModel.UserId, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, DateTo = searchUserModel.DateTo, DateFrom = searchUserModel.DateFrom });
         }
 
         public JsonResult IsMyTrajectory(string userName, string locationId)
@@ -348,5 +346,76 @@ namespace MobileSurveillanceWebApplication.Controllers
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
+        public JsonResult GetRouteString(string startId, string desId, string mode)
+        {
+            string result = "";
+            var locationRoute = this.context.LocationRoutes
+                .Where(x => x.StartLocationId.Equals(startId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.DestinationLocationId.Equals(desId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.TravelMode.Equals(mode, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.Type == true)
+                .SingleOrDefault();
+            var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(startId, StringComparison.InvariantCultureIgnoreCase));
+            var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(desId, StringComparison.InvariantCultureIgnoreCase));
+            if (startLocation.IsActive && desLocation.IsActive && locationRoute != null)
+            {
+                var routingApimodel = new RoutingApiModel()
+                {
+                    StartLocationId = locationRoute.StartLocationId,
+                    DestinationLocationId = locationRoute.DestinationLocationId,
+                    TravelMode = locationRoute.TravelMode,
+                    RouteString = locationRoute.RouteString,
+                    TrajectoryId = locationRoute.TrajectoryId,
+                    Index = 0
+                };
+                return Json(routingApimodel, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                var routingApimodel = new RoutingApiModel()
+                {
+                    StartLocationId = startId,
+                    DestinationLocationId = desId,
+                    TravelMode = mode,
+                    RouteString = "Empty",
+                    TrajectoryId = "Empty",
+                    Index = 0
+                };
+                return Json(routingApimodel, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult UpdateRouteString(string startId, string desId, string mode, string routeString)
+        {
+            int result = 0;
+            routeString = HttpUtility.UrlDecode(routeString, Encoding.UTF8);
+            var locationRoute = this.context.LocationRoutes
+                .Where(x => x.StartLocationId.Equals(startId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.DestinationLocationId.Equals(desId, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.TravelMode.Equals(mode, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.Type == true)
+                .SingleOrDefault();
+            var startLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(startId, StringComparison.InvariantCultureIgnoreCase));
+            var desLocation = this.context.Locations.SingleOrDefault(x => x.Id.Equals(desId, StringComparison.InvariantCultureIgnoreCase));
+            if (startLocation.IsActive && desLocation.IsActive)
+            {
+                if (locationRoute == null)
+                {
+                    locationRoute = new LocationRoute()
+                    {
+                        StartLocationId = startId,
+                        DestinationLocationId = desId,
+                        TravelMode = mode,
+                        RouteString = routeString,
+                        TrajectoryId = desLocation.TrajectoryId,
+                        Type = true
+                    };
+                    this.context.LocationRoutes.Add(locationRoute);
+                    result = this.context.SaveChanges();
+                }
+            }
+            return Json(result > 0 ? "OK" : "KO", JsonRequestBehavior.AllowGet);
+        }
     }
 }

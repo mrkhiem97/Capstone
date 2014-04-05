@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace MobileSurveillanceWebApplication.Models.ApiModel
@@ -8,6 +9,8 @@ namespace MobileSurveillanceWebApplication.Models.ApiModel
     public class PagingApiModel
     {
         private String searchQuery;
+        private String username;
+
         public String SearchQuery
         {
             get
@@ -22,15 +25,21 @@ namespace MobileSurveillanceWebApplication.Models.ApiModel
                 }
                 else
                 {
-                    searchQuery = value;
+                    searchQuery = HttpUtility.UrlDecode(value, Encoding.UTF8).ToLower();
                 }
             }
         }
 
         public String Username
         {
-            get;
-            set;
+            get
+            {
+                return this.username;
+            }
+            set
+            {
+                this.username = HttpUtility.UrlDecode(value, Encoding.UTF8).ToLower();
+            }
         }
 
         public int Page { get; set; }

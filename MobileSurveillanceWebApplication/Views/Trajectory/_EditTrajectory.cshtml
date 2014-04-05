@@ -1,0 +1,110 @@
+﻿@model MobileSurveillanceWebApplication.Models.ViewModel.TrajectoryViewModel
+@{
+    var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectSearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+}
+<script>
+    //var currentTraject;
+    //$(document).ready(function () {
+    //    $(".btn-edit").click(function () {
+    //        var id = $(this).parent().parent().parent().attr('id');
+    //        currentTraject = id;
+    //        $.getJSON("/Trajectory/GetTrajectory", { trajectId: id }, function (data) {
+    //            $("#name").val(data.TrajectoryName);
+    //            $("#description").val(data.Description);
+    //            $("#status").val(data.Status);
+    //        })
+    //    });
+
+    //    $(".btn-save").click(function () {
+    //        var id = currentTraject;
+    //        var Tname = $("#name").val();
+    //        var Tdescription = $("#description").val();
+    //        var Tstatus = $('#status :selected').text();
+    //        $.getJSON("/Trajectory/SaveTrajectory", { trajectId: id, name: Tname, description: Tdescription, status: Tstatus }, function (data) {
+    //            alert(data);
+    //        })
+    //        $("#myModal").modal('hide');
+    //        setTimeout(function () {
+    //            window.location.reload();
+    //        }, 500)
+
+    //    });
+
+    //});
+
+    //function onProductDeleteSuccess(response, status, data) {
+    //    var id = "#" + response.id;
+    //    $(id).hide(500, function () {
+    //        $(id).remove();
+    //    });
+    //    window.location.href = window.location.href; //This is a possibility
+    //    //window.location.reload(); //Another possiblity
+    //    //history.go(0); //And another
+    //}
+
+    //function onProductDeleteFailure() {
+    //    alert('Something went wrong, please try again!');
+    //}
+</script>
+
+
+@using (Html.BeginForm("SaveTrajectory", "Trajectory", FormMethod.Post, new { role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <!-- Modal -->
+    <div class="modal fade" id="@Model.ModalEditId" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="myModalLabel">Modify trajectory @Model.TrajectoryName</h3>
+                </div>
+                <div class="modal-body">
+                    <fieldset>
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.TrajectoryName)
+                        </div>
+                        <div class="editor-field">
+                            @Html.TextBoxFor(model => model.TrajectoryName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.TrajectoryName)
+                        </div>
+
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.Description)
+                        </div>
+                        <div class="editor-field">
+                            
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @rows = "4" })
+                            @Html.ValidationMessageFor(model => model.Description)
+                        </div>
+
+                        <div class="editor-label">
+                            @Html.LabelFor(model => model.Status)
+                        </div>
+                        <div class="editor-field">
+                            @{
+    var optionList = new List<SelectListItem>();
+    optionList.Add(new SelectListItem() { Text = "Public", Value = "Public" });
+    optionList.Add(new SelectListItem() { Text = "Private", Value = "Private" });
+
+                            }
+                            @Html.DropDownListFor(model => model.Status, optionList, new { @class = "form-control" })
+                        </div>
+
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.Hidden("UserId", searchUserModel.UserId)
+                    @Html.Hidden("SearchKeyword", searchUserModel.SearchKeyword)
+                    @Html.Hidden("PageNumber", searchUserModel.PageNumber)
+                    @Html.Hidden("PageCount", searchUserModel.PageCount)
+                    @Html.Hidden("DateFrom", searchUserModel.DateFrom)
+                    @Html.Hidden("DateTo", searchUserModel.DateTo)
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </div>
+        </div>
+    </div>
+}

@@ -72,6 +72,7 @@ namespace MobileSurveillanceWebApplication.Models.ApiModel
                 this.trajectoryId = HttpUtility.UrlDecode(value, Encoding.UTF8);
             }
         }
+        public int Index { get; set; }
     }
 
     public class LoadRoutingApiModel
@@ -114,5 +115,7 @@ namespace MobileSurveillanceWebApplication.Models.ApiModel
                 this.travelMode = HttpUtility.UrlDecode(value, Encoding.UTF8);
             }
         }
+
+        public int Index { get; set; }
     }
 }

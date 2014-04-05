@@ -16,7 +16,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class ProfileController : Controller
     {
-        private readonly EntityContext context = new EntityContext();
+        private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
         //
         // GET: /Profile/
 
@@ -92,7 +92,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             }
 
             int result = this.context.SaveChanges();
-            Response.Cookies["FullName"].Value = account.Fullname;
+            Response.Cookies["FullName"].Value = HttpUtility.UrlEncode(account.Fullname); 
             Response.Cookies["FullName"].Expires = DateTime.Now.AddDays(30);
             Response.Cookies["Role"].Value = account.Role.RoleName;
             Response.Cookies["Role"].Expires = DateTime.Now.AddDays(30);

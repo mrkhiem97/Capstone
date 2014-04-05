@@ -21,7 +21,7 @@ namespace MobileSurveillanceWebApplication.Controllers
     public class AccountController : Controller
     {
         // GET: /Trajectory/
-        private readonly EntityContext context = new EntityContext();
+        private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
         //
         // GET: /Account/Login
 
@@ -57,7 +57,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                     if (account.IsActive)
                     {
                         FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
-                        Response.Cookies["FullName"].Value = account.Fullname;
+
+                        Response.Cookies["FullName"].Value = HttpUtility.UrlEncode(account.Fullname); 
                         Response.Cookies["FullName"].Expires = DateTime.Now.AddDays(30);
                         Response.Cookies["Role"].Value = account.Role.RoleName;
                         Response.Cookies["Role"].Expires = DateTime.Now.AddDays(30);

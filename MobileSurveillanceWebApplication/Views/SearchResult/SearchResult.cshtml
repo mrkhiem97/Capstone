@@ -46,8 +46,7 @@
                             break;
 
                         case "requestSent":
-                        <h4>
-                            <span class="glyphicon glyphicon-ok"><span style="padding-left:3px">RequestSent</span></span>
+                        <h4>                            
                             @Ajax.ActionLink("Cancel Request", "CancelRequest", new { friendId = item.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                     {
                                         HttpMethod = "POST",
@@ -94,7 +93,7 @@
             <li>@Html.ActionLink("First", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount })</li>
             @if (searchUserModel.PageNumber > 1)
             {
-                <li>@Html.ActionLink("<<", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount })</li>
+            <li>@Html.ActionLink("<<", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount })</li>
             }
             @if (searchUserModel.PageCount > 5)
             {
@@ -114,12 +113,12 @@
 
                 for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
                 {
-                    <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+            <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
                 }
-                <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+            <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
                 for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
                 {
-                    <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+            <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
                 }
             }
             else
@@ -128,17 +127,17 @@
                 {
                     if (i == searchUserModel.PageNumber)
                     {
-                        <li class="active">@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+            <li class="active">@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+            <li>@Html.ActionLink((i).ToString(), "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
                     }
                 }
             }
             @if (searchUserModel.PageNumber < searchUserModel.PageCount)
             {
-                <li>@Html.ActionLink(">>", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount })</li>
+            <li>@Html.ActionLink(">>", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount })</li>
             }
             <li>@Html.ActionLink("Last", "SearchResult", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount })</li>
         </ul>

@@ -13,9 +13,9 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class EntityContext : DbContext
+    public partial class MobileSurveillanceContext : DbContext
     {
-        public EntityContext()
+        public MobileSurveillanceContext()
             : base("name=MobileSurveillanceEntities")
         {
         }
@@ -29,8 +29,8 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
         public virtual DbSet<CapturedImage> CapturedImages { get; set; }
         public virtual DbSet<FriendShip> FriendShips { get; set; }
         public virtual DbSet<Location> Locations { get; set; }
-        public virtual DbSet<LocationRoute> LocationRoutes { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Trajectory> Trajectories { get; set; }
+        public virtual DbSet<LocationRoute> LocationRoutes { get; set; }
     }
 }

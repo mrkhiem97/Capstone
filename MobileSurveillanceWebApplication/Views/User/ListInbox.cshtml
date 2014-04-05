@@ -18,6 +18,10 @@
 
 <h2>Notification</h2>
 
+@if (!Model.ListUser.Any())
+{
+    <div class="alert alert-danger" style="width: 400px;">There is no request friend for you at this time!!</div> 
+}
 
 @foreach (var item in Model.ListUser)
 {

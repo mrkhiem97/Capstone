@@ -10,7 +10,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class LocationController : Controller
     {
-        private readonly EntityContext context = new EntityContext();
+        private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
         private const String USER_DATA_FOLDER = "/UserData/";
 
         [Authorize]

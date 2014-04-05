@@ -17,6 +17,7 @@ namespace MobileSurveillanceWebApplication.Models.DatabaseModel
         public string StartLocationId { get; set; }
         public string DestinationLocationId { get; set; }
         public string TravelMode { get; set; }
+        public bool Type { get; set; }
         public string RouteString { get; set; }
         public string TrajectoryId { get; set; }
     }
