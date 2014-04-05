@@ -256,9 +256,10 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 //listTrajectory = account.Trajectories.Skip(page * pageSize).Take(pageSize).ToList();
                 listFriendShip = account.FriendShips1
+                                  .Where(x => x.Account.IsActive)
                                   .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
-                                  .OrderByDescending(x => x.Account.Fullname)
-                                  .OrderByDescending(x => x.Account.Username)
+                                  .OrderBy(x => x.Account.Fullname)
+                                  .OrderBy(x => x.Account.Username)
                                   .Skip(page * pageSize).Take(pageSize).ToList();
             }
 
