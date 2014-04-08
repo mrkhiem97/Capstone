@@ -269,6 +269,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 accountFriendApiModel.Id = listFriendShip.ElementAt(i).Account.Id;
                 accountFriendApiModel.Username = listFriendShip.ElementAt(i).Account.Username;
                 accountFriendApiModel.Fullname = listFriendShip.ElementAt(i).Account.Fullname;
+                accountFriendApiModel.Email = listFriendShip.ElementAt(i).Account.Email;
                 accountFriendApiModel.Avatar = listFriendShip.ElementAt(i).Account.Avatar.Remove(0, 1);
                 list.Add(accountFriendApiModel);
             }
