@@ -654,14 +654,75 @@ namespace MobileSurveillanceWebApplication.Controllers
             return retVal;
         }
 
+
+        [HttpPost]
+        [BasicAuthenticationFilter(true)]
+        public HttpResponseMessage DeleteLocation([FromBody]DeleteApiModel deleteApiModel)
+        {
+            HttpResponseMessage retVal = null;
+            var location = this.context.Locations.SingleOrDefault(x => x.Id.Equals(deleteApiModel.Id, StringComparison.InvariantCultureIgnoreCase));
+            location.IsActive = false;
+            for (int i = 0; i < location.CapturedImages.Count; i++)
+            {
+                location.CapturedImages.ElementAt(i).IsActive = false;
+            }
+            try
+            {
+                // Save changed
+                if (this.context.SaveChanges() > 0)
+                {
+                    retVal = Request.CreateResponse(HttpStatusCode.OK);
+                }
+                else
+                {
+                    retVal = Request.CreateResponse(HttpStatusCode.NotAcceptable);
+                }
+            }
+            catch (Exception)
+            {
+                retVal = Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            return retVal;
+        }
+
+
+        [HttpPost]
+        [BasicAuthenticationFilter(true)]
+        public HttpResponseMessage DeleteImage([FromBody]DeleteApiModel deleteApiModel)
+        {
+            HttpResponseMessage retVal = null;
+            int id = int.Parse(deleteApiModel.Id);
+            var capturedImage = this.context.CapturedImages.SingleOrDefault(x => x.Id == id);
+            capturedImage.IsActive = false;
+            try
+            {
+                // Save changed
+                if (this.context.SaveChanges() > 0)
+                {
+                    retVal = Request.CreateResponse(HttpStatusCode.OK);
+                }
+                else
+                {
+                    retVal = Request.CreateResponse(HttpStatusCode.NotAcceptable);
+                }
+            }
+            catch (Exception)
+            {
+                retVal = Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            return retVal;
+        }
+
         [HttpPost]
         //[BasicAuthenticationFilter(true)]
         public HttpResponseMessage LoadListRouting()
         {
             HttpResponseMessage retVal = null;
             List<LoadRoutingApiModel> model = GetListLoadRoutingApiModel();
-            
-            
+
+
             var list = new List<RoutingApiModel>();
             for (int i = 0; i < model.Count; i++)
             {
