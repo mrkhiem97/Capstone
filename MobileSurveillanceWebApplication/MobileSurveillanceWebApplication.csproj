@@ -429,6 +429,7 @@
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>DBModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
+    <Content Include="Images\android_download.png" />
     <Content Include="Images\login-box-backg.png" />
     <Content Include="Images\Map.jpg" />
     <Content Include="Images\marker-next.png" />
@@ -452,6 +453,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Content\bootstrap.css.map" />
+    <Content Include="DefaultUserData\App\MobileSurveillance.apk" />
     <None Include="Scripts\jquery-1.9.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />

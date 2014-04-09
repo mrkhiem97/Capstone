@@ -23,6 +23,11 @@
 
 </head>
 <body id="login-body">
+    <div class="row" style="float:right; margin-right: 10px; margin-top: 10px">
+        <a href="../DefaultUserData/App/MobileSurveillance.apk">
+            <img src="Images/android_download.png" width="200" height="70" />
+        </a>
+    </div>
     <div style="padding: 100px 0 0 250px;">
         <div id="login-box">
 
@@ -55,7 +60,7 @@
                     </div>
 
                     <div style="float:right">
-                        <a href="retrievePassword.html">Forgot Password?</a>
+                        @Html.ActionLink("Forgot password", "RetrievePassword", "Account", null)
                         @Html.ActionLink("Register", "Register", "Account", null, htmlAttributes: new { @class = "btn btn-primary" })
                         <input type="submit" value="Login" class="btn btn-default" />
                     </div>
