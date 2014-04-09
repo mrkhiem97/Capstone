@@ -25,6 +25,12 @@ namespace MobileSurveillanceWebApplication
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AuthConfig.RegisterAuth();
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
+			
+			
+			
+			
+			
+			
         }
     }
 }
