@@ -441,6 +441,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         private Location FindBestLocation(ImageLocationApiModel imageLocationApiModel)
         {
             var listLocation = this.context.Locations
+                .Where(x => x.IsActive)
                 .Where(x => x.TrajectoryId.Equals(imageLocationApiModel.TrajectoryId, StringComparison.InvariantCultureIgnoreCase))
                 .OrderBy(x => x.CreatedDate).ToList();
             var minDistance = double.MaxValue;

@@ -65,6 +65,10 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             var location = this.context.Locations.SingleOrDefault(x => x.Id.Equals(locationId, StringComparison.InvariantCultureIgnoreCase));
             location.IsActive = false;
+            for (int i = 0; i < location.CapturedImages.Count; i++)
+            {
+                location.CapturedImages.ElementAt(i).IsActive = false;
+            }
             int result = this.context.SaveChanges();
             string message;
             if (result > 0)
