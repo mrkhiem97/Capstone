@@ -16,7 +16,10 @@ namespace MobileSurveillanceWebApplication.Controllers
         [Authorize]
         public ActionResult ManageLocationImages(String locationId, int index)
         {
-            var location = this.context.Locations.SingleOrDefault(x => x.Id.Equals(locationId, StringComparison.InvariantCultureIgnoreCase));
+            var location = this.context.Locations
+                .Where(x => x.IsActive)
+                .Where(x => x.Id.Equals(locationId, StringComparison.InvariantCultureIgnoreCase))
+                .SingleOrDefault();
             if (location == null)
             {
                 return RedirectToAction("ListTrajectories", "Trajectory");

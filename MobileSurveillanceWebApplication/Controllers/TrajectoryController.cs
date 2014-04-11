@@ -97,6 +97,9 @@ namespace MobileSurveillanceWebApplication.Controllers
             // Condition
             if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword) && !String.IsNullOrWhiteSpace(searchUserModel.SearchKeyword))
             {
+                string[] trajectName = searchUserModel.SearchKeyword.Split(new string[] { "" }, StringSplitOptions.RemoveEmptyEntries);
+                //listTraject = (from c in this.context.Trajectories where c.TrajectoryName.ToLower().Contains()
+
                 listTraject = account.Trajectories.Where(x => x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword)
                     && x.IsActive
                     && x.Status.Equals("Public", StringComparison.InvariantCultureIgnoreCase)
@@ -318,6 +321,17 @@ namespace MobileSurveillanceWebApplication.Controllers
             model.Status = trajectory.Status;
 
             return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetTrajectoryList()
+        {
+            var trajectory = this.context.Trajectories.ToList();
+            var  trajectList = new List<string>();
+            for (int i = 0; i < trajectory.Count; i++)
+            {
+                trajectList.Add(trajectory[i].TrajectoryName);
+            }
+                return Json(trajectList, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SaveTrajectory(TrajectoryViewModel model, TrajectSearchCriteriaViewModel searchUserModel)

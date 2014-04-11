@@ -7,9 +7,12 @@
 }
 
 <script>
+
     function onSuccess(response, status, data) {
         window.location = "?SearchKeyword=" + response.SearchKeyword + "&PageNumber=" + response.PageNumber + "&PageCount=" + response.PageCount;
     }
+
+
 
 
     function onFailure() {
@@ -19,8 +22,8 @@
     function onLoadMutualFriendSuccess(response, status, data) {
         // Generate modal with carousel inside
         var itemHtml = $("#track-user-pattern").html();
-        
-        
+
+
         var fullResult = "";
         for (var i = 0; i < response.length; i++) {
             var item = itemHtml;
@@ -39,26 +42,20 @@
     }
 </script>
 
-<h2>Friend List</h2>
+<div class="alert alert-info" style="margin-top: 25px; margin-left: 18px; width: 400px"><h4><b>You have these following friends!</b></h4></div>
 
 <div class="row">
     <!-- List Friends-->
-    <div class="col-md-9">
-        <div class="row" style="margin-bottom:50px">
+    <div class="col-lg-9 col-md-9 col-sm-12">
+        <div class="row" style="margin-bottom: 20px">
             @using (Html.BeginForm("ListUser", "User", FormMethod.Post, new { @role = "search" }))
             {
-                <div class="col-lg-6">
-                    <div class="input-group">
-                        <div class="form-group">
-                            <input type="text" name="SearchKeyword" class="form-control" placeholder="Your friends name ..." value="@searchUserModel.SearchKeyword">
-                            <input type="hidden" name="PageNumber" value="1" />
-                            <input type="hidden" name="PageCount" value="0" />
-                        </div>
-                        <span class="input-group-btn">
-                            <button type="submit" class="btn btn-default">Filter</button>
-                        </span>
-                    </div><!-- /input-group -->
-                </div><!-- /.col-lg-6 -->
+                <div class="col-lg-12" style="margin-left: 18px">
+                    <input type="text" name="SearchKeyword" id="searchFriend" class="form-control" placeholder="Your friends name ..." value="@searchUserModel.SearchKeyword" style="width: 400px">
+                    <input type="hidden" name="PageNumber" value="1" />
+                    <input type="hidden" name="PageCount" value="0" />
+                    <button type="submit" class="btn btn-default" style="">Filter <span class="glyphicon glyphicon-search"></span></button>
+                </div><!-- /input-group -->
             }
         </div>
 
@@ -142,7 +139,7 @@
     </div>
     <!-- End of List Friends-->
     <!-- Suggest Friends-->
-    <div class="col-md-3">
+    <div class="col-lg-3 col-md-3 col-sm-12">
         <blockquote>
             <p><span class="glyphicon glyphicon-pencil"></span> You may know these people</p>
         </blockquote>
@@ -229,3 +226,46 @@
     </div>
 </div>
 <!-- End List of Mutual Friends-->
+
+<script>
+    var substringMatcher = function (strs) {
+        return function findMatches(q, cb) {
+            var matches, substringRegex;
+
+            // an array that will be populated with substring matches
+            matches = [];
+
+            // regex used to determine if a string contains the substring `q`
+            substrRegex = new RegExp(q, 'i');
+
+            // iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array
+            $.each(strs, function (i, str) {
+                if (substrRegex.test(str)) {
+                    // the typeahead jQuery plugin expects suggestions to a
+                    // JavaScript object, refer to typeahead docs for more info
+                    matches.push({ value: str });
+                }
+            });
+
+            cb(matches);
+        };
+    };
+
+    //var states = Trajectories;
+
+
+
+    $('#searchFriend').typeahead({
+        limit: 3,
+        hint: true,
+        highlight: true,
+        minLength: 1,
+
+    },
+    {
+        name: 'states',
+        displayKey: 'value',
+        source: substringMatcher(Users)
+    });
+</script>

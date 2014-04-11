@@ -1,7 +1,7 @@
 ﻿@using (Html.BeginForm("SearchResult", "SearchResult", FormMethod.Post, new { @id = "search-form-bar", @role = "form", @class = "navbar-form navbar-left" }))
 {
     <div class="form-group form-search">
-        <input id="txtSearchAll" placeholder="People" value="" type="text" name="SearchKeyword" class="form-control col-lg-9 col-md-9 search-box" />
+        <input id="txtSearchAll" placeholder="People" value="" type="text" name="SearchKeyword" class="form-control col-lg-9 col-md-9 search-box typeahead" />
         <i class="glyphicon glyphicon-search"></i>
         <input id="txtPageNumber" type="hidden" name="PageNumber" value="1" />
         <input id="txtPageCount" type="hidden" name="PageCount" value="0" />
@@ -9,12 +9,19 @@
 }
 
 <script>
+    var Users = [];
     $(window).load(function () {
         $('#txtSearchAll').on('keydown', function (e) {
             if (e.which == 13) {
                 $('#search-form-bar').submit();
             }
         });
+
+        $.getJSON("/User/GetUserList/", {}, function (data) {
+            for (var i = 0; i < data.length; i++) {
+                Users.push(data[i]);
+            }
+        })
     });
 </script>
 <style>
@@ -35,3 +42,46 @@
             color: #a7a7a7;
         }
 </style>
+
+<script>
+    var substringMatcher = function (strs) {
+        return function findMatches(q, cb) {
+            var matches, substringRegex;
+
+            // an array that will be populated with substring matches
+            matches = [];
+
+            // regex used to determine if a string contains the substring `q`
+            substrRegex = new RegExp(q, 'i');
+
+            // iterate through the pool of strings and for any string that
+            // contains the substring `q`, add it to the `matches` array
+            $.each(strs, function (i, str) {
+                if (substrRegex.test(str)) {
+                    // the typeahead jQuery plugin expects suggestions to a
+                    // JavaScript object, refer to typeahead docs for more info
+                    matches.push({ value: str });
+                }
+            });
+
+            cb(matches);
+        };
+    };
+
+    //var states = Trajectories;
+
+    
+
+    $('#txtSearchAll').typeahead({
+        limit: 3,
+        hint: true,
+        highlight: true,
+        minLength: 1,
+
+    },
+    {
+        name: 'states',
+        displayKey: 'value',
+        source: substringMatcher(Users)
+    });
+</script>

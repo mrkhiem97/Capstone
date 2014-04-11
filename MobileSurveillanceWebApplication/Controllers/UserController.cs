@@ -31,6 +31,17 @@ namespace MobileSurveillanceWebApplication.Controllers
             return RedirectToAction("ListUser", new { SearchKeyword = "", PageNumber = 1, PageCount = 0 });
         }
 
+        public JsonResult GetUserList()
+        {
+            var account = this.context.Accounts.ToList();
+            var accountList = new List<string>();
+            for (int i = 0; i < account.Count; i++)
+            {
+                accountList.Add(account[i].Fullname);
+            }
+            return Json(accountList, JsonRequestBehavior.AllowGet);
+        }
+
         /// <summary>
         /// List All Friends
         /// </summary>

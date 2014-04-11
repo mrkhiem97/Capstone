@@ -479,6 +479,7 @@
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\markerwithlabel.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\typeahead.jquery.js" />
     <Content Include="UserData\admin1\Avatar\131.jpg" />
     <Content Include="UserData\admin1\Image\20140317125204.jpg" />
     <Content Include="UserData\admin1\Image\20140317125206.jpg" />

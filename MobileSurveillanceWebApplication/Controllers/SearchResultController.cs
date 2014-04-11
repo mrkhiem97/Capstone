@@ -44,12 +44,12 @@ namespace MobileSurveillanceWebApplication.Controllers
             if (!String.IsNullOrEmpty(searchCriteriaViewModel.SearchKeyword.Trim()) && !String.IsNullOrWhiteSpace(searchCriteriaViewModel.SearchKeyword.Trim()))
             {
                 listUser = this.context.Accounts.Where(x => x.Username.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower()) || x.Fullname.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower())).ToList();
-                listUser.Remove(account);
+                //listUser.Remove(account);
             }
             else
             {
                 listUser = this.context.Accounts.ToList();
-                listUser.Remove(account);
+                //listUser.Remove(account);
             }
             ViewBag.SearchUserCount = listUser.Count();
 

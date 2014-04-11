@@ -23,6 +23,9 @@ namespace MobileSurveillanceWebApplication.Controllers
     public class MobileSurveillanceApiController : ApiController
     {
         private const String USER_DATA_FOLDER = "UserData";
+        private const string IS_FRIEND = "1";
+        private const string NOT_FRIEND = "0";
+
         private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
 
         /// <summary>
@@ -75,13 +78,12 @@ namespace MobileSurveillanceWebApplication.Controllers
                     }
                     else
                     {
-                        trajectoryApiModel = null;
-                        retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
+                        retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                     }
                 }
                 catch (Exception)
                 {
-                    retVal = new HttpResponseMessage(HttpStatusCode.BadRequest);
+                    retVal = Request.CreateResponse(HttpStatusCode.BadRequest, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                 }
             }
             else
@@ -90,9 +92,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     trajectory.IsActive = false;
                     this.context.SaveChanges();
-                    trajectoryApiModel = null;
                     // Update lại trajectory
-                    retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
+                    retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                 }
                 else
                 {
@@ -113,8 +114,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                             }
                             else
                             {
-                                trajectoryApiModel = null;
-                                retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
+                                retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                             }
                         }
                         else if (lastUpdated == trajectory.LastUpdated)
@@ -129,8 +129,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                     }
                     else
                     {
-                        trajectoryApiModel = null;
-                        retVal = new HttpResponseMessage(HttpStatusCode.NotModified);
+                        retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                     }
                 }
             }
@@ -246,32 +245,100 @@ namespace MobileSurveillanceWebApplication.Controllers
             int pageSize = pagingModel.PageSize;
             long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
             // Get user account
-            var account = (from x in this.context.Accounts where x.Id == accountId select x).Single();
             ICollection<FriendShip> listFriendShip = null;
             if (String.IsNullOrEmpty(pagingModel.SearchQuery))
             {
-                listFriendShip = account.FriendShips1.Where(x => x.Account.IsActive).OrderBy(x => x.Account.Fullname).OrderBy(x => x.Account.Username).Skip(page * pageSize).Take(pageSize).ToList();
+                listFriendShip = this.context.FriendShips
+                    .Where(x => x.MyId == accountId)
+                    .Where(x => x.Status.Equals(IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                    .OrderBy(x => x.Account.Username)
+                    .OrderBy(x => x.Account.Fullname)
+                    .ToList();
             }
             else
             {
-                //listTrajectory = account.Trajectories.Skip(page * pageSize).Take(pageSize).ToList();
-                listFriendShip = account.FriendShips1
-                                  .Where(x => x.Account.IsActive)
-                                  .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
-                                  .OrderBy(x => x.Account.Fullname)
-                                  .OrderBy(x => x.Account.Username)
-                                  .Skip(page * pageSize).Take(pageSize).ToList();
+                listFriendShip = this.context.FriendShips
+                    .Where(x => x.MyId == accountId)
+                    .Where(x => x.Status.Equals(IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                    .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
+                    .OrderBy(x => x.Account.Username)
+                    .OrderBy(x => x.Account.Fullname)
+                    .ToList();
+
             }
 
             for (int i = 0; i < listFriendShip.Count; i++)
             {
-                var accountFriendApiModel = new AccountFriendApiModel();
-                accountFriendApiModel.Id = listFriendShip.ElementAt(i).Account.Id;
-                accountFriendApiModel.Username = listFriendShip.ElementAt(i).Account.Username;
-                accountFriendApiModel.Fullname = listFriendShip.ElementAt(i).Account.Fullname;
-                accountFriendApiModel.Email = listFriendShip.ElementAt(i).Account.Email;
-                accountFriendApiModel.Avatar = listFriendShip.ElementAt(i).Account.Avatar.Remove(0, 1);
-                list.Add(accountFriendApiModel);
+                var myId = listFriendShip.ElementAt(i).MyId;
+                var myFriendId = listFriendShip.ElementAt(i).MyFriendId;
+                var isBothFriend = this.context.FriendShips
+                    .Where(x => x.MyId == myFriendId)
+                    .Where(x => x.MyFriendId == myId)
+                    .Where(x => x.Status.Equals(IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                    .Any();
+                if (isBothFriend)
+                {
+                    var accountFriendApiModel = new AccountFriendApiModel();
+                    accountFriendApiModel.Id = listFriendShip.ElementAt(i).Account.Id;
+                    accountFriendApiModel.Username = listFriendShip.ElementAt(i).Account.Username;
+                    accountFriendApiModel.Fullname = listFriendShip.ElementAt(i).Account.Fullname;
+                    accountFriendApiModel.Email = listFriendShip.ElementAt(i).Account.Email;
+                    accountFriendApiModel.Avatar = listFriendShip.ElementAt(i).Account.Avatar.Remove(0, 1);
+                    list.Add(accountFriendApiModel);
+                }
+            }
+            list = list.Skip(page * pageSize).Take(pageSize).ToList();
+            retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
+            return retVal;
+        }
+
+
+        /// <summary>
+        /// Load Friends
+        /// </summary>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [BasicAuthenticationFilter(true)]
+        public HttpResponseMessage LoadPeople([FromBody]PagingApiModel pagingModel)
+        {
+            HttpResponseMessage retVal = null;
+            var list = new List<AccountFriendApiModel>();
+            int page = pagingModel.Page;
+            int pageSize = pagingModel.PageSize;
+            long accountId = ((BasicAuthenticationIdentity)User.Identity).Id;
+            // Get user account
+            ICollection<Account> listAccount = null;
+            if (String.IsNullOrEmpty(pagingModel.SearchQuery))
+            {
+                listAccount = this.context.Accounts
+                    .Where(x => x.IsActive)
+                    .OrderBy(x => x.Username)
+                    .OrderBy(x => x.Fullname)
+                    .Skip(page * pageSize).Take(pageSize)
+                    .ToList();
+            }
+            else
+            {
+                listAccount = this.context.Accounts
+                    .Where(x => x.IsActive)
+                    .Where(x => x.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Fullname.ToLower().Contains(pagingModel.SearchQuery))
+                    .OrderBy(x => x.Username)
+                    .OrderBy(x => x.Fullname)
+                    .Skip(page * pageSize).Take(pageSize)
+                    .ToList();
+
+            }
+
+            for (int i = 0; i < listAccount.Count; i++)
+            {
+                    var accountFriendApiModel = new AccountFriendApiModel();
+                    accountFriendApiModel.Id = listAccount.ElementAt(i).Id;
+                    accountFriendApiModel.Username = listAccount.ElementAt(i).Username;
+                    accountFriendApiModel.Fullname = listAccount.ElementAt(i).Fullname;
+                    accountFriendApiModel.Email = listAccount.ElementAt(i).Email;
+                    accountFriendApiModel.Avatar = listAccount.ElementAt(i).Avatar.Remove(0, 1);
+                    list.Add(accountFriendApiModel);
             }
             retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
             return retVal;
@@ -597,7 +664,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         }
 
         [HttpPost]
-        //[BasicAuthenticationFilter(true)]
+        [BasicAuthenticationFilter(true)]
         public HttpResponseMessage UpdateRoutingResult([FromBody] RoutingApiModel routingApiModel)
         {
             HttpResponseMessage retVal = null;
@@ -717,7 +784,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         }
 
         [HttpPost]
-        //[BasicAuthenticationFilter(true)]
+        [BasicAuthenticationFilter(true)]
         public HttpResponseMessage LoadListRouting()
         {
             HttpResponseMessage retVal = null;
@@ -800,7 +867,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         }
 
         [HttpPost]
-        //[BasicAuthenticationFilter(true)]
+        [BasicAuthenticationFilter(true)]
         public HttpResponseMessage LoadRouting([FromBody]LoadRoutingApiModel model)
         {
             HttpResponseMessage retVal = null;
