@@ -37,6 +37,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             model.CreateDate = trajectory.CreatedDate.ToString();
             model.Description = trajectory.Description;
             model.LastUpdate = trajectory.LastUpdated.ToString();
+            model.TotalLocation = trajectory.Locations.Count(x => x.IsActive);
             return View(model);
         }
 

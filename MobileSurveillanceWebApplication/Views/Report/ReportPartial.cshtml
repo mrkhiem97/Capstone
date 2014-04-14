@@ -1,0 +1,145 @@
+﻿@model MobileSurveillanceWebApplication.Models.ViewModel.TrajectoryViewModel
+<script src="@Url.Content("~/Scripts/amcharts/amcharts.js")"></script>
+<script src="@Url.Content("~/Scripts/amcharts/serial.js")"></script>
+<!-- scripts for exporting chart as an image -->
+<!-- Exporting to image works on all modern browsers except IE9 (IE10 works fine) -->
+<!-- Note, the exporting will work only if you view the file from web server -->
+<!--[if (!IE) | (gte IE 10)]> -->
+<script src="@Url.Content("~/Scripts/amcharts/exporting/amexport.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/amcharts/exporting/canvg.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/amcharts/exporting/filesaver.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/amcharts/exporting/jspdf.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/amcharts/exporting/jspdf.plugin.addimage.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/amcharts/exporting/rgbcolor.js")" type="text/javascript"></script>
+
+<!-- <![endif]-->
+<script type="text/javascript">
+    $(document).ready(function () {
+        var chart;
+        var graph;
+        $("#summary-report").hide();
+        $.getJSON("/Report/GetReportData/", { trajectoryId: '@Model.Id' }, function (chartData) {
+            $("#total-distance").text("Total Distances: " + chartData[chartData.length - 1].CummulativeDistance + " Kilometers");
+            $("#summary-report").show();
+            $("#total-location").text("Total Locations: " + @Model.TotalLocation);
+            // SERIAL CHART
+            chart = new AmCharts.AmSerialChart();
+            chart.pathToImages = "@Url.Content("~/Scripts/amcharts/images/")";
+            chart.dataProvider = chartData;
+            chart.marginLeft = 10;
+            chart.categoryField = "TakenDate";
+            chart.allLabels = [
+                { "x": 50, "y": 50, "text": "@Model.TrajectoryName", "align": "center", "size": 24, "color": "#0066CC", "alpha": 1, "rotation": 0, "bold": true, "url": "@Url.Action("ViewDetail", "Trajectory", new { trajectoryId = Model.Id})" },
+                { "x": 50, "y": 80, "text": "@Model.CreateDate", "align": "center", "size": 16, "color": "#0066CC", "alpha": 1, "rotation": 0, "bold": true, "url": "@Url.Action("ViewDetail", "Trajectory", new { trajectoryId = Model.Id})" }
+            ];
+
+            // AXES
+            // category
+            var categoryAxis = chart.categoryAxis;
+            categoryAxis.dashLength = 3;
+            categoryAxis.minorGridEnabled = true;
+            categoryAxis.minorGridAlpha = 0.1;
+            categoryAxis.autoWrap = true;
+            categoryAxis.title = "Time Line";
+
+            // value
+            var valueAxis = new AmCharts.ValueAxis();
+            valueAxis.axisAlpha = 0;
+            valueAxis.inside = true;
+            valueAxis.dashLength = 10;
+            valueAxis.title = "Distance";
+            chart.addValueAxis(valueAxis);
+
+            // GRAPH
+            graph = new AmCharts.AmGraph();
+            graph.type = "line"; // this line makes the graph smoothed line.
+            graph.lineColor = "#d1655d";
+            //graph.bullet = "round";
+            graph.bulletSize = 40;
+            graph.bulletOffset = 25;
+            graph.bulletBorderColor = "#FFFFFF";
+            graph.bulletBorderAlpha = 1;
+            graph.bulletBorderThickness = 2;
+            graph.lineThickness = 2;
+            graph.valueField = "Distance";
+            graph.customBulletField = "Marker";
+            graph.balloonText = "<span style='color:red;'>[[category]]</span>" +
+                "<br><b><span style='font-size:13px;'>Velocity: [[Velocity]] Km/h</span></b>" +
+                "<br><b><span style='font-size:13px;'>Distance: [[value]] Km</span></b>" +
+                "<br><b><span style='font-size:13px;'>Total Distance: [[CummulativeDistance]] Km</span></b>" +
+                "<br><b><span style='font-size:13px;'>GPS: ([[Latitude]], [[Longitude]])</span></b>" +
+                "<br><b><span style='font-size:13px;'>Address: [[Address]]</span></b>";
+            chart.addGraph(graph);
+
+            // CURSOR
+            var chartCursor = new AmCharts.ChartCursor();
+            chartCursor.cursorAlpha = 0;
+            chartCursor.cursorPosition = "mouse";
+            chart.addChartCursor(chartCursor);
+
+            // SCROLLBAR
+            var chartScrollbar = new AmCharts.ChartScrollbar();
+            chart.addChartScrollbar(chartScrollbar);
+
+            chart.creditsPosition = "bottom-right";
+
+            chart.exportConfig = {
+                menuTop: "80px",
+                menuBottom: "auto",
+                menuRight: "20px",
+                backgroundColor: "#efefef",
+
+                menuItemStyle	: {
+                    backgroundColor			: '#EFEFEF',
+                    rollOverBackgroundColor	: '#DDDDDD'},
+
+                menuItems: [{
+                    textAlign: 'center',
+                    icon: '@Url.Content("~/Scripts/amcharts/images/export.png")',
+                    onclick:function(){},
+                    iconTitle: 'Save chart as an image',
+                    items: [{
+                        title: 'JPG',
+                        format: 'jpg'
+                    }, {
+                        title: 'PNG',
+                        format: 'png'
+                    }, {
+                        title: 'SVG',
+                        format: 'svg'
+                    }, {
+                        title: 'PDF',
+                        format: 'pdf'
+                    }]
+                }]
+            };
+
+            // WRITE
+            chart.write("chartdiv");
+        });
+    });
+
+
+
+    // this method is called when chart is first inited as we listen for "dataUpdated" event
+    function zoomChart() {
+        // different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
+        chart.zoomToDates(new Date(1972, 0), new Date(1984, 0));
+    }
+</script>
+<div class="col-lg-5 col-md-5 col-sm-12">
+    <div id="summary-report" class="alert alert-info sumary-report">
+        <div id="total-location">
+        </div>
+        <div id="total-distance">
+        </div>
+    </div>
+</div>
+<div class="col-lg-7 col-md-7 col-sm-12">
+    @using (Html.BeginForm("ExcelReport", "Report", FormMethod.Post, new { enctype = "multipart/form-data", id="report-download-form" }))
+    {
+        <input type="hidden" name="trajectoryId" value="@Model.Id" />
+        <input class="download-report" type="submit" name="Export" id="Export" value="" />
+    }
+</div>
+<div id="chartdiv" style="width: 90%; height: 470px; margin-left: 18px; margin-right: auto;"></div>

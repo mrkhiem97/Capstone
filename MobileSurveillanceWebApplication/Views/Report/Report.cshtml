@@ -1,0 +1,10 @@
+﻿@model MobileSurveillanceWebApplication.Models.ViewModel.TrajectoryViewModel
+
+@{
+    ViewBag.Title = "Report";
+}
+<div class="row">
+    @{
+        Html.RenderPartial("~/Views/Report/ReportPartial.cshtml", Model);
+    }
+</div>

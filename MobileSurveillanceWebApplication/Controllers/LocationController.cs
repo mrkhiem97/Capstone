@@ -38,7 +38,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             var listActiveImages = location.CapturedImages.Where(x => x.IsActive).ToList();
             for (int i = 0; i < listActiveImages.Count; i++)
             {
-                var capturedImage = location.CapturedImages.ElementAt(i);
+                var capturedImage = listActiveImages[i];
                 var imageViewModel = new ImageViewModel()
                 {
                     Id = capturedImage.Id,

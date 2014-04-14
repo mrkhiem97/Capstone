@@ -232,7 +232,7 @@
 
 #map-canvas {
     float: left;
-    height: 570px;
+    height: 600px;
     left: 10px;
     border: solid 1px #cccccc;
     border-radius: 1%;
@@ -280,7 +280,6 @@
 }
 
 #locationPanel {
-    
 }
 
 #location-list {
@@ -771,3 +770,40 @@
     background-color: #E9EAED;
 }
 /*End Type Ahead*/
+
+/**Report*/
+.sumary-report {
+    margin-top: 25px;
+    margin-left: 18px;
+    width: 420px;
+}
+
+#total-location {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#total-distance {
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.download-report {
+    float: right;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+#Export {
+    border: none;
+    background: url("../Images/excel-report.png") no-repeat;
+    width: 60px;
+    height: 60px;
+}
+
+.chart-report {
+    margin-top: 20px;
+}

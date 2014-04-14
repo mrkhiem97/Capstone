@@ -46,6 +46,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
 
         public string EndAddress {get;set;}
 
+        public int TotalLocation { get; set; }
         public TrajectoryViewModel()
         {
             LocateList = new List<Location>();

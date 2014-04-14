@@ -16,10 +16,14 @@
     }
 </script>
 
-<div class="alert alert-info" style="margin-top: 25px; margin-left: 18px; width: 420px"><h4><b>You have these following friend requests!</b></h4></div>
 @if (!Model.ListUser.Any())
 {
     <div class="alert alert-danger" style="margin-top: 25px; margin-left: 18px; width: 450px"><h4><b>There is no friend request for you at this time!!</b></h4></div>
+}
+else
+{
+    <div class="alert alert-info" style="margin-top: 25px; margin-left: 18px; width: 420px"><h4><b>You have these following friend requests!</b></h4></div>
+
 }
 
 @foreach (var item in Model.ListUser)

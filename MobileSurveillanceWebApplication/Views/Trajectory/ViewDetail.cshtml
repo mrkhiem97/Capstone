@@ -633,8 +633,8 @@
             <div class="modal-body" id="modalbody">
             </div>
             @*<div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>*@
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>*@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
@@ -696,18 +696,23 @@
     </div>
 </div>
 
-
-
-<div class="row social-share">
-    @*Viết 1 hàm check friend để kiểmt tra nếu là friend của nhau thì mới thực hiệnch ức năng share*@
-    <span class='st_facebook_large' displaytext='Facebook'></span>
-    <span class='st_fblike_large' displaytext='Facebook Like'></span>
-    <span class='st_googleplus_large' displaytext='Google +'></span>
-    <span class='st_plusone_large' displaytext='Google +1'></span>
-    <span class='st_twitter_large' displaytext='Tweet'></span>
-    <span class='st_linkedin_large' displaytext='LinkedIn'></span>
-    <span class='st_pinterest_large' displaytext='Pinterest'></span>
-    <span class='st_email_large' displaytext='Email'></span>
+<div class="row chart-report">
+    @{
+        Html.RenderPartial("~/Views/Report/ReportPartial.cshtml", Model);
+    }
+</div>
+<div class="row">
+    <!-- AddThis Button BEGIN -->
+    <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+        <a class="addthis_button_facebook"></a>
+        <a class="addthis_button_google_plusone_share"></a>
+        <a class="addthis_button_twitter"></a>
+        <a class="addthis_button_linkedin"></a>
+        <a class="addthis_button_gmail"></a>
+        <a class="addthis_button_yahoomail"></a>
+        <a class="addthis_button_compact"></a><a class="addthis_counter addthis_bubble_style"></a>
+    </div>
+    <!-- AddThis Button END -->
 </div>
 
 <div id="panel" style="border: 1px solid #666666">
@@ -721,13 +726,12 @@
     </select>
 </div>
 @section scripts{
-    <!-- Javascript -->
-    <script type="text/javascript"
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9aFiBetpU1mIBG65QpO8LzYslOhdQyXE&sensor=true">
-    </script>
-    <script src="/Scripts/markerwithlabel.js"></script>
-    <script src="/Scripts/jquery.rs.slideshow.js"></script>
-    <script type="text/javascript">var switchTo5x = true;</script>
-    <script type="text/javascript" src="http://w.sharethis.com/button/buttons.js"></script>
-    <script type="text/javascript">stLight.options({ publisher: "130b538d-b972-4463-a794-cc455cf14bfb", doNotHash: false, doNotCopy: false, hashAddressBar: true });</script>
+<!-- Javascript -->
+<script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9aFiBetpU1mIBG65QpO8LzYslOhdQyXE&sensor=true">
+</script>
+<script src="/Scripts/markerwithlabel.js"></script>
+<script src="/Scripts/jquery.rs.slideshow.js"></script>
+<script type="text/javascript">var addthis_config = { "data_track_addressbar": true };</script>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-534c0de3376c4f4c"></script>
 }
