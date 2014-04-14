@@ -51,10 +51,10 @@
             @using (Html.BeginForm("ListUser", "User", FormMethod.Post, new { @role = "search" }))
             {
                 <div class="col-lg-12" style="margin-left: 18px">
-                    <input type="text" name="SearchKeyword" id="searchFriend" class="form-control" placeholder="Your friends name ..." value="@searchUserModel.SearchKeyword" style="width: 400px; display: inline">
+                    <input type="text" name="SearchKeyword" id="searchFriend" class="form-control" placeholder="Your friends name ..." value="@searchUserModel.SearchKeyword" style="width: 400px; display: inline-block">
                     <input type="hidden" name="PageNumber" value="1" />
                     <input type="hidden" name="PageCount" value="0" />
-                    <button type="submit" class="btn btn-default" style="display:inline">Filter <span class="glyphicon glyphicon-search"></span></button>
+                    <button type="submit" class="btn btn-default" style="display: inline-block; margin-top: 15px">Filter <span class="glyphicon glyphicon-search"></span></button>
                 </div><!-- /input-group -->
             }
         </div>
