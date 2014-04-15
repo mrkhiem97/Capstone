@@ -9,6 +9,7 @@ using System.Data.OleDb;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -38,6 +39,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 
         public async Task<JsonResult> GetReportData(string trajectoryId)
         {
+            var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectoryId, StringComparison.InvariantCultureIgnoreCase)).SingleOrDefault();
             var listLocation = this.context.Locations
                     .Where(x => x.TrajectoryId.Equals(trajectoryId) && x.IsActive)
                     .OrderBy(x => x.CreatedDate).ToList();
@@ -77,7 +79,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                 list.Add(reportViewModel);
             }
 
-            return Json(list, JsonRequestBehavior.AllowGet);
+            return Json(new {
+                TrajectoryName = HttpUtility.JavaScriptStringEncode(trajectory.TrajectoryName),
+                ChartData = list
+            }, JsonRequestBehavior.AllowGet);
         }
 
         public async Task<ReportViewModel> GetReportViewModel(Location start, Location destination, double cummulativeDistance)

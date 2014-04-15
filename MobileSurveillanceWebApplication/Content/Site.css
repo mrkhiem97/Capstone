@@ -804,6 +804,10 @@
     height: 60px;
 }
 
+    #Export:hover {
+        opacity: 0.7;
+    }
+
 .chart-report {
     margin-top: 20px;
 }

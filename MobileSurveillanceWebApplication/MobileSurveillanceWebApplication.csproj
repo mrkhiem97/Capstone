@@ -562,6 +562,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\typeahead.jquery.js" />
     <Content Include="UserData\admin1\Avatar\131.jpg" />
+    <Content Include="UserData\admin1\Avatar\39.jpg" />
     <Content Include="UserData\admin1\Image\20140317125204.jpg" />
     <Content Include="UserData\admin1\Image\20140317125206.jpg" />
     <Content Include="UserData\admin1\Image\20140317125208.jpg" />
@@ -795,6 +796,34 @@
     <Content Include="UserData\admin1\Image\20140404090550.jpg" />
     <Content Include="UserData\admin1\Image\20140404090553.jpg" />
     <Content Include="UserData\admin1\Image\20140404090558.jpg" />
+    <Content Include="UserData\admin1\Image\20140415101130.jpg" />
+    <Content Include="UserData\admin1\Image\20140415101133.jpg" />
+    <Content Include="UserData\admin1\Image\20140415101139.jpg" />
+    <Content Include="UserData\admin1\Image\20140415101326.jpg" />
+    <Content Include="UserData\admin1\Image\20140415101346.jpg" />
+    <Content Include="UserData\admin1\Image\20140415101353.jpg" />
+    <Content Include="UserData\admin1\Image\20140415102132.jpg" />
+    <Content Include="UserData\admin1\Image\20140415102141.jpg" />
+    <Content Include="UserData\admin1\Image\20140415102934.jpg" />
+    <Content Include="UserData\admin1\Image\20140415102940.jpg" />
+    <Content Include="UserData\admin1\Image\20140415103706.jpg" />
+    <Content Include="UserData\admin1\Image\20140415103716.jpg" />
+    <Content Include="UserData\admin1\Image\20140415104037.jpg" />
+    <Content Include="UserData\admin1\Image\20140415104056.jpg" />
+    <Content Include="UserData\admin1\Image\20140415105050.jpg" />
+    <Content Include="UserData\admin1\Image\20140415105102.jpg" />
+    <Content Include="UserData\admin1\Image\20140415105510.jpg" />
+    <Content Include="UserData\admin1\Image\20140415105514.jpg" />
+    <Content Include="UserData\admin1\Image\20140415105526.jpg" />
+    <Content Include="UserData\admin1\Image\20140415105535.jpg" />
+    <Content Include="UserData\admin1\Image\20140415110356.jpg" />
+    <Content Include="UserData\admin1\Image\20140415110408.jpg" />
+    <Content Include="UserData\admin1\Image\20140415111023.jpg" />
+    <Content Include="UserData\admin1\Image\20140415111036.jpg" />
+    <Content Include="UserData\admin1\Image\20140415111045.jpg" />
+    <Content Include="UserData\admin1\Image\20140415111052.jpg" />
+    <Content Include="UserData\admin1\Image\20140415131033.jpg" />
+    <Content Include="UserData\admin1\Image\20140415131040.jpg" />
     <Content Include="UserData\admin7\Image\20140321162541.jpg" />
     <Content Include="UserData\admin7\Image\20140321162544.jpg" />
     <Content Include="UserData\admin7\Image\20140321162547.jpg" />
@@ -806,14 +835,22 @@
     <Content Include="UserData\admin7\Image\20140321162908.jpg" />
     <Content Include="UserData\admin7\Image\20140321163120.jpg" />
     <Content Include="UserData\admin7\Image\20140321163214.jpg" />
+    <Content Include="UserData\admin\Avatar\02.jpg" />
+    <Content Include="UserData\admin\Avatar\05.jpg" />
+    <Content Include="UserData\admin\Avatar\08.jpg" />
     <Content Include="UserData\admin\Avatar\100.JPG" />
+    <Content Include="UserData\admin\Avatar\15.jpg" />
     <Content Include="UserData\admin\Avatar\22.jpg" />
     <Content Include="UserData\admin\Avatar\38.jpg" />
+    <Content Include="UserData\admin\Avatar\57.jpg" />
+    <Content Include="UserData\admin\Avatar\68.JPG" />
     <Content Include="UserData\admin\Avatar\Avatar.png" />
     <Content Include="UserData\admin\Image\20140402131113.jpg" />
     <Content Include="UserData\admin\Image\20140402131116.jpg" />
     <Content Include="UserData\admin\Image\20140402131249.jpg" />
     <Content Include="UserData\admin\Image\20140402131252.jpg" />
+    <Content Include="UserData\phuonglhk\Avatar\09.jpg" />
+    <Content Include="UserData\phuonglhk\Avatar\18.jpg" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -869,6 +906,7 @@
     <Content Include="Views\Trajectory\_EditTrajectory.cshtml" />
     <Content Include="Views\Report\Report.cshtml" />
     <Content Include="Views\Report\ReportPartial.cshtml" />
+    <Content Include="UserData\admin1\Report\admin140zF3z08zECz33zED20140329063439.xls" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Library\" />

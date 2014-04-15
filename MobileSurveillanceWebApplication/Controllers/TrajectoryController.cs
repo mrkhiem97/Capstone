@@ -34,9 +34,9 @@ namespace MobileSurveillanceWebApplication.Controllers
             model.Id = trajectory.Id;
             model.TrajectoryName = trajectory.TrajectoryName;
             model.Status = trajectory.Status;
-            model.CreateDate = trajectory.CreatedDate.ToString();
+            model.CreateDate = trajectory.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
             model.Description = trajectory.Description;
-            model.LastUpdate = trajectory.LastUpdated.ToString();
+            model.LastUpdate = trajectory.LastUpdated.ToString("dd/MM/yyyy HH:mm:ss tt");
             model.TotalLocation = trajectory.Locations.Count(x => x.IsActive);
             return View(model);
         }
@@ -132,10 +132,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                 trajectoryViewModel.TrajectoryName = trajectory.TrajectoryName;
                 trajectoryViewModel.Description = trajectory.Description;
                 trajectoryViewModel.Status = trajectory.Status;
-                trajectoryViewModel.CreateDate = trajectory.CreatedDate.ToString();
-                trajectoryViewModel.LastUpdate = trajectory.LastUpdated.ToString();
-                var startLocation = trajectory.Locations.Where(x => x.IsActive).OrderByDescending(x => x.CreatedDate).FirstOrDefault();
-                var endLocation = trajectory.Locations.Where(x => x.IsActive).OrderByDescending(x => x.CreatedDate).LastOrDefault();
+                trajectoryViewModel.CreateDate = trajectory.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
+                trajectoryViewModel.LastUpdate = trajectory.LastUpdated.ToString("dd/MM/yyyy HH:mm:ss tt");
+                var startLocation = trajectory.Locations.Where(x => x.IsActive).OrderBy(x => x.CreatedDate).FirstOrDefault();
+                var endLocation = trajectory.Locations.Where(x => x.IsActive).OrderBy(x => x.CreatedDate).LastOrDefault();
                 if (startLocation != null)
                 {
                     trajectoryViewModel.StartLongitude = startLocation.Longitude.ToString();

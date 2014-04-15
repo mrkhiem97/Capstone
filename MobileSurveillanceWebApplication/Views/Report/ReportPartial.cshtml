@@ -18,9 +18,9 @@
         var chart;
         var graph;
         $("#summary-report").hide();
-        $.getJSON("/Report/GetReportData/", { trajectoryId: '@Model.Id' }, function (chartData) {
+        $.getJSON("/Report/GetReportData/", { trajectoryId: '@Model.Id' }, function (responseData) {
+            var chartData = responseData.ChartData;
             $("#total-distance").text("Total Distances: " + chartData[chartData.length - 1].CummulativeDistance + " Kilometers");
-            $("#summary-report").show();
             $("#total-location").text("Total Locations: " + @Model.TotalLocation);
             // SERIAL CHART
             chart = new AmCharts.AmSerialChart();
@@ -29,7 +29,7 @@
             chart.marginLeft = 10;
             chart.categoryField = "TakenDate";
             chart.allLabels = [
-                { "x": 50, "y": 50, "text": "@Model.TrajectoryName", "align": "center", "size": 24, "color": "#0066CC", "alpha": 1, "rotation": 0, "bold": true, "url": "@Url.Action("ViewDetail", "Trajectory", new { trajectoryId = Model.Id})" },
+                { "x": 50, "y": 50, "text": responseData.TrajectoryName, "align": "center", "size": 24, "color": "#0066CC", "alpha": 1, "rotation": 0, "bold": true, "url": "@Url.Action("ViewDetail", "Trajectory", new { trajectoryId = Model.Id})" },
                 { "x": 50, "y": 80, "text": "@Model.CreateDate", "align": "center", "size": 16, "color": "#0066CC", "alpha": 1, "rotation": 0, "bold": true, "url": "@Url.Action("ViewDetail", "Trajectory", new { trajectoryId = Model.Id})" }
             ];
 
@@ -40,6 +40,7 @@
             categoryAxis.minorGridEnabled = true;
             categoryAxis.minorGridAlpha = 0.1;
             categoryAxis.autoWrap = true;
+            categoryAxis.offset = 20;
             categoryAxis.title = "Time Line";
 
             // value
@@ -52,7 +53,7 @@
 
             // GRAPH
             graph = new AmCharts.AmGraph();
-            graph.type = "line"; // this line makes the graph smoothed line.
+            graph.type = "smoothedLine"; // this line makes the graph smoothed line.
             graph.lineColor = "#d1655d";
             //graph.bullet = "round";
             graph.bulletSize = 40;
@@ -116,6 +117,7 @@
 
             // WRITE
             chart.write("chartdiv");
+            $("#summary-report").show();
         });
     });
 
@@ -142,4 +144,4 @@
         <input class="download-report" type="submit" name="Export" id="Export" value="" />
     }
 </div>
-<div id="chartdiv" style="width: 90%; height: 470px; margin-left: 18px; margin-right: auto;"></div>
+<div id="chartdiv" style="width: 90%; height: 550px; margin-left: 18px; margin-right: auto;"></div>
