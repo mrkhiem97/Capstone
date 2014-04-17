@@ -144,10 +144,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     context.SaveChanges();
                     string validateAccountToken = KeyUltil.GenerateHashKey(account.Username);
-
-                    String url = Request.Url.AbsoluteUri;
-                    int index = url.IndexOf("Account");
-                    String host = url.Substring(0, index) + Url.Action("ValidateUserAccount", "Account", new { validateAccountToken = validateAccountToken, username = account.Username });
+                    String url = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host;
+                    String host = url + Url.Action("ValidateUserAccount", "Account", new { validateAccountToken = validateAccountToken, username = account.Username });
                     String link = String.Format("<a href=\"{0}\">{0}</a>", host);
                     string body = "Mobile Surveillance\r\n" + "Please click the link below to Activate your Account\r\n" + link;
                     String subject = "Mobile surveillance - Activate Account";
