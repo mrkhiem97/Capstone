@@ -365,7 +365,7 @@
     -webkit-border-radius: 12px;
     -moz-border-radius: 12px;
     -khtml-border-radius: 12px;
-    height: 560px;
+    height: 505px;
     margin: 10px auto;
     overflow: hidden;
     position: relative;
@@ -644,30 +644,12 @@
     overflow-x: auto;
 }
 
-
-@media (min-width: 1200px) {
-    .modal-size {
-        width: 80%;
-        height: auto;
-        margin-top: 5px;
-    }
+.modal-size {
+    width: 75%;
+    height: auto;
+    margin-top: 5px;
 }
 
-@media (min-width: 992px) {
-    .modal-size {
-        width: 90%;
-        height: auto;
-        margin-top: 5px;
-    }
-}
-
-@media (min-width: 768px) {
-    .modal-size {
-        width: 95%;
-        height: auto;
-        margin-top: 5px;
-    }
-}
 
 .ui-datepicker {
     width: auto;

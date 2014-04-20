@@ -120,6 +120,9 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.0.2\lib\net40\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Geocoding">
+      <HintPath>..\packages\Geocoding.net.3.1.0\lib\net40\Geocoding.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.2.1\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
@@ -354,6 +357,7 @@
     <Compile Include="Utility\EmailUltil.cs" />
     <Compile Include="Utility\IOManager.cs" />
     <Compile Include="Utility\KeyUltil.cs" />
+    <Compile Include="Utility\ReverseGeoCoding.cs" />
     <Compile Include="Utility\SupportUtility.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -561,6 +565,45 @@
     <Content Include="Scripts\markerwithlabel.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Scripts\typeahead.jquery.js" />
+    <Content Include="UserData\admin11\Image\20140419182618.jpg" />
+    <Content Include="UserData\admin11\Image\20140419182630.jpg" />
+    <Content Include="UserData\admin11\Image\20140419182659.jpg" />
+    <Content Include="UserData\admin11\Image\20140419184801.jpg" />
+    <Content Include="UserData\admin11\Image\20140419185417.jpg" />
+    <Content Include="UserData\admin11\Image\20140419185749.jpg" />
+    <Content Include="UserData\admin11\Image\20140419185950.jpg" />
+    <Content Include="UserData\admin11\Image\20140419190151.jpg" />
+    <Content Include="UserData\admin11\Image\20140419190351.jpg" />
+    <Content Include="UserData\admin11\Image\20140419190432.jpg" />
+    <Content Include="UserData\admin11\Image\20140419190435.jpg" />
+    <Content Include="UserData\admin11\Image\20140419190440.jpg" />
+    <Content Include="UserData\admin11\Image\20140419190552.jpg" />
+    <Content Include="UserData\admin11\Image\20140419190752.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215514.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215707.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215710.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215714.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215811.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215813.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215915.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215925.jpg" />
+    <Content Include="UserData\admin11\Image\20140419215928.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220115.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220316.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220516.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220602.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220717.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220742.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220744.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220755.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220756.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220917.jpg" />
+    <Content Include="UserData\admin11\Image\20140419220940.jpg" />
+    <Content Include="UserData\admin11\Image\20140419221118.jpg" />
+    <Content Include="UserData\admin11\Image\20140419221125.jpg" />
+    <Content Include="UserData\admin11\Image\20140419221127.jpg" />
+    <Content Include="UserData\admin11\Image\20140419221318.jpg" />
+    <Content Include="UserData\admin11\Image\20140419221453.jpg" />
     <Content Include="UserData\admin1\Avatar\131.jpg" />
     <Content Include="UserData\admin1\Avatar\39.jpg" />
     <Content Include="UserData\admin1\Image\20140317125204.jpg" />

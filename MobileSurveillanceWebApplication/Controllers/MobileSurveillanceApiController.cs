@@ -423,7 +423,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             try
             {
                 await Request.Content.ReadAsMultipartAsync(provider);
-                var imageLocationApiModel = GetImageLocation(provider, ((BasicAuthenticationIdentity)User.Identity).Name);
+                var imageLocationApiModel = await GetImageLocation(provider, ((BasicAuthenticationIdentity)User.Identity).Name);
                 var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(imageLocationApiModel.TrajectoryId, StringComparison.InvariantCultureIgnoreCase));
                 if (trajectory != null && trajectory.IsActive)
                 {
@@ -601,7 +601,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return retVal;
         }
 
-        private static ImageLocationApiModel GetImageLocation(ExtendMultipartFormDataStreamProvider provider, String username)
+        private static async Task<ImageLocationApiModel> GetImageLocation(ExtendMultipartFormDataStreamProvider provider, String username)
         {
             ImageLocationApiModel imageLocationApiModel = new ImageLocationApiModel();
 
@@ -649,7 +649,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                     }
                 }
             }
-
+            imageLocationApiModel.Address = await ReverseGeoCoding.GetAddress(imageLocationApiModel.Latitude, imageLocationApiModel.Longitude);
             // This illustrates how to get the file names for uploaded files.
             foreach (var file in provider.FileData)
             {

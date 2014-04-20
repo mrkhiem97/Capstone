@@ -298,8 +298,8 @@ namespace MobileSurveillanceWebApplication.Controllers
         public JsonResult GetImgList(string locateId)
         {
             var imgList = new List<string>();
-            var locate = this.context.Locations.Where(x => x.Id == locateId).SingleOrDefault();
-            var img = locate.CapturedImages.ToList();
+            var locate = this.context.Locations.Where(x => x.Id == locateId && x.IsActive).SingleOrDefault();
+            var img = locate.CapturedImages.Where(x => x.IsActive).ToList();
             foreach (var i in img)
             {
                 imgList.Add(USER_DATA_FOLDER + i.ImageUrl);
