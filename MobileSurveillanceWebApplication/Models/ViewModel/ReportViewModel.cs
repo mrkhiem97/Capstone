@@ -16,5 +16,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public String Address { get; set; }
+
+        public int LocationNumber { get; set; }
     }
 }

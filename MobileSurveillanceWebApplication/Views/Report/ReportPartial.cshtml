@@ -51,26 +51,46 @@
             valueAxis.title = "Distance";
             chart.addValueAxis(valueAxis);
 
-            // GRAPH
-            graph = new AmCharts.AmGraph();
-            graph.type = "smoothedLine"; // this line makes the graph smoothed line.
-            graph.lineColor = "#d1655d";
+            // GRAPH 2
+            graph1 = new AmCharts.AmGraph();
+            graph1.type = "smoothedLine"; // this line makes the graph smoothed line.
+            graph1.lineColor = "#d1655d";
             //graph.bullet = "round";
-            graph.bulletSize = 40;
-            graph.bulletOffset = 25;
-            graph.bulletBorderColor = "#FFFFFF";
-            graph.bulletBorderAlpha = 1;
-            graph.bulletBorderThickness = 2;
-            graph.lineThickness = 2;
-            graph.valueField = "Distance";
-            graph.customBulletField = "Marker";
-            graph.balloonText = "<span style='color:red;'>[[category]]</span>" +
+            graph1.bulletSize = 40;
+            graph1.bulletOffset = 25;
+            graph1.bulletBorderColor = "#FFFFFF";
+            graph1.bulletBorderAlpha = 1;
+            graph1.bulletBorderThickness = 2;
+            graph1.lineThickness = 3;
+            graph1.valueField = "Distance";
+            graph1.customBulletField = "Marker";
+            graph1.balloonText = "<span style='color:red; font-size:10px'>[[category]]</span>" +
+                "<br><b><span style='font-size:13px;'>Location: [[LocationNumber]]</span></b>" +
                 "<br><b><span style='font-size:13px;'>Velocity: [[Velocity]] Km/h</span></b>" +
                 "<br><b><span style='font-size:13px;'>Distance: [[value]] Km</span></b>" +
-                "<br><b><span style='font-size:13px;'>Total Distance: [[CummulativeDistance]] Km</span></b>" +
                 "<br><b><span style='font-size:13px;'>GPS: ([[Latitude]], [[Longitude]])</span></b>" +
                 "<br><b><span style='font-size:13px;'>Address: [[Address]]</span></b>";
-            chart.addGraph(graph);
+            chart.addGraph(graph1);
+
+
+            // GRAPH 2
+            graph2 = new AmCharts.AmGraph();
+            graph2.type = "smoothedLine"; // this line makes the graph smoothed line.
+            graph2.lineColor = "#3333FF";
+            //graph.bullet = "round";
+            graph2.bulletSize = 40;
+            graph2.bulletOffset = 25;
+            graph2.bulletBorderColor = "#FFFFFF";
+            graph2.bulletBorderAlpha = 1;
+            graph2.bulletBorderThickness = 2;
+            graph2.lineThickness = 4;
+            graph2.valueField = "CummulativeDistance";
+            graph2.customBulletField = "Marker";
+            graph2.balloonText = null;
+            graph2.balloonText = "<span style='color:red; font-size:10px'>[[category]]</span>" +
+                "<br><b><span style='font-size:13px;'>Location: [[LocationNumber]]</span></b>" +
+                "<br><b><span style='font-size:13px;'>Total Distance: [[CummulativeDistance]] Km</span></b>";
+            chart.addGraph(graph2);
 
             // CURSOR
             var chartCursor = new AmCharts.ChartCursor();
