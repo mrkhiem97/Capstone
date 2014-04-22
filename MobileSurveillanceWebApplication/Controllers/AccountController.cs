@@ -47,18 +47,20 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                var account = (from x in this.context.Accounts
-                               where
+                var account = this.context.Accounts.
+                               Where(x =>
                                    x.Username.Equals(model.UserName, StringComparison.InvariantCultureIgnoreCase) &&
                                    x.Password.Equals(model.Password)
-                               select x).SingleOrDefault();
+                               ).SingleOrDefault();
                 if (account != null)
                 {
                     if (account.IsActive)
                     {
+                        account.LastLogin = DateTime.Now;
+                        this.context.SaveChanges();
                         FormsAuthentication.SetAuthCookie(model.UserName, model.RememberMe);
 
-                        Response.Cookies["FullName"].Value = HttpUtility.UrlEncode(account.Fullname); 
+                        Response.Cookies["FullName"].Value = HttpUtility.UrlEncode(account.Fullname);
                         Response.Cookies["FullName"].Expires = DateTime.Now.AddDays(30);
                         Response.Cookies["Role"].Value = account.Role.RoleName;
                         Response.Cookies["Role"].Expires = DateTime.Now.AddDays(30);
@@ -286,17 +288,17 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(User.Identity.Name,
                               StringComparison.InvariantCultureIgnoreCase));
-                    if (account.Password.Equals(model.OldPassword))
-                    {
-                        account.Password = model.NewPassword;
-                        this.context.SaveChanges();
-                        return View("Login");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Your old password does not match your current password");
-                        return View(model);
-                    }
+                if (account.Password.Equals(model.OldPassword))
+                {
+                    account.Password = model.NewPassword;
+                    this.context.SaveChanges();
+                    return View("Login");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Your old password does not match your current password");
+                    return View(model);
+                }
             }
             else
             {

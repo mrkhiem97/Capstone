@@ -1,6 +1,6 @@
 ﻿@model MobileSurveillanceWebApplication.Models.ViewModel.FriendViewModel
 @{
-    var searchUserModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectSearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+    var searchModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectorySearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
 }
 
 <script type="text/javascript">
@@ -50,7 +50,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                @Ajax.ActionLink("Unfriend", "Unfriend", "SearchResult", new { friendId = Model.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount, UserId = searchUserModel.UserId, DateFrom = searchUserModel.DateFrom, DateTo = searchUserModel.DateTo }, new AjaxOptions()
+                                @Ajax.ActionLink("Unfriend", "Unfriend", "SearchResult", new { friendId = Model.Id, SearchKeyword = searchModel.SearchKeyword, PageNumber = searchModel.PageNumber, PageCount = searchModel.PageCount, UserId = searchModel.UserId, DateFrom = searchModel.DateFrom, DateTo = searchModel.DateTo }, new AjaxOptions()
                                 {
                                     HttpMethod = "POST",
                                     OnSuccess = "onSuccess",

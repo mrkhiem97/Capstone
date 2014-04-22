@@ -37,6 +37,9 @@ namespace MobileSurveillanceWebApplication.Controllers
         [BasicAuthenticationFilter(true)]
         public HttpResponseMessage Login()
         {
+            var account = this.context.Accounts.SingleOrDefault(x => x.Id == ((BasicAuthenticationIdentity)User.Identity).Id);
+            account.LastLogin = DateTime.Now;
+            this.context.SaveChanges();
             HttpResponseMessage retVal = Request.CreateResponse(HttpStatusCode.OK, ((BasicAuthenticationIdentity)User.Identity).Id, Configuration.Formatters.JsonFormatter);
             return retVal;
         }
@@ -338,13 +341,13 @@ namespace MobileSurveillanceWebApplication.Controllers
 
             for (int i = 0; i < listAccount.Count; i++)
             {
-                    var accountFriendApiModel = new AccountFriendApiModel();
-                    accountFriendApiModel.Id = listAccount.ElementAt(i).Id;
-                    accountFriendApiModel.Username = listAccount.ElementAt(i).Username;
-                    accountFriendApiModel.Fullname = listAccount.ElementAt(i).Fullname;
-                    accountFriendApiModel.Email = listAccount.ElementAt(i).Email;
-                    accountFriendApiModel.Avatar = listAccount.ElementAt(i).Avatar.Remove(0, 1);
-                    list.Add(accountFriendApiModel);
+                var accountFriendApiModel = new AccountFriendApiModel();
+                accountFriendApiModel.Id = listAccount.ElementAt(i).Id;
+                accountFriendApiModel.Username = listAccount.ElementAt(i).Username;
+                accountFriendApiModel.Fullname = listAccount.ElementAt(i).Fullname;
+                accountFriendApiModel.Email = listAccount.ElementAt(i).Email;
+                accountFriendApiModel.Avatar = listAccount.ElementAt(i).Avatar.Remove(0, 1);
+                list.Add(accountFriendApiModel);
             }
             retVal = Request.CreateResponse(HttpStatusCode.OK, list, Configuration.Formatters.JsonFormatter);
             return retVal;

@@ -187,7 +187,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// Unfriend function
         /// </summary>
         /// <returns></returns>
-        public JsonResult Unfriend(long friendId, TrajectSearchCriteriaViewModel searchCriteriaViewModel)
+        public JsonResult Unfriend(long friendId, TrajectorySearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             var friendAccount = this.context.Accounts.Where(x => x.Id == friendId).SingleOrDefault();
@@ -227,7 +227,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <param name="friendId"></param>
         /// <param name="searchCriteriaViewModel"></param>
         /// <returns></returns>
-        public JsonResult DenyRequest(long friendId, TrajectSearchCriteriaViewModel searchCriteriaViewModel)
+        public JsonResult DenyRequest(long friendId, TrajectorySearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             var friendAccount = this.context.Accounts.Where(x => x.Id.Equals(friendId)).SingleOrDefault();

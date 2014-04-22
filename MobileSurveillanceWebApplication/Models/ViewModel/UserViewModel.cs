@@ -114,9 +114,8 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public int PageCount { get; set; }
     }
 
-    public class TrajectSearchCriteriaViewModel : SearchCriteriaViewModel
+    public class TrajectorySearchCriteriaViewModel : SearchCriteriaViewModel
     {
-
         public long UserId { get; set; }
 
         public string DateFrom { get; set; }

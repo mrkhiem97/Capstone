@@ -78,35 +78,35 @@ namespace MobileSurveillanceWebApplication.Controllers
 
 
         [Authorize]
-        public ActionResult ListTrajectory(TrajectSearchCriteriaViewModel searchUserModel)
+        public ActionResult ListTrajectory(TrajectorySearchCriteriaViewModel searchModel)
         {
             //page size
             int pageSize = 7;
 
-            if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword))
+            if (!String.IsNullOrEmpty(searchModel.SearchKeyword))
             {
-                searchUserModel.SearchKeyword = searchUserModel.SearchKeyword.Trim().ToLower();
+                searchModel.SearchKeyword = searchModel.SearchKeyword.Trim().ToLower();
             }
             // List trajectory
             var model = new ListTrajectoryViewModel();
 
             // Get account
-            var account = this.context.Accounts.SingleOrDefault(x => x.Id == searchUserModel.UserId);
+            var account = this.context.Accounts.SingleOrDefault(x => x.Id == searchModel.UserId);
             // Get trajectory of the username
             var listTraject = new List<Trajectory>();
             var user = this.context.Accounts.Where(x => x.Username == User.Identity.Name).SingleOrDefault();
             // Condition
-            if (!String.IsNullOrEmpty(searchUserModel.SearchKeyword) && !String.IsNullOrWhiteSpace(searchUserModel.SearchKeyword))
+            if (!String.IsNullOrEmpty(searchModel.SearchKeyword) && !String.IsNullOrWhiteSpace(searchModel.SearchKeyword))
             {
-                string[] trajectName = searchUserModel.SearchKeyword.Split(new string[] { "" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] trajectName = searchModel.SearchKeyword.Split(new string[] { "" }, StringSplitOptions.RemoveEmptyEntries);
                 //listTraject = (from c in this.context.Trajectories where c.TrajectoryName.ToLower().Contains()
 
-                listTraject = account.Trajectories.Where(x => x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword)
+                listTraject = account.Trajectories.Where(x => x.TrajectoryName.ToLower().Contains(searchModel.SearchKeyword)
                     && x.IsActive
                     && x.Status.Equals("Public", StringComparison.InvariantCultureIgnoreCase)
 
 
-                    || x.TrajectoryName.ToLower().Contains(searchUserModel.SearchKeyword)
+                    || x.TrajectoryName.ToLower().Contains(searchModel.SearchKeyword)
                     && x.IsActive
                     && x.UserId == user.Id) //Private
                     .OrderByDescending(x => x.CreatedDate).ToList();
@@ -121,8 +121,8 @@ namespace MobileSurveillanceWebApplication.Controllers
 
                     .OrderByDescending(x => x.CreatedDate).ToList();
             }
-            searchUserModel.PageCount = (listTraject.Count - 1) / pageSize + 1;
-            listTraject = listTraject.Skip((searchUserModel.PageNumber - 1) * pageSize).Take(pageSize).ToList();
+            searchModel.PageCount = (listTraject.Count - 1) / pageSize + 1;
+            listTraject = listTraject.Skip((searchModel.PageNumber - 1) * pageSize).Take(pageSize).ToList();
 
 
             foreach (var trajectory in listTraject)
@@ -148,7 +148,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 model.ListTrajectory.Add(trajectoryViewModel);
             }
 
-            ViewBag.SearchCriteriaViewModel = searchUserModel;
+            ViewBag.SearchCriteriaViewModel = searchModel;
 
             // Get User
             var userModel = GetUserViewModel(account);
@@ -335,7 +335,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 return Json(trajectList, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult SaveTrajectory(TrajectoryViewModel model, TrajectSearchCriteriaViewModel searchUserModel)
+        public ActionResult SaveTrajectory(TrajectoryViewModel model, TrajectorySearchCriteriaViewModel searchUserModel)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(model.Id)).SingleOrDefault();
             trajectory.TrajectoryName = model.TrajectoryName;

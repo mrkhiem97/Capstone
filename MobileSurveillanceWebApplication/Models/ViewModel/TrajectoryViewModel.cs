@@ -44,7 +44,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
 
         public string StartAddress { get; set; }
 
-        public string EndAddress {get;set;}
+        public string EndAddress { get; set; }
 
         public int TotalLocation { get; set; }
         public TrajectoryViewModel()
@@ -63,8 +63,5 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
             this.ListTrajectory = new List<TrajectoryViewModel>();
             this.FriendViewModel = new FriendViewModel();
         }
-
     }
-
-
 }
