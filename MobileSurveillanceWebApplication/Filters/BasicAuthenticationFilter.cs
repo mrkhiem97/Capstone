@@ -28,11 +28,13 @@ namespace MobileSurveillanceWebApplication.Filters
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
     public class BasicAuthenticationFilter : AuthorizationFilterAttribute
     {
-        bool Active = true;
+        private bool active = true;
         private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
 
         public BasicAuthenticationFilter()
-        { }
+        {
+            this.active = false;
+        }
 
         /// <summary>
         /// Overriden constructor to allow explicit disabling of this
@@ -42,7 +44,7 @@ namespace MobileSurveillanceWebApplication.Filters
         /// <param name="active"></param>
         public BasicAuthenticationFilter(bool active)
         {
-            Active = active;
+            this.active = active;
         }
 
 
@@ -52,7 +54,7 @@ namespace MobileSurveillanceWebApplication.Filters
         /// <param name="actionContext"></param>
         public override void OnAuthorization(HttpActionContext actionContext)
         {
-            if (Active)
+            if (active)
             {
                 var basicAccount = ParseAuthorizationHeader(actionContext);
                 if (basicAccount == null)

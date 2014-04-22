@@ -92,6 +92,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     trajectory.IsActive = false;
                     this.context.SaveChanges();
+                    trajectoryApiModel = trajectoryModel;
                     // Update lại trajectory
                     retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                 }
