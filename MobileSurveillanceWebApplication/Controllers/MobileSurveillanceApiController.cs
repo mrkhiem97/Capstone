@@ -79,11 +79,13 @@ namespace MobileSurveillanceWebApplication.Controllers
                     else
                     {
                         retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
+                        return retVal;
                     }
                 }
                 catch (Exception)
                 {
                     retVal = Request.CreateResponse(HttpStatusCode.BadRequest, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
+                    return retVal;
                 }
             }
             else
@@ -117,6 +119,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                             else
                             {
                                 retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
+                                return retVal;
                             }
                         }
                         else if (lastUpdated == trajectory.LastUpdated)
@@ -132,6 +135,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                     else
                     {
                         retVal = Request.CreateResponse(HttpStatusCode.NotModified, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
+                        return retVal;
                     }
                 }
             }
