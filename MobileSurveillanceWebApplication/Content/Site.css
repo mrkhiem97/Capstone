@@ -770,6 +770,13 @@
 #total-distance {
     display: block;
     font-size: 16px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#total-time {
+    display: block;
+    font-size: 16px;
     font-weight: bold;
 }
 

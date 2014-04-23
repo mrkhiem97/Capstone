@@ -30,6 +30,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         public ActionResult ViewDetail(string trajectoryId)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectoryId)).SingleOrDefault();
+            var listLocation = trajectory.Locations.Where(x => x.IsActive).OrderBy(x => x.CreatedDate).ToList();
             var model = new TrajectoryViewModel();
             model.Id = trajectory.Id;
             model.TrajectoryName = trajectory.TrajectoryName;
@@ -37,7 +38,16 @@ namespace MobileSurveillanceWebApplication.Controllers
             model.CreateDate = trajectory.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
             model.Description = trajectory.Description;
             model.LastUpdate = trajectory.LastUpdated.ToString("dd/MM/yyyy HH:mm:ss tt");
-            model.TotalLocation = trajectory.Locations.Count(x => x.IsActive);
+            model.TotalLocation = listLocation.Count;
+            if (listLocation.Count > 0)
+            {
+                model.TotalTime = SupportUtility.TotalTime(listLocation.First().CreatedDate, listLocation.Last().CreatedDate);
+            }
+            else
+            {
+                model.TotalTime = "";
+            }
+            
             return View(model);
         }
 
@@ -324,15 +334,15 @@ namespace MobileSurveillanceWebApplication.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetTrajectoryList()
+        public JsonResult GetTrajectoryList(long userId)
         {
-            var trajectory = this.context.Trajectories.ToList();
-            var  trajectList = new List<string>();
-            for (int i = 0; i < trajectory.Count; i++)
+            var listTrajectory = this.context.Trajectories.Where(x => x.IsActive).Where(x => x.Account.Id == userId).ToList();
+            var  retVal = new List<string>();
+            for (int i = 0; i < listTrajectory.Count; i++)
             {
-                trajectList.Add(trajectory[i].TrajectoryName);
+                retVal.Add(listTrajectory[i].TrajectoryName);
             }
-                return Json(trajectList, JsonRequestBehavior.AllowGet);
+                return Json(retVal, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult SaveTrajectory(TrajectoryViewModel model, TrajectorySearchCriteriaViewModel searchUserModel)

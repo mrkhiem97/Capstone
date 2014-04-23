@@ -10,6 +10,13 @@ namespace MobileSurveillanceWebApplication.Utility
     {
         public static String TIME_FORMAT = "yyyyMMddHHmmss";
 
+        public static String TotalTime(DateTime start, DateTime end)
+        {
+            String retVal = String.Empty;
+            var intervalDate = end - start;
+            retVal = String.Format("{0} Days {1} Hours {2} Minutes {3} Seconds", intervalDate.Days, intervalDate.Hours, intervalDate.Minutes, intervalDate.Seconds);
+            return retVal;
+        }
 
         public static bool CompareDate(DateTime d1, DateTime d2)
         {

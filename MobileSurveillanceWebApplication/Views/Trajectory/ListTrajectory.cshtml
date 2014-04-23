@@ -4,7 +4,6 @@
     var searchModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectorySearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
     int count = 0;
     int count1 = 0;
-
 }
 
 
@@ -12,17 +11,7 @@
     var Trajectories = [];
     var currentTraject;
     $(document).ready(function () {
-        $(".btn-edit").click(function () {
-            var id = $(this).parent().parent().parent().attr('id');
-            currentTraject = id;
-            $.getJSON("/Trajectory/GetTrajectory", { trajectId: id }, function (data) {
-                $("#name").val(data.TrajectoryName);
-                $("#description").val(data.Description);
-                $("#status").val(data.Status);
-            })
-        });
-
-        $.getJSON("/Trajectory/GetTrajectoryList/", {}, function (data) {
+        $.getJSON("/Trajectory/GetTrajectoryList/", {userId :  "@Model.FriendViewModel.Id"}, function (data) {
             for (var i = 0; i < data.length; i++) {
                 Trajectories.push(data[i]);
             }
@@ -68,7 +57,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="panel panel-primary" style="border-color: #cccccc;">
                 <!-- Default panel contents -->
-                <div class="panel-heading" style="padding:5px;">@(ViewBag.FriendStatus == null ? "My" : "") Trajectories</div>
+                <div class="panel-heading" style="padding:5px;">@(ViewBag.FriendStatus == null ? "My" : (Model.FriendViewModel.Fullname + "'s ")) Trajectories</div>
 
                 @foreach (var item in Model.ListTrajectory)
                 {

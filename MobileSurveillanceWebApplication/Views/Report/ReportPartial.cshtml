@@ -20,8 +20,9 @@
         $("#summary-report").hide();
         $.getJSON("/Report/GetReportData/", { trajectoryId: '@Model.Id' }, function (responseData) {
             var chartData = responseData.ChartData;
-            $("#total-distance").text("Total Distances: " + chartData[chartData.length - 1].CummulativeDistance + " Kilometers");
-            $("#total-location").text("Total Locations: " + @Model.TotalLocation);
+            $("#total-distance").text("Total Distances: " + chartData[chartData.length - 1].TotalDistance + " Kilometers");
+            $("#total-location").text("Total Locations: " + "@Model.TotalLocation");
+            $("#total-time").text("Total Time: " + "@Model.TotalTime");
             // SERIAL CHART
             chart = new AmCharts.AmSerialChart();
             chart.pathToImages = "@Url.Content("~/Scripts/amcharts/images/")";
@@ -68,6 +69,7 @@
                 "<br><b><span style='font-size:13px;'>Location: [[LocationNumber]]</span></b>" +
                 "<br><b><span style='font-size:13px;'>Velocity: [[Velocity]] Km/h</span></b>" +
                 "<br><b><span style='font-size:13px;'>Distance: [[value]] Km</span></b>" +
+                "<br><b><span style='font-size:13px;'>Time Interval: [[TimeInterval]]</span></b>" +
                 "<br><b><span style='font-size:13px;'>GPS: ([[Latitude]], [[Longitude]])</span></b>" +
                 "<br><b><span style='font-size:13px;'>Address: [[Address]]</span></b>";
             chart.addGraph(graph1);
@@ -84,12 +86,13 @@
             graph2.bulletBorderAlpha = 1;
             graph2.bulletBorderThickness = 2;
             graph2.lineThickness = 4;
-            graph2.valueField = "CummulativeDistance";
+            graph2.valueField = "TotalDistance";
             graph2.customBulletField = "Marker";
             graph2.balloonText = null;
             graph2.balloonText = "<span style='color:red; font-size:10px'>[[category]]</span>" +
                 "<br><b><span style='font-size:13px;'>Location: [[LocationNumber]]</span></b>" +
-                "<br><b><span style='font-size:13px;'>Total Distance: [[CummulativeDistance]] Km</span></b>";
+                "<br><b><span style='font-size:13px;'>Total Time: [[TotalTime]]</span></b>" +
+                "<br><b><span style='font-size:13px;'>Total Distance: [[TotalDistance]] Km</span></b>";
             chart.addGraph(graph2);
 
             // CURSOR
@@ -154,6 +157,8 @@
         <div id="total-location">
         </div>
         <div id="total-distance">
+        </div>
+        <div id="total-time">
         </div>
     </div>
 </div>

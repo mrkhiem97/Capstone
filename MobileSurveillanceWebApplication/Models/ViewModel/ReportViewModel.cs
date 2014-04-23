@@ -9,13 +9,17 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     {
         public String TakenDate { get; set; }
         public double Distance { get; set; }
-        public double CummulativeDistance { get; set; }
+        public double TotalDistance { get; set; }
         public double Velocity { get; set; }
         public String Marker { get; set; }
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public String Address { get; set; }
+
+        public String TimeInterval { get; set; }
+
+        public String TotalTime { get; set; }
 
         public int LocationNumber { get; set; }
     }

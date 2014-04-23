@@ -40,67 +40,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         public async Task<JsonResult> GetReportData(string trajectoryId)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectoryId, StringComparison.InvariantCultureIgnoreCase)).SingleOrDefault();
-            var listLocation = this.context.Locations
-                    .Where(x => x.TrajectoryId.Equals(trajectoryId) && x.IsActive)
-                    .OrderBy(x => x.CreatedDate).ToList();
-            var list = new List<ReportViewModel>();
-            double cummulativeDistance = 0;
-            if (listLocation.Count > 1)
-            {
-                for (int i = 0; i < listLocation.Count - 1; i++)
-                {
-                    if (i == 0)
-                    {
-                        var startReportViewModel = new ReportViewModel()
-                        {
-                            TakenDate = listLocation[i].CreatedDate.ToString("dd-MM-yyyy HH:mm:ss"),
-                            Distance = 0,
-                            CummulativeDistance = cummulativeDistance,
-                            Marker = "/Images/marker-start.png",
-                            Velocity = 0,
-                            Address = listLocation[i].Address,
-                            Latitude = Math.Round(listLocation[i].Latitude, 5),
-                            Longitude = Math.Round(listLocation[i].Longitude, 5),
-                            LocationNumber = i + 1
-                        };
-                        list.Add(startReportViewModel);
-                    }
-                    var startLocation = listLocation[i];
-                    var desLocation = listLocation[i + 1];
-                    var reportViewModel = await GetReportViewModel(startLocation, desLocation, cummulativeDistance);
-                    reportViewModel.Velocity = this.Velocity(reportViewModel.Distance, startLocation.CreatedDate, desLocation.CreatedDate);
-                    reportViewModel.Address = desLocation.Address;
-                    reportViewModel.Latitude = Math.Round(desLocation.Latitude, 5);
-                    reportViewModel.Longitude = Math.Round(desLocation.Longitude, 5);
-                    reportViewModel.LocationNumber = i + 2;
-                    reportViewModel.Marker = "/Images/marker-next.png";
-                    if (i + 1 == listLocation.Count - 1)
-                    {
-                        reportViewModel.Marker = "/Images/marker-stop.png";
-                    }
-                    Console.WriteLine("Distance: " + reportViewModel.Distance);
-                    cummulativeDistance += reportViewModel.Distance;
-                    list.Add(reportViewModel);
-                }
-            }
-            else if (listLocation.Count == 1)
-            {
-                var reportViewModel = new ReportViewModel()
-                {
-                    Address = listLocation[0].Address,
-                    CummulativeDistance = 0,
-                    Distance = 0,
-                    Latitude = listLocation[0].Latitude,
-                    Longitude = listLocation[0].Longitude,
-                    Velocity = 0,
-                    Marker = "/Images/marker-start.png",
-                    TakenDate = listLocation[0].CreatedDate.ToString("dd-MM-yyyy HH:mm:ss"),
-                    LocationNumber = 1
-                };
-                Console.WriteLine("Distance: " + reportViewModel.Distance);
-                list.Add(reportViewModel);
-            }
-
+            var list = await this.GetListReport(trajectoryId);
             return Json(new
             {
                 TrajectoryName = HttpUtility.JavaScriptStringEncode(trajectory.TrajectoryName),
@@ -128,7 +68,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     TakenDate = destination.CreatedDate.ToString("dd-MM-yyyy HH:mm:ss"),
                     Distance = distance,
-                    CummulativeDistance = Math.Round(cummulativeDistance + distance, 3)
+                    TotalDistance = Math.Round(cummulativeDistance + distance, 3)
                 };
             }
             else
@@ -138,7 +78,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     TakenDate = destination.CreatedDate.ToString("dd-MM-yyyy HH:mm:ss"),
                     Distance = distance,
-                    CummulativeDistance = Math.Round(cummulativeDistance + distance, 3)
+                    TotalDistance = Math.Round(cummulativeDistance + distance, 3)
                 };
             }
             return retVal;
@@ -266,17 +206,19 @@ namespace MobileSurveillanceWebApplication.Controllers
 
             for (int i = 0; i < list.Count; i++)
             {
-                String query = "Insert Into [Sheet1$] VALUES(@Location, @Address, @Distance, @TotalDistance, @Velocity, @TakenDate, @Latitude, @Longitude)";
+                String query = "Insert Into [Sheet1$] VALUES(@Location, @Address, @Distance, @TotalDistance, @Velocity, @TakenDate, @Latitude, @Longitude, @TimeInterval, @TotalTime)";
                 var parameters = new IDataParameter[]
                                  {
                                      new OleDbParameter("@Location", OleDbType.VarChar) { Value = "Location " + (i + 1).ToString()}, 
                                      new OleDbParameter("@Address", OleDbType.VarChar) {Value = list[i].Address},
                                      new OleDbParameter("@Distance", OleDbType.Double) {Value = list[i].Distance},
-                                     new OleDbParameter("@TotalDistance", OleDbType.Double) {Value = list[i].CummulativeDistance},
+                                     new OleDbParameter("@TotalDistance", OleDbType.Double) {Value = list[i].TotalDistance},
                                      new OleDbParameter("@Velocity", OleDbType.Double) {Value = list[i].Velocity},
                                      new OleDbParameter("@TakenDate", OleDbType.VarChar) {Value = list[i].TakenDate},
                                      new OleDbParameter("@Latitude", OleDbType.Double) {Value = list[i].Latitude},
                                      new OleDbParameter("@Longitude", OleDbType.Double) {Value = list[i].Longitude},
+                                     new OleDbParameter("@TimeInterval", OleDbType.VarChar) {Value = list[i].TimeInterval},
+                                     new OleDbParameter("@TotalTime", OleDbType.VarChar) {Value = list[i].TotalTime},
                                  };
                 int result = helper.ExecuteNonQuery(query, parameters);
             }
@@ -300,12 +242,15 @@ namespace MobileSurveillanceWebApplication.Controllers
                         {
                             TakenDate = listLocation[i].CreatedDate.ToString("dd-MM-yyyy HH:mm:ss"),
                             Distance = 0,
-                            CummulativeDistance = cummulativeDistance,
+                            TotalDistance = cummulativeDistance,
                             Marker = "/Images/marker-start.png",
                             Velocity = 0,
                             Address = listLocation[i].Address,
                             Latitude = Math.Round(listLocation[i].Latitude, 5),
-                            Longitude = Math.Round(listLocation[i].Longitude, 5)
+                            Longitude = Math.Round(listLocation[i].Longitude, 5),
+                            LocationNumber = i + 1,
+                            TimeInterval = SupportUtility.TotalTime(listLocation[i].CreatedDate, listLocation[i].CreatedDate),
+                            TotalTime = SupportUtility.TotalTime(listLocation[i].CreatedDate, listLocation[i].CreatedDate)
                         };
                         list.Add(startReportViewModel);
                     }
@@ -316,6 +261,9 @@ namespace MobileSurveillanceWebApplication.Controllers
                     reportViewModel.Address = desLocation.Address;
                     reportViewModel.Latitude = Math.Round(desLocation.Latitude, 5);
                     reportViewModel.Longitude = Math.Round(desLocation.Longitude, 5);
+                    reportViewModel.LocationNumber = i + 2;
+                    reportViewModel.TimeInterval = SupportUtility.TotalTime(startLocation.CreatedDate, desLocation.CreatedDate);
+                    reportViewModel.TotalTime = SupportUtility.TotalTime(listLocation[0].CreatedDate, desLocation.CreatedDate);
                     reportViewModel.Marker = "/Images/marker-next.png";
                     if (i + 1 == listLocation.Count - 1)
                     {
@@ -331,13 +279,16 @@ namespace MobileSurveillanceWebApplication.Controllers
                 var reportViewModel = new ReportViewModel()
                 {
                     Address = listLocation[0].Address,
-                    CummulativeDistance = 0,
+                    TotalDistance = 0,
                     Distance = 0,
                     Latitude = listLocation[0].Latitude,
                     Longitude = listLocation[0].Longitude,
                     Velocity = 0,
                     Marker = "/Images/marker-start.png",
                     TakenDate = listLocation[0].CreatedDate.ToString("dd-MM-yyyy HH:mm:ss"),
+                    LocationNumber = 1,
+                    TimeInterval = SupportUtility.TotalTime(listLocation[0].CreatedDate, listLocation[0].CreatedDate),
+                    TotalTime = SupportUtility.TotalTime(listLocation[0].CreatedDate, listLocation[0].CreatedDate)
                 };
                 Console.WriteLine("Distance: " + reportViewModel.Distance);
                 list.Add(reportViewModel);
