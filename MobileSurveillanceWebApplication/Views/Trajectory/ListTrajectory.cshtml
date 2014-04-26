@@ -4,13 +4,6 @@
     var searchModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectorySearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
     int count = 0;
     int count1 = 0;
-    var urlStartLocation = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host + "/Images/start-location.png";
-    var urlEndLocation = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host + "/Images/end-location.png";
-    var isLocalhost = false;
-    if (Request.Url.Host.Contains("localhost"))
-    {
-        isLocalhost = true;
-    }
 }
 
 
@@ -71,14 +64,7 @@
                     {
                         <div class="row trajectory-list-item" id="@item.Id">
                             <div class="trajectory-thumail col-lg-5 col-md-6 col-sm-12 col-xs-12">
-                                @if (isLocalhost)
-                                {
-                                    <img src="@String.Format("http://maps.googleapis.com/maps/api/staticmap?center={0},{1}&markers=color:{2}{3}{4},{5}&markers=color:{6}{3}{7},{8}&size=400x350&sensor=true&format=jpeg", item.CenterLatitude.ToString(), item.CenterLongitude.ToString(), "green" , HttpUtility.UrlEncode("|"), item.StartLatitude.ToString(), item.StartLongitude.ToString(), "blue", item.EndLatitude.ToString(), item.EndLongitude.ToString())" alt="Mobile Surveillance">
-                                }
-                                else
-                                {
-                                    <img src="@String.Format("http://maps.googleapis.com/maps/api/staticmap?center={0},{1}&markers=icon:{2}{3}{4},{5}&markers=icon:{6}{3}{7},{8}&size=400x350&sensor=true&format=jpeg", item.CenterLatitude.ToString(), item.CenterLongitude.ToString(), urlStartLocation , HttpUtility.UrlEncode("|"), item.StartLatitude.ToString(), item.StartLongitude.ToString(), urlEndLocation, item.EndLatitude.ToString(), item.EndLongitude.ToString())" alt="Mobile Surveillance">
-                                }
+                                <img src="@String.Format("http://maps.googleapis.com/maps/api/staticmap?center={0},{1}&markers=color:{2}{3}{4},{5}&markers=color:{6}{3}{7},{8}&size=400x350&sensor=true&format=jpeg", item.CenterLatitude.ToString(), item.CenterLongitude.ToString(), "green" , HttpUtility.UrlEncode("|"), item.StartLatitude.ToString(), item.StartLongitude.ToString(), "blue", item.EndLatitude.ToString(), item.EndLongitude.ToString())" alt="Mobile Surveillance">
                             </div>
                             <div class="col-lg-7 col-md-6 col-sm-12 col-xs-12" style="padding: 2px; display: inline-block; margin-left:20px">
                                 <div class="row">
@@ -99,7 +85,7 @@
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
                                             <div class="trajectory-list-icon">
-                                                <img width="32" height="32" src="@Url.Content("~/Images/start-location.png")" />
+                                                <img width="32" height="32" src="@Url.Content("~/Images/marker-normal.png")" />
                                             </div>
                                             <div class="trajectory-list-display">
                                                 <span class="trajectory-item-index">Start Location:</span>
@@ -113,7 +99,7 @@
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
                                             <div class="trajectory-list-icon">
-                                                <img width="32" height="32" src="@Url.Content("~/Images/end-location.png")" />
+                                                <img width="32" height="32" src="@Url.Content("~/Images/marker-normal.png")" />
                                             </div>
                                             <div class="trajectory-list-display">
                                                 <span class="trajectory-item-index">Last Location:</span>

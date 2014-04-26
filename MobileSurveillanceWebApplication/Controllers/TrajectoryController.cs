@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -211,7 +212,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return userModel;
         }
 
-        public JsonResult GetLocationList(string trajectId)
+        public async Task<JsonResult> GetLocationList(string trajectId)
         {
 
             var locateList = new List<LocationViewModel>();
@@ -224,6 +225,11 @@ namespace MobileSurveillanceWebApplication.Controllers
                 model.Id = listLocation[i].Id.ToString();
                 model.Latitude = listLocation[i].Latitude;
                 model.Longitude = listLocation[i].Longitude;
+                if (String.IsNullOrEmpty(listLocation[i].Address))
+                {
+                    listLocation[i].Address = await ReverseGeoCoding.GetAddress(listLocation[i].Latitude, listLocation[i].Longitude);
+                    this.context.SaveChanges();
+                }
                 model.Address = listLocation[i].Address;
                 model.Index = i + 1;
                 DateTime dt = listLocation[i].CreatedDate;

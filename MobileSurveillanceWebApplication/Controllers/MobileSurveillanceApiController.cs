@@ -383,7 +383,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 
         [HttpPost]
         [BasicAuthenticationFilter(true)]
-        public HttpResponseMessage LoadLocations([FromBody]LoadApiModel model)
+        public async Task<HttpResponseMessage> LoadLocations([FromBody]LoadApiModel model)
         {
             HttpResponseMessage retVal = null;
             var list = new List<LocationApiModel>();
@@ -396,6 +396,11 @@ namespace MobileSurveillanceWebApplication.Controllers
                 location.Id = listLocations[i].Id;
                 location.Latitude = listLocations[i].Latitude;
                 location.Longitude = listLocations[i].Longitude;
+                if (String.IsNullOrEmpty(listLocations[i].Address))
+                {
+                    listLocations[i].Address = await ReverseGeoCoding.GetAddress(listLocations[i].Latitude, listLocations[i].Longitude);
+                    this.context.SaveChanges();
+                }
                 location.Address = listLocations[i].Address;
                 location.IsActive = listLocations[i].IsActive;
                 location.CreatedDate = listLocations[i].CreatedDate.ToString(SupportUtility.TIME_FORMAT);

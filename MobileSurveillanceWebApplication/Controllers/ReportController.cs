@@ -201,7 +201,6 @@ namespace MobileSurveillanceWebApplication.Controllers
 
             String conectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0; Data Source={0};Extended Properties=\"Excel 8.0;HDR=YES\"", newFile);
             DataAccessHelper helper = new DataAccessHelper(conectionString);
-
             var list = await GetListReport(trajectoryId);
 
             for (int i = 0; i < list.Count; i++)
@@ -264,10 +263,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                     reportViewModel.LocationNumber = i + 2;
                     reportViewModel.TimeInterval = SupportUtility.TotalTime(startLocation.CreatedDate, desLocation.CreatedDate);
                     reportViewModel.TotalTime = SupportUtility.TotalTime(listLocation[0].CreatedDate, desLocation.CreatedDate);
-                    reportViewModel.Marker = "/Images/marker-next.png";
+                    reportViewModel.Marker = "/Images/marker-normal.png";
                     if (i + 1 == listLocation.Count - 1)
                     {
-                        reportViewModel.Marker = "/Images/marker-stop.png";
+                        reportViewModel.Marker = "/Images/marker-end.png";
                     }
                     Console.WriteLine("Distance: " + reportViewModel.Distance);
                     cummulativeDistance += reportViewModel.Distance;
