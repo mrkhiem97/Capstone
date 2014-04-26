@@ -64,7 +64,14 @@
                     {
                         <div class="row trajectory-list-item" id="@item.Id">
                             <div class="trajectory-thumail col-lg-5 col-md-6 col-sm-12 col-xs-12">
-                                <img src="@String.Format("http://maps.googleapis.com/maps/api/staticmap?center={0},{1}&markers=color:{2}{3}{4},{5}&markers=color:{6}{3}{7},{8}&size=400x350&sensor=true&format=jpeg", item.CenterLatitude.ToString(), item.CenterLongitude.ToString(), "green" , HttpUtility.UrlEncode("|"), item.StartLatitude.ToString(), item.StartLongitude.ToString(), "blue", item.EndLatitude.ToString(), item.EndLongitude.ToString())" alt="Mobile Surveillance">
+                                @if (item.TotalLocation > 0)
+                                {
+                                    <img src="@String.Format("http://maps.googleapis.com/maps/api/staticmap?center={0},{1}&markers=color:{2}{3}{4},{5}&markers=color:{6}{3}{7},{8}&size=400x350&sensor=true&format=jpeg", item.CenterLatitude.ToString(), item.CenterLongitude.ToString(), "green" , HttpUtility.UrlEncode("|"), item.StartLatitude.ToString(), item.StartLongitude.ToString(), "blue", item.EndLatitude.ToString(), item.EndLongitude.ToString())" alt="Mobile Surveillance">
+                                }
+                                else
+                                {
+                                    <img src="http://maps.googleapis.com/maps/api/staticmap?center=0,0&size=400x350&sensor=true&format=jpeg" alt="Mobile Surveillance">
+                                }
                             </div>
                             <div class="col-lg-7 col-md-6 col-sm-12 col-xs-12" style="padding: 2px; display: inline-block; margin-left:20px">
                                 <div class="row">

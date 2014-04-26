@@ -160,6 +160,11 @@ namespace MobileSurveillanceWebApplication.Controllers
                     trajectoryViewModel.EndAddress = endLocation.Address;
                     trajectoryViewModel.StartTime = startLocation.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
                     trajectoryViewModel.EndTime = endLocation.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
+                    trajectoryViewModel.TotalLocation = listLocation.Count;
+                }
+                else
+                {
+                    trajectoryViewModel.TotalLocation = 0;
                 }
                 model.ListTrajectory.Add(trajectoryViewModel);
             }
