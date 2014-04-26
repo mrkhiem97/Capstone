@@ -235,7 +235,7 @@
                         map: map,
                         labelText: value.Index,
                         labelClass: "labels", // the CSS class for the label
-                        labelStyle: { opacity: 0.75 },
+                        labelStyle: { opacity: 0.8 },
                         labelVisible: true,
                     });
 
@@ -247,6 +247,7 @@
 
                     // Infor window for each marker
                     var infowindow = new google.maps.InfoWindow({
+                        pixelOffset: new google.maps.Size(0, -32),
                         content: value.CreatedDate + '</br>' + (locationList[index].Address ? locationList[index].Address : "")
                     });
 
@@ -286,7 +287,7 @@
                     });
 
                     google.maps.event.addListener(marker, 'mouseout', function () {
-                        setTimeout(function () { infowindow.close(); }, 3000);
+                        setTimeout(function () { infowindow.close(); }, 500);
                     });
 
                     // Click event for markers
@@ -357,12 +358,12 @@
                     geodesic: true,
                     strokeColor: '#FF0000',
                     strokeOpacity: 0.9,
-                    strokeWeight: 1.5
+                    strokeWeight: 3
                 };
 
                 // Add the connection line
                 poly = new google.maps.Polyline(polyOption);
-                poly.setMap(map);
+                //poly.setMap(map);
                 var path = poly.getPath();
                 for (var i = 0; i < lineArr.length; i++) {
                     path.push(lineArr[i]);
