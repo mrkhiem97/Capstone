@@ -24,11 +24,14 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         [Display(Name = "Description")]
         public string Description { get; set; }
 
-        public string StartLatitude { get; set; }
-        public string StartLongitude { get; set; }
+        public double StartLatitude { get; set; }
+        public double StartLongitude { get; set; }
 
-        public string EndLatitude { get; set; }
-        public string EndLongitude { get; set; }
+        public double EndLatitude { get; set; }
+        public double EndLongitude { get; set; }
+
+        public double CenterLatitude { get; set; }
+        public double CenterLongitude { get; set; }
 
         public List<Location> LocateList { get; set; }
 

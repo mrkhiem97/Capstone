@@ -144,12 +144,17 @@ namespace MobileSurveillanceWebApplication.Controllers
                 trajectoryViewModel.Status = trajectory.Status;
                 trajectoryViewModel.CreateDate = trajectory.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");
                 trajectoryViewModel.LastUpdate = trajectory.LastUpdated.ToString("dd/MM/yyyy HH:mm:ss tt");
-                var startLocation = trajectory.Locations.Where(x => x.IsActive).OrderBy(x => x.CreatedDate).FirstOrDefault();
-                var endLocation = trajectory.Locations.Where(x => x.IsActive).OrderBy(x => x.CreatedDate).LastOrDefault();
-                if (startLocation != null)
+                var listLocation = trajectory.Locations.Where(x => x.IsActive).OrderBy(x => x.CreatedDate).ToList();
+                var startLocation = listLocation.FirstOrDefault();
+                var endLocation = listLocation.LastOrDefault();
+                if (listLocation.Count > 0)
                 {
-                    trajectoryViewModel.StartLongitude = startLocation.Longitude.ToString();
-                    trajectoryViewModel.StartLatitude = startLocation.Latitude.ToString();
+                    trajectoryViewModel.StartLongitude = startLocation.Longitude;
+                    trajectoryViewModel.StartLatitude = startLocation.Latitude;
+                    trajectoryViewModel.EndLatitude = endLocation.Latitude;
+                    trajectoryViewModel.EndLongitude = endLocation.Longitude;
+                    trajectoryViewModel.CenterLatitude = listLocation.Average(x => x.Latitude);
+                    trajectoryViewModel.CenterLongitude = listLocation.Average(x => x.Longitude);
                     trajectoryViewModel.StartAddress = startLocation.Address;
                     trajectoryViewModel.EndAddress = endLocation.Address;
                     trajectoryViewModel.StartTime = startLocation.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss tt");

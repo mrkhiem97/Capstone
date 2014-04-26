@@ -4,6 +4,13 @@
     var searchModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectorySearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
     int count = 0;
     int count1 = 0;
+    var urlStartLocation = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host + "/Images/start-location.png";
+    var urlEndLocation = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host + "/Images/end-location.png";
+    var isLocalhost = false;
+    if (Request.Url.Host.Contains("localhost"))
+    {
+        isLocalhost = true;
+    }
 }
 
 
@@ -11,7 +18,7 @@
     var Trajectories = [];
     var currentTraject;
     $(document).ready(function () {
-        $.getJSON("/Trajectory/GetTrajectoryList/", {userId :  "@Model.FriendViewModel.Id"}, function (data) {
+        $.getJSON("/Trajectory/GetTrajectoryList/", { userId: "@Model.FriendViewModel.Id" }, function (data) {
             for (var i = 0; i < data.length; i++) {
                 Trajectories.push(data[i]);
             }
@@ -48,7 +55,6 @@
                 <button type="submit" class="btn btn-default" style="display:inline-block; margin-top: 15px">Search <span class="glyphicon glyphicon-search"></span></button>
             </div>
         }
-
     </div>
 
 
@@ -64,56 +70,96 @@
                     if (ViewBag.FriendStatus == null || (ViewBag.FriendStatus != null && item.Status.Equals("Public", StringComparison.InvariantCultureIgnoreCase)))
                     {
                         <div class="row trajectory-list-item" id="@item.Id">
-
                             <div class="trajectory-thumail col-lg-5 col-md-6 col-sm-12 col-xs-12">
-                                <img src="http://maps.googleapis.com/maps/api/staticmap?center=@item.StartLatitude,@item.StartLongitude&markers=@item.StartLatitude,@item.StartLongitude&zoom=13&size=400x280&sensor=true" alt="Mobile Surveillance">
+                                @if (isLocalhost)
+                                {
+                                    <img src="@String.Format("http://maps.googleapis.com/maps/api/staticmap?center={0},{1}&markers=color:{2}{3}{4},{5}&markers=color:{6}{3}{7},{8}&size=400x350&sensor=true", item.CenterLatitude.ToString(), item.CenterLongitude.ToString(), "green" , HttpUtility.UrlEncode("|"), item.StartLatitude.ToString(), item.StartLongitude.ToString(), "blue", item.EndLatitude.ToString(), item.EndLongitude.ToString())" alt="Mobile Surveillance">
+                                }
+                                else
+                                {
+                                    <img src="@String.Format("http://maps.googleapis.com/maps/api/staticmap?center={0},{1}&markers=icon:{2}{3}{4},{5}&markers=icon:{6}{3}{7},{8}&size=400x350&sensor=true", item.CenterLatitude.ToString(), item.CenterLongitude.ToString(), urlStartLocation , HttpUtility.UrlEncode("|"), item.StartLatitude.ToString(), item.StartLongitude.ToString(), urlEndLocation, item.EndLatitude.ToString(), item.EndLongitude.ToString())" alt="Mobile Surveillance">
+                                }
                             </div>
-                            <div class="col-lg-7 col-md-6 col-sm-12 col-xs-12" style="padding: 5px; display: inline-block; margin-left:20px">
+                            <div class="col-lg-7 col-md-6 col-sm-12 col-xs-12" style="padding: 2px; display: inline-block; margin-left:20px">
                                 <div class="row">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail " style="font-size: 25px">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail " style="font-size: 27px">
                                         @Html.ActionLink(@item.TrajectoryName, "ViewDetail", new { trajectoryId = item.Id })
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-7 col-md-7 col-sm-12 col-xs-12">
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
-                                            <b><u>Created On:</u></b> @item.CreateDate
+                                            <div class="trajectory-list-icon">
+                                                <img width="32" height="32" src="@Url.Content("~/Images/start-date.png")" />
+                                            </div>
+                                            <div class="trajectory-list-display">
+                                                <span class="trajectory-item-index">Created On:</span>
+                                                <span class="trajectory-item-content">@item.CreateDate</span>
+                                            </div>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
-                                            <b><u>Start From:</u></b> @item.StartAddress at @item.StartTime
+                                            <div class="trajectory-list-icon">
+                                                <img width="32" height="32" src="@Url.Content("~/Images/start-location.png")" />
+                                            </div>
+                                            <div class="trajectory-list-display">
+                                                <span class="trajectory-item-index">Start Location:</span>
+                                                <span class="trajectory-item-content">
+                                                    @if (!String.IsNullOrEmpty(item.StartAddress))
+                                                    {
+                                                        <text>@item.StartAddress At @item.StartTime</text>
+                                                    }
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
-                                            <b><u>Last Address:</u></b> @item.EndAddress at @item.EndTime
+                                            <div class="trajectory-list-icon">
+                                                <img width="32" height="32" src="@Url.Content("~/Images/end-location.png")" />
+                                            </div>
+                                            <div class="trajectory-list-display">
+                                                <span class="trajectory-item-index">Last Location:</span>
+                                                <span class="trajectory-item-content">
+                                                    @if (!String.IsNullOrEmpty(item.EndAddress))
+                                                    {
+                                                        <text>@item.EndAddress at @item.EndTime</text>
+                                                    }
+                                                </span>
+                                            </div>
                                         </div>
                                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 traject-detail ">
-                                            <b><u>Last Edited:</u></b> @item.LastUpdate
+                                            <div class="trajectory-list-icon">
+                                                <img width="32" height="32" src="@Url.Content("~/Images/last-edit.png")" />
+                                            </div>
+                                            <div class="trajectory-list-display">
+                                                <span class="trajectory-item-index">Last Edited:</span>
+                                                <span class="trajectory-item-content">
+                                                    @item.LastUpdate
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 ">
                                         <div class="traject-detail">
-                                            <b>
-                                                <u>
-                                                    Description
-                                                </u>
-                                            </b>
-                                            <p style="height: 180px;overflow-y: auto; overflow-x: hidden; padding: 5px;">
-                                                @item.Description
-                                            </p>
+                                            <div class="trajectory-list-icon">
+                                                <img width="32" height="32" src="@Url.Content("~/Images/description-icon.png")" />
+                                            </div>
+                                            <div class="trajectory-list-display">
+                                                <span class="trajectory-item-index">Description</span>
+                                                <p class="trajectory-description">
+                                                    @item.Description
+                                                </p>
+                                            </div>
                                         </div>
-
                                     </div>
                                 </div>
 
-
-                                @if (ViewBag.FriendStatus == null)
-                                {
-                                    var modalDeleteId = "delete-modal-" + count.ToString();
-                                    count++;
-                                    var modalEditId = "edit-modal-" + count1.ToString();
-                                    count1++;
-                                    item.ModalEditId = modalEditId;
-
-                                    <div class="row" style="margin-left:0px;">
+                                <div class="row trajectory-list-button">
+                                    @if (ViewBag.FriendStatus == null)
+                                    {
+                                        var modalDeleteId = "delete-modal-" + count.ToString();
+                                        count++;
+                                        var modalEditId = "edit-modal-" + count1.ToString();
+                                        count1++;
+                                        item.ModalEditId = modalEditId;
 
                                         <!-- Button trigger modal -->
                                         <button class="btn btn-primary btn-md btn-edit" style="width:12%;" data-toggle="modal" data-target="#@modalEditId">
@@ -123,9 +169,7 @@
                                             Delete <span class="glyphicon glyphicon-remove"></span>
                                         </button>
 
-                                        @{
-                                    Html.RenderPartial("~/Views/Trajectory/_EditTrajectory.cshtml", item);
-                                        }
+                                        Html.RenderPartial("~/Views/Trajectory/_EditTrajectory.cshtml", item);
                                         <div class="modal fade" id="@modalDeleteId">
                                             <div class=" modal-dialog">
                                                 <div class="modal-content">
@@ -148,16 +192,13 @@
                                                 </div><!-- /.modal-content -->
                                             </div><!-- /.modal-dialog -->
                                         </div><!-- /.modal -->
-
-                                    </div>
-                                }
+                                    }
+                                </div>
                             </div>
                         </div>
                     }
                 }
             </div>
-
-
 
 
             <!-- Pagination-->
@@ -168,7 +209,7 @@
                         <li>@Html.ActionLink("First", "ListTrajectory", new { SearchKeyword = searchModel.SearchKeyword, PageNumber = 1, PageCount = searchModel.PageCount, UserId = searchModel.UserId, DateFrom = searchModel.DateFrom, DateTo = searchModel.DateTo })</li>
                         @if (searchModel.PageNumber > 1)
                         {
-                            <li>@Html.ActionLink("<<", "ListTrajectory", new { SearchKeyword = searchModel.SearchKeyword, PageNumber = searchModel.PageNumber - 1, PageCount = searchModel.PageCount, UserId = searchModel.UserId, DateFrom = searchModel.DateFrom, DateTo = searchModel.DateTo })</li>
+                            <li>@Html.ActionLink("«", "ListTrajectory", new { SearchKeyword = searchModel.SearchKeyword, PageNumber = searchModel.PageNumber - 1, PageCount = searchModel.PageCount, UserId = searchModel.UserId, DateFrom = searchModel.DateFrom, DateTo = searchModel.DateTo })</li>
                         }
                         @if (searchModel.PageCount > 5)
                         {
@@ -212,7 +253,7 @@
                         }
                         @if (searchModel.PageNumber < searchModel.PageCount)
                         {
-                            <li>@Html.ActionLink(">>", "ListTrajectory", new { SearchKeyword = searchModel.SearchKeyword, PageNumber = searchModel.PageNumber + 1, PageCount = searchModel.PageCount, UserId = searchModel.UserId, DateFrom = searchModel.DateFrom, DateTo = searchModel.DateTo })</li>
+                            <li>@Html.ActionLink("»", "ListTrajectory", new { SearchKeyword = searchModel.SearchKeyword, PageNumber = searchModel.PageNumber + 1, PageCount = searchModel.PageCount, UserId = searchModel.UserId, DateFrom = searchModel.DateFrom, DateTo = searchModel.DateTo })</li>
                         }
                         <li>@Html.ActionLink("Last", "ListTrajectory", new { SearchKeyword = searchModel.SearchKeyword, PageNumber = searchModel.PageCount, PageCount = searchModel.PageCount, UserId = searchModel.UserId, DateFrom = searchModel.DateFrom, DateTo = searchModel.DateTo })</li>
                     </ul>

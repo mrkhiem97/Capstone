@@ -437,12 +437,17 @@
       <LastGenOutput>DBModel.Designer.cs</LastGenOutput>
     </EntityDeploy>
     <Content Include="Images\android_download.png" />
+    <Content Include="Images\description-icon.png" />
+    <Content Include="Images\end-location.png" />
     <Content Include="Images\excel-report.png" />
+    <Content Include="Images\last-edit.png" />
     <Content Include="Images\login-box-backg.png" />
     <Content Include="Images\Map.jpg" />
     <Content Include="Images\marker-next.png" />
     <Content Include="Images\marker-start.png" />
     <Content Include="Images\marker-stop.png" />
+    <Content Include="Images\start-date.png" />
+    <Content Include="Images\start-location.png" />
     <Content Include="Models\DatabaseModel\DBModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>DBModel.edmx</DependentUpon>

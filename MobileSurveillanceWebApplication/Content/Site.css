@@ -2,6 +2,14 @@
     border: solid 0px;
 }
 
+hr {
+    background-color: #d4d4d4;
+    color: #d4d4d4;
+    height: 1px;
+    border: 0px;
+    clear: both;
+}
+
 #container {
     width: 100%;
 }
@@ -246,10 +254,45 @@
 .trajectory-list-item {
     border-bottom: solid 1px #cccccc;
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     padding-bottom: 5px;
     margin-left: 5px;
     margin-right: 5px;
+}
+
+.trajectory-list-icon {
+    display: inline-block;
+    margin-right: 5px;
+    padding: 3px;
+}
+
+.trajectory-list-display {
+    display: inline;
+}
+
+.trajectory-item-index {
+    font-size: 14px;
+    font-weight: bold;
+    width: 50px;
+    color: #181818;
+}
+
+.trajectory-item-content {
+    font-size: 14px;
+    color: #303030;
+}
+
+.trajectory-description {
+    height: 180px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 5px;
+    font-size: 14px;
+    color: #303030;
+}
+
+.trajectory-list-button {
+    padding-top: 15px;
 }
 
 .trajectory-thumail {
