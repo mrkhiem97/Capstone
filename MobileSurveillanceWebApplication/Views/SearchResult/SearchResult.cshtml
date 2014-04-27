@@ -9,7 +9,6 @@
         window.location = "?SearchKeyword=" + response.SearchKeyword + "&PageNumber=" + response.PageNumber + "&PageCount=" + response.PageCount;
     }
 
-
     function onFailure() {
         alert('Something went wrong, please try again!');
     }
@@ -38,53 +37,61 @@
                     <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
                 </div>
                 <div class="row" align="center">
-                    @switch (item.FriendStatus)
+                    @if (item.MyId == item.Id)
                     {
-                        case "notFriend":
-                            <h4>
-                                @Ajax.ActionLink("Add Friend", "AddFriend", new { friendId = item.Id, requestType = "addFriend", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                        <h4>
+                            @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-success" })
+                        </h4>
+                    }
+                    else
+                    {
+                        switch (item.FriendStatus)
+                        {
+                            case "notFriend":
+                                <h4>
+                                    @Ajax.ActionLink("Add Friend", "AddFriend", new { friendId = item.Id, requestType = "addFriend", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                     {
                                         HttpMethod = "POST",
                                         OnSuccess = "onSuccess",
                                         OnFailure = "",
                                     }, new { @class = "label label-primary" })
-                            </h4>
-                            break;
-
-                        case "requestSent":
-                        <h4>
-                            @Ajax.ActionLink("Cancel Request", "CancelRequest", new { friendId = item.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                                </h4>
+                                break;
+                            case "requestSent":
+                            <h4>
+                                @Ajax.ActionLink("Cancel Request", "CancelRequest", new { friendId = item.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                     {
                                         HttpMethod = "POST",
                                         OnSuccess = "onSuccess",
                                         OnFailure = "",
                                     }, new { @class = "label label-danger" })
-                        </h4>
-                            break;
+                            </h4>
+                                break;
 
-                        case "confirmNeed":
-                        <h4>
-                            @Ajax.ActionLink("Accept Request", "AddFriend", new { friendId = item.Id, requestType = "confirmRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                            case "confirmNeed":
+                            <h4>
+                                @Ajax.ActionLink("Accept Request", "AddFriend", new { friendId = item.Id, requestType = "confirmRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                    {
                                        HttpMethod = "POST",
                                        OnSuccess = "onSuccess",
                                        OnFailure = "",
                                    }, new { @class = "label label-primary" })
 
-                            @Ajax.ActionLink("Deny Request", "DenyRequest", "SearchResult", new { friendId = @item.Id, requestType = "denyRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                                @Ajax.ActionLink("Deny Request", "DenyRequest", "SearchResult", new { friendId = @item.Id, requestType = "denyRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                    {
                                        HttpMethod = "POST",
                                        OnSuccess = "onSuccess",
                                        OnFailure = "",
                                    }, new { @class = "label label-warning" })
-                        </h4>
-                            break;
+                            </h4>
+                                break;
 
-                        default:
-                        <h4>
-                            @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-success" })
-                        </h4>
-                            break;
+                            default:
+                            <h4>
+                                @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-success" })
+                            </h4>
+                                break;
+                        }
                     }
                 </div>
             </div>

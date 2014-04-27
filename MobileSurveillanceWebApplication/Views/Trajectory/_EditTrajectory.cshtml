@@ -1,10 +1,42 @@
 ﻿@model MobileSurveillanceWebApplication.Models.ViewModel.TrajectoryViewModel
 @{
     var searchModel = (MobileSurveillanceWebApplication.Models.ViewModel.TrajectorySearchCriteriaViewModel)ViewBag.SearchCriteriaViewModel;
+    var formId = "form" + @Model.ModalEditId;
+    var lastUpdateId = "lastUpdate" + @Model.ModalEditId;
+    var btnSaveId = "save" + Model.ModalEditId;
 }
 
+<script>
+    function getDateString(value, accept) {
+        if (value < accept) {
+            return '0' + value.toString(10);
+        } else {
+            return value.toString(10);
+        }
+    }
 
-@using (Html.BeginForm("SaveTrajectory", "Trajectory", FormMethod.Post, new { role = "form" }))
+    $(document).ready(function () {
+        $("#@btnSaveId").click(function () {
+            var currentDate = new Date();
+            var year = currentDate.getFullYear().toString(10);
+            var month = getDateString(currentDate.getMonth() + 1, 9);
+            var day = getDateString(currentDate.getDate(), 9);
+            var hour = getDateString(currentDate.getHours(), 9);
+            var minute = getDateString(currentDate.getMinutes(), 9);
+            var second = getDateString(currentDate.getSeconds(), 9);
+
+            var dateValue = year + month + day + hour + minute + second;
+            var serializedData = $("#@formId :input");
+            $.each(serializedData, function (i, data) {
+                if (data['name'] == 'LastUpdate') {
+                    data['value'] = dateValue;
+                }
+            });
+            $("#@formId").submit();
+        });
+    });
+</script>
+@using (Html.BeginForm("SaveTrajectory", "Trajectory", FormMethod.Post, new { role = "form", id = formId }))
 {
     @Html.AntiForgeryToken()
     <!-- Modal -->
@@ -29,7 +61,7 @@
                             @Html.LabelFor(model => model.Description)
                         </div>
                         <div class="editor-field">
-                            
+
                             @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @rows = "4" })
                             @Html.ValidationMessageFor(model => model.Description)
                         </div>
@@ -42,7 +74,6 @@
     var optionList = new List<SelectListItem>();
     optionList.Add(new SelectListItem() { Text = "Public", Value = "Public" });
     optionList.Add(new SelectListItem() { Text = "Private", Value = "Private" });
-
                             }
                             @Html.DropDownListFor(model => model.Status, optionList, new { @class = "form-control" })
                         </div>
@@ -51,6 +82,7 @@
                 </div>
                 <div class="modal-footer">
                     @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.LastUpdate)
                     @Html.Hidden("UserId", searchModel.UserId)
                     @Html.Hidden("SearchKeyword", searchModel.SearchKeyword)
                     @Html.Hidden("PageNumber", searchModel.PageNumber)
@@ -58,7 +90,7 @@
                     @Html.Hidden("DateFrom", searchModel.DateFrom)
                     @Html.Hidden("DateTo", searchModel.DateTo)
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input type="submit" value="Save" class="btn btn-primary" />
+                    <input id="@btnSaveId" type="button" value="Save" class="btn btn-primary" />
                 </div>
             </div>
         </div>

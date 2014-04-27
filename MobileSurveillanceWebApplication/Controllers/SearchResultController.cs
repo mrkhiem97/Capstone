@@ -67,6 +67,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 friendViewModel.Fullname = user.Fullname;
                 friendViewModel.Birthday = user.Birthday;
                 friendViewModel.Address = user.Address;
+                friendViewModel.MyId = account.Id;
 
                 //CHECKING STATUS OF FRIENDSHIP                    
                 // if me (0) - you (1) --> confirmNeed

@@ -26,7 +26,15 @@ namespace MobileSurveillanceWebApplication.Utility
 
         public static DateTime ConvertFormattedStringToDateTime(String formattedString)
         {
-            var retVal = DateTime.ParseExact(formattedString, TIME_FORMAT, CultureInfo.InvariantCulture);
+            DateTime retVal = DateTime.Now;
+            try
+            {
+                retVal = DateTime.ParseExact(formattedString, TIME_FORMAT, CultureInfo.InvariantCulture);
+            }
+            catch (Exception)
+            {
+                retVal = DateTime.Now;
+            }
             return retVal;
         }
 
@@ -73,7 +81,7 @@ namespace MobileSurveillanceWebApplication.Utility
             {
                 dist = dist * 1.609344 * 1000;
             }
-            else if (unit ==  DistanceUnit.NauticalMile)
+            else if (unit == DistanceUnit.NauticalMile)
             {
                 dist = dist * 0.8684;
             }

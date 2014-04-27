@@ -367,7 +367,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             trajectory.TrajectoryName = model.TrajectoryName;
             trajectory.Description = model.Description;
             trajectory.Status = model.Status.Trim();
-            trajectory.LastUpdated = DateTime.Now;
+            trajectory.LastUpdated = SupportUtility.ConvertFormattedStringToDateTime(model.LastUpdate);
 
             int result = this.context.SaveChanges();
 

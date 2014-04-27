@@ -607,6 +607,26 @@
     <Content Include="UserData\admin11\Image\20140419221127.jpg" />
     <Content Include="UserData\admin11\Image\20140419221318.jpg" />
     <Content Include="UserData\admin11\Image\20140419221453.jpg" />
+    <Content Include="UserData\admin13\Avatar\tieulongnu.jpg" />
+    <Content Include="UserData\admin13\Image\20140427185427.jpg" />
+    <Content Include="UserData\admin13\Image\20140427185432.jpg" />
+    <Content Include="UserData\admin13\Image\20140427191209.jpg" />
+    <Content Include="UserData\admin13\Image\20140427191415.jpg" />
+    <Content Include="UserData\admin13\Image\20140427191616.jpg" />
+    <Content Include="UserData\admin13\Image\20140427191816.jpg" />
+    <Content Include="UserData\admin13\Image\20140427192017.jpg" />
+    <Content Include="UserData\admin13\Image\20140427192217.jpg" />
+    <Content Include="UserData\admin13\Image\20140427192417.jpg" />
+    <Content Include="UserData\admin13\Image\20140427192618.jpg" />
+    <Content Include="UserData\admin13\Image\20140427192818.jpg" />
+    <Content Include="UserData\admin13\Image\20140427193018.jpg" />
+    <Content Include="UserData\admin13\Image\20140427220639.jpg" />
+    <Content Include="UserData\admin13\Image\20140427220840.jpg" />
+    <Content Include="UserData\admin13\Image\20140427221040.jpg" />
+    <Content Include="UserData\admin13\Image\20140427221240.jpg" />
+    <Content Include="UserData\admin13\Image\20140427221441.jpg" />
+    <Content Include="UserData\admin13\Image\20140427221641.jpg" />
+    <Content Include="UserData\admin13\Image\20140427221842.jpg" />
     <Content Include="UserData\admin1\Avatar\131.jpg" />
     <Content Include="UserData\admin1\Avatar\39.jpg" />
     <Content Include="UserData\admin1\Image\20140317125204.jpg" />
@@ -885,6 +905,7 @@
     <Content Include="UserData\admin\Avatar\05.jpg" />
     <Content Include="UserData\admin\Avatar\08.jpg" />
     <Content Include="UserData\admin\Avatar\100.JPG" />
+    <Content Include="UserData\admin\Avatar\133.jpg" />
     <Content Include="UserData\admin\Avatar\15.jpg" />
     <Content Include="UserData\admin\Avatar\22.jpg" />
     <Content Include="UserData\admin\Avatar\38.jpg" />
@@ -895,6 +916,8 @@
     <Content Include="UserData\admin\Image\20140402131116.jpg" />
     <Content Include="UserData\admin\Image\20140402131249.jpg" />
     <Content Include="UserData\admin\Image\20140402131252.jpg" />
+    <Content Include="UserData\binhdc\Avatar\doanchibinh.jpg" />
+    <Content Include="UserData\khiemdm\Avatar\131.jpg" />
     <Content Include="UserData\phuonglhk\Avatar\09.jpg" />
     <Content Include="UserData\phuonglhk\Avatar\18.jpg" />
     <Content Include="Web.config">
@@ -952,7 +975,10 @@
     <Content Include="Views\Trajectory\_EditTrajectory.cshtml" />
     <Content Include="Views\Report\Report.cshtml" />
     <Content Include="Views\Report\ReportPartial.cshtml" />
+    <Content Include="UserData\admin1\Report\1240zF3z08zECz33zED20140419182451.xls" />
+    <Content Include="UserData\admin1\Report\240zF3z08zECz33zED20140415101056.xls" />
     <Content Include="UserData\admin1\Report\admin140zF3z08zECz33zED20140329063439.xls" />
+    <Content Include="UserData\admin\Report\140zF3z08zECz33zED20140420154653.xls" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Library\" />
