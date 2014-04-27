@@ -242,7 +242,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                             TakenDate = listLocation[i].CreatedDate.ToString("dd-MM-yyyy HH:mm:ss"),
                             Distance = 0,
                             TotalDistance = cummulativeDistance,
-                            Marker = "/Images/marker-start.png",
+                            Marker = "/Images/report-marker-start.png",
                             Velocity = 0,
                             Address = listLocation[i].Address,
                             Latitude = Math.Round(listLocation[i].Latitude, 5),
@@ -263,10 +263,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                     reportViewModel.LocationNumber = i + 2;
                     reportViewModel.TimeInterval = SupportUtility.TotalTime(startLocation.CreatedDate, desLocation.CreatedDate);
                     reportViewModel.TotalTime = SupportUtility.TotalTime(listLocation[0].CreatedDate, desLocation.CreatedDate);
-                    reportViewModel.Marker = "/Images/marker-normal.png";
+                    reportViewModel.Marker = "/Images/report-marker-normal.png";
                     if (i + 1 == listLocation.Count - 1)
                     {
-                        reportViewModel.Marker = "/Images/marker-end.png";
+                        reportViewModel.Marker = "/Images/report-marker-end.png";
                     }
                     Console.WriteLine("Distance: " + reportViewModel.Distance);
                     cummulativeDistance += reportViewModel.Distance;

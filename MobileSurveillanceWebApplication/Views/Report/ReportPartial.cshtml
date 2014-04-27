@@ -58,7 +58,7 @@
             graph1.lineColor = "#d1655d";
             //graph.bullet = "round";
             graph1.bulletSize = 32;
-            graph1.bulletOffset = 25;
+            graph1.bulletOffset = 20;
             graph1.bulletBorderColor = "#FFFFFF";
             graph1.bulletBorderAlpha = 1;
             graph1.bulletBorderThickness = 2;
@@ -81,7 +81,7 @@
             graph2.lineColor = "#3333FF";
             //graph.bullet = "round";
             graph2.bulletSize = 32;
-            graph2.bulletOffset = 25;
+            graph2.bulletOffset = 20;
             graph2.bulletBorderColor = "#FFFFFF";
             graph2.bulletBorderAlpha = 1;
             graph2.bulletBorderThickness = 2;
@@ -143,17 +143,9 @@
             $("#summary-report").show();
         });
     });
-
-
-
-    // this method is called when chart is first inited as we listen for "dataUpdated" event
-    function zoomChart() {
-        // different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
-        chart.zoomToDates(new Date(1972, 0), new Date(1984, 0));
-    }
 </script>
-<div class="col-lg-5 col-md-5 col-sm-12">
-    <div id="summary-report" class="alert alert-info sumary-report">
+<div class="col-lg-6 col-md-6 col-sm-12">
+    <div id="summary-report" class="alert alert-info summary-report">
         <div id="total-location">
         </div>
         <div id="total-distance">
@@ -162,7 +154,7 @@
         </div>
     </div>
 </div>
-<div class="col-lg-7 col-md-7 col-sm-12">
+<div class="col-lg-6 col-md-6 col-sm-12">
     @using (Html.BeginForm("ExcelReport", "Report", FormMethod.Post, new { enctype = "multipart/form-data", id="report-download-form" }))
     {
         <input type="hidden" name="trajectoryId" value="@Model.Id" />
