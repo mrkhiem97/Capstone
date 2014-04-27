@@ -445,6 +445,9 @@
     <Content Include="Images\marker-end.png" />
     <Content Include="Images\marker-normal.png" />
     <Content Include="Images\marker-start.png" />
+    <Content Include="Images\report-marker-end.png" />
+    <Content Include="Images\report-marker-normal.png" />
+    <Content Include="Images\report-marker-start.png" />
     <Content Include="Images\start-date.png" />
     <Content Include="Models\DatabaseModel\DBModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
