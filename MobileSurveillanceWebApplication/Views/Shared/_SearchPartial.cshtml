@@ -1,7 +1,7 @@
 ﻿@using (Html.BeginForm("SearchResult", "SearchResult", FormMethod.Post, new { @id = "search-form-bar", @role = "form", @class = "navbar-form navbar-left" }))
 {
     <div class="form-group form-search">
-        <input id="txtSearchAll" placeholder="People" value="" type="text" name="SearchKeyword" class="form-control col-lg-9 col-md-9 search-box typeahead" />
+        <input id="txtSearchAll" placeholder="People" value="" type="text" maxlength="200" name="SearchKeyword" class="form-control col-lg-9 col-md-9 search-box typeahead" />
         <i class="glyphicon glyphicon-search"></i>
         <input id="txtPageNumber" type="hidden" name="PageNumber" value="1" />
         <input id="txtPageCount" type="hidden" name="PageCount" value="0" />

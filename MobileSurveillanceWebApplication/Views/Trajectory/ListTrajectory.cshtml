@@ -39,7 +39,7 @@
         @using (Html.BeginForm("ListTrajectory", "Trajectory", FormMethod.Post, new { @role = "search" }))
         {
             <div>
-                <input type="text" id="searchTraject" name="SearchKeyword" class="typeahead form-control" placeholder="Trajectories name..." value="@searchModel.SearchKeyword" style="width: 400px; display:inline-block">
+                <input type="text" id="searchTraject" name="SearchKeyword" maxlength="500" class="typeahead form-control" placeholder="Trajectories name..." value="@searchModel.SearchKeyword" style="width: 400px; display:inline-block">
                 <input type="hidden" name="UserId" value="@searchModel.UserId" />
                 <input type="hidden" name="PageNumber" value="1" />
                 <input type="hidden" name="PageCount" value="0" />
