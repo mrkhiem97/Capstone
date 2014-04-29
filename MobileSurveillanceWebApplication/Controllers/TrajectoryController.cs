@@ -48,7 +48,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 model.TotalTime = "";
             }
-            
+
             return View(model);
         }
 
@@ -81,13 +81,14 @@ namespace MobileSurveillanceWebApplication.Controllers
         }
 
         [Authorize]
+        [ValidateInput(false)]
         public ActionResult ListTrajectories()
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             return RedirectToAction("ListTrajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = account.Id, DateFrom = " ", DateTo = " " });
         }
 
-
+        [ValidateInput(false)]
         [Authorize]
         public ActionResult ListTrajectory(TrajectorySearchCriteriaViewModel searchModel)
         {
@@ -350,17 +351,32 @@ namespace MobileSurveillanceWebApplication.Controllers
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
-        public JsonResult GetTrajectoryList(long userId)
+        [HttpGet]
+        [ValidateInput(false)]
+        public JsonResult GetTrajectoryList(long id, string query)
         {
-            var listTrajectory = this.context.Trajectories.Where(x => x.IsActive).Where(x => x.Account.Id == userId).ToList();
-            var  retVal = new List<string>();
-            for (int i = 0; i < listTrajectory.Count; i++)
+            query = HttpUtility.UrlDecode(query);
+            var listTrajectory = this.context.Trajectories
+                .Where(x => x.IsActive)
+                .Where(x => x.Account.Id == id).ToList();
+
+            var listResult = new List<Object>();
+            foreach (var item in listTrajectory)
             {
-                retVal.Add(listTrajectory[i].TrajectoryName);
+                if (item.TrajectoryName.ToLower().Contains(query.ToLower()))
+                {
+                    listResult.Add(new
+                    {
+                        Display = HttpUtility.HtmlEncode(item.TrajectoryName),
+                        Value = item.TrajectoryName,
+                        Id = item.Id
+                    });
+                }
             }
-                return Json(retVal, JsonRequestBehavior.AllowGet);
+            return Json(listResult, JsonRequestBehavior.AllowGet);
         }
 
+        [ValidateInput(false)]
         public ActionResult SaveTrajectory(TrajectoryViewModel model, TrajectorySearchCriteriaViewModel searchUserModel)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(model.Id)).SingleOrDefault();

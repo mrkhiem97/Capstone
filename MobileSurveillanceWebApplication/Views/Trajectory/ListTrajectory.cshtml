@@ -6,19 +6,6 @@
     int count1 = 0;
 }
 
-
-<script>
-    var Trajectories = [];
-    var currentTraject;
-    $(document).ready(function () {
-        $.getJSON("/Trajectory/GetTrajectoryList/", { userId: "@Model.FriendViewModel.Id" }, function (data) {
-            for (var i = 0; i < data.length; i++) {
-                Trajectories.push(data[i]);
-            }
-        })
-    });
-
-</script>
 <script>
     function onDeleteSuccess(response, status, data) {
         window.location.href = window.location.href;
@@ -38,14 +25,14 @@
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 filter-trajectory-form" style="">
         @using (Html.BeginForm("ListTrajectory", "Trajectory", FormMethod.Post, new { @role = "search" }))
         {
-            <div>
-                <input type="text" id="searchTraject" name="SearchKeyword" maxlength="500" class="typeahead form-control" placeholder="Trajectories name..." value="@searchModel.SearchKeyword" style="width: 400px; display:inline-block">
+            <div class="form-group form-inline">
+                <input type="text" id="searchTraject" name="SearchKeyword" maxlength="500" class="form-control" placeholder="Trajectories name..." value="@searchModel.SearchKeyword" style="width: 400px;">
                 <input type="hidden" name="UserId" value="@searchModel.UserId" />
                 <input type="hidden" name="PageNumber" value="1" />
                 <input type="hidden" name="PageCount" value="0" />
                 <input type="hidden" name="DateFrom" value="@searchModel.DateFrom" />
                 <input type="hidden" name="DateTo" value="@searchModel.DateTo" />
-                <button type="submit" class="btn btn-default" style="display:inline-block; margin-top: 15px">Search <span class="glyphicon glyphicon-search"></span></button>
+                <button type="submit" class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button>
             </div>
         }
     </div>
@@ -252,59 +239,62 @@
                     </ul>
                 </div>
             </div>
-
+        </div>
+    }
+    else
+    {
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="alert alert-info" style="margin-top: 25px; margin-left: 0px; width: 600px"><h4><b>@Model.FriendViewModel.Fullname has no trajectory "@searchModel.SearchKeyword"</b></h4></div>
         </div>
     }
 </div>
 <script>
-    var substringMatcher = function (strs) {
-        return function findMatches(q, cb) {
-            var matches, substringRegex;
+    $(document).ready(function () {
+        $('#searchTraject').typeahead({
+            source: function (query, process) {
 
-            // an array that will be populated with substring matches
-            matches = [];
-
-            // regex used to determine if a string contains the substring `q`
-            substrRegex = new RegExp(q, 'i');
-
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
-            $.each(strs, function (i, str) {
-                if (substrRegex.test(str)) {
-                    // the typeahead jQuery plugin expects suggestions to a
-                    // JavaScript object, refer to typeahead docs for more info
-                    matches.push({ value: str });
+                if (query.indexOf('[') > -1) {
+                    query = query.replace('[', '\[');
                 }
-            });
+                // implementation
+                var listTrajectories = [];
+                states = [];
+                map = {};
+                $.getJSON("/Trajectory/GetTrajectoryList/", { id: "@Model.FriendViewModel.Id", query: query }, function (data) {
 
-            cb(matches);
-        };
-    };
-
-    //var states = Trajectories;
-
-    var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
-      'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
-      'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
-      'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
-      'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-      'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
-      'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
-      'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
-      'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
-    ];
-
-    $('#searchTraject').typeahead({
-        limit: 3,
-        hint: true,
-        highlight: true,
-        minLength: 1,
-
-    },
-    {
-        name: 'states',
-        displayKey: 'value',
-        source: substringMatcher(Trajectories)
+                    $.each(data, function (i, trajectory) {
+                        map[trajectory.Display] = trajectory;
+                        listTrajectories.push(trajectory.Display);
+                    });
+                    process(listTrajectories);
+                });
+            },
+            updater: function (item) {
+                // implementation
+                $('#searchTraject').attr('value', map[item].Value);
+                return map[item].Value;
+            },
+            matcher: function (item) {
+                if (this.query.indexOf('[') > -1) {
+                    this.query = this.query.replace('[', '\[');
+                }
+                // implementation
+                if (map[item].Value.toLowerCase().indexOf(this.query.toLowerCase()) != -1) {
+                    return true;
+                }
+            },
+            sorter: function (items) {
+                // implementation
+                return items.sort();
+            },
+            highlighter: function (item) {
+                // implementation
+                if (this.query.indexOf('[') > -1) {
+                    this.query = this.query.replace('[', '\\[');
+                }
+                var regex = new RegExp('(' + this.query + ')', 'gi');
+                return item.replace(regex, "<strong>$1</strong>");
+            },
+        });
     });
 </script>
-

@@ -33,6 +33,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <param name="searchCriteriaViewModel"></param>
         /// <returns></returns>
+        [ValidateInput(false)]
         public ActionResult SearchResult(SearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
@@ -152,10 +153,21 @@ namespace MobileSurveillanceWebApplication.Controllers
                 var message = "Nothing changes.";
                 return Json(message, JsonRequestBehavior.AllowGet);
             }
-
         }
 
-
+        [HttpGet]
+        [ValidateInput(false)]
+        public JsonResult GetUserList(string query)
+        {
+            query = HttpUtility.UrlDecode(query);
+            var accounts = this.context.Accounts.Where(x => x.IsActive).Where(x => x.Fullname.ToLower().Contains(query.ToLower())).ToList();
+            var listResult = new List<string>();
+            foreach (var item in accounts)
+            {
+                listResult.Add(item.Fullname);
+            }
+            return Json(listResult, JsonRequestBehavior.AllowGet);
+        }
 
         /// <summary>
         /// Cancel Friend Request
@@ -261,7 +273,5 @@ namespace MobileSurveillanceWebApplication.Controllers
             };
             return Json(returnJson, JsonRequestBehavior.AllowGet);
         }
-
-
     }
 }

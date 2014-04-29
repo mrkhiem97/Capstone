@@ -35,99 +35,112 @@
         alert('Something went wrong, please try again!');
     }
 </script>
-
-<div class="alert alert-info" style="margin-top: 25px; margin-left: 18px; width: 400px"><h4><b>You have these following friends!</b></h4></div>
-
+@if (Model.ListUser.Any())
+{
+    <div class="alert alert-info" style="margin-top: 25px; margin-left: 18px; width: 400px"><h4><b>You have these following friends!</b></h4></div>
+}
+else
+{
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="alert alert-info" style="margin-top: 25px; margin-left: 0px; width: 600px"><h4><b>You has no friend "@searchUserModel.SearchKeyword"</b></h4></div>
+    </div>
+}
 <div class="row">
     <!-- List Friends-->
     <div class="col-lg-9 col-md-9 col-sm-12">
         <div class="row" style="margin-bottom: 20px">
             @using (Html.BeginForm("ListUser", "User", FormMethod.Post, new { @role = "search" }))
             {
-                <div class="col-lg-12" style="margin-left: 18px">
-                    <input type="text" name="SearchKeyword" id="searchFriend" maxlength="500" class="form-control" placeholder="Your friends name ..." value="@searchUserModel.SearchKeyword" style="width: 400px; display: inline-block">
+                <div class="col-lg-12 form-group form-inline" style="margin-left: 18px">
+                    <input type="text" name="SearchKeyword" id="searchFriend" maxlength="500" class="form-control" placeholder="Your friends name ..." value="@searchUserModel.SearchKeyword" style="width: 400px">
                     <input type="hidden" name="PageNumber" value="1" />
                     <input type="hidden" name="PageCount" value="0" />
-                    <button type="submit" class="btn btn-default" style="display: inline-block; margin-top: 15px">Filter <span class="glyphicon glyphicon-search"></span></button>
+                    <button type="submit" class="btn btn-default">Filter <span class="glyphicon glyphicon-search"></span></button>
                 </div><!-- /input-group -->
             }
         </div>
-
-        @foreach (var item in Model.ListUser)
+        @if (Model.ListUser.Any())
         {
+            foreach (var item in Model.ListUser)
+            {
             <!-- Thumbnail User-->
-            <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-                <div class="list-thumb">
-                    <div class="row" align="center">
-                        <img src="@item.Avatar" alt="MobileSurveillance" class="avatar-thumbnail">
-                    </div>
-                    <div class="row" align="center">
-                        <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
-                    </div>
-                    <div class="row" align="center">
-                        <h4> @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-primary " })</h4>
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+                    <div class="list-thumb">
+                        <div class="row" align="center">
+                            <img src="@item.Avatar" alt="MobileSurveillance" class="avatar-thumbnail">
+                        </div>
+                        <div class="row" align="center">
+                            <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
+                        </div>
+                        <div class="row" align="center">
+                            <h4> @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-primary " })</h4>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
         <!-- Pagination-->
-        <div class="row" style="text-align: center;clear:both">
-            <div style="text-align: left; display: inline-block; /* for ie6/7: */ *display: inline; zoom: 1;">
-                <ul class="pagination">
+            <div class="row" style="text-align: center;clear:both">
+                <div style="text-align: left; display: inline-block; /* for ie6/7: */ *display: inline; zoom: 1;">
+                    <ul class="pagination">
 
-                    <li>@Html.ActionLink("First", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount })</li>
-                    @if (searchUserModel.PageNumber > 1)
-                    {
-                        <li>@Html.ActionLink("«", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount })</li>
-                    }
-                    @if (searchUserModel.PageCount > 5)
-                    {
-                        int firstSegmentLength = 3;
-                        while (searchUserModel.PageNumber - firstSegmentLength < 0)
+                        <li>@Html.ActionLink("First", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = 1, PageCount = searchUserModel.PageCount })</li>
+                        @if (searchUserModel.PageNumber > 1)
                         {
-                            firstSegmentLength--;
+                            <li>@Html.ActionLink("«", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber - 1, PageCount = searchUserModel.PageCount })</li>
                         }
-
-                        int lastSegment = searchUserModel.PageNumber + 3;
-
-
-                        if (lastSegment > searchUserModel.PageCount)
+                        @if (searchUserModel.PageCount > 5)
                         {
-                            lastSegment = searchUserModel.PageCount;
-                        }
-
-                        for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
-                        {
-                            <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
-                        }
-                        <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
-                        for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
-                        {
-                            <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 1; i <= searchUserModel.PageCount; i++)
-                        {
-                            if (i == searchUserModel.PageNumber)
+                            int firstSegmentLength = 3;
+                            while (searchUserModel.PageNumber - firstSegmentLength < 0)
                             {
-                                <li class="active">@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+                                firstSegmentLength--;
                             }
-                            else
+
+                            int lastSegment = searchUserModel.PageNumber + 3;
+
+
+                            if (lastSegment > searchUserModel.PageCount)
+                            {
+                                lastSegment = searchUserModel.PageCount;
+                            }
+
+                            for (int i = searchUserModel.PageNumber - firstSegmentLength + 1; i < searchUserModel.PageNumber; i++)
+                            {
+                                <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                            }
+                            <li class="active">@Html.ActionLink((searchUserModel.PageNumber).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+                            for (int i = searchUserModel.PageNumber + 1; i <= lastSegment + 3 - firstSegmentLength; i++)
                             {
                                 <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
                             }
                         }
-                    }
-                    @if (searchUserModel.PageNumber < searchUserModel.PageCount)
-                    {
-                        <li>@Html.ActionLink("»", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount })</li>
-                    }
-                    <li>@Html.ActionLink("Last", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount })</li>
-                </ul>
+                        else
+                        {
+                            for (int i = 1; i <= searchUserModel.PageCount; i++)
+                            {
+                                if (i == searchUserModel.PageNumber)
+                                {
+                                    <li class="active">@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount })</li>
+                                }
+                                else
+                                {
+                                    <li>@Html.ActionLink((i).ToString(), "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = i, PageCount = searchUserModel.PageCount })</li>
+                                }
+                            }
+                        }
+                        @if (searchUserModel.PageNumber < searchUserModel.PageCount)
+                        {
+                            <li>@Html.ActionLink("»", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber + 1, PageCount = searchUserModel.PageCount })</li>
+                        }
+                        <li>@Html.ActionLink("Last", "ListUser", new { SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageCount, PageCount = searchUserModel.PageCount })</li>
+                    </ul>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+        }
+
     </div>
     <!-- End of List Friends-->
     <!-- Suggest Friends-->
@@ -220,44 +233,48 @@
 <!-- End List of Mutual Friends-->
 
 <script>
-    var substringMatcher = function (strs) {
-        return function findMatches(q, cb) {
-            var matches, substringRegex;
+    $(document).ready(function () {
+        $('#searchFriend').typeahead({
+            source: function (query, process) {
 
-            // an array that will be populated with substring matches
-            matches = [];
-
-            // regex used to determine if a string contains the substring `q`
-            substrRegex = new RegExp(q, 'i');
-
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
-            $.each(strs, function (i, str) {
-                if (substrRegex.test(str)) {
-                    // the typeahead jQuery plugin expects suggestions to a
-                    // JavaScript object, refer to typeahead docs for more info
-                    matches.push({ value: str });
+                if (query.indexOf('[') > -1) {
+                    query = query.replace('[', '\[');
                 }
-            });
-
-            cb(matches);
-        };
-    };
-
-    //var states = Trajectories;
-
-
-
-    $('#searchFriend').typeahead({
-        limit: 3,
-        hint: true,
-        highlight: true,
-        minLength: 1,
-
-    },
-    {
-        name: 'states',
-        displayKey: 'value',
-        source: substringMatcher(Users)
+                // implementation
+                var listUsers = [];
+                $.getJSON("/User/GetListFriend/", { query: query }, function (data) {
+                    $.each(data, function (i, user) {
+                        listUsers.push(user);
+                    });
+                    process(listUsers);
+                })
+            },
+            updater: function (item) {
+                // implementation
+                $('#searchFriend').attr('value', item);
+                return item;
+            },
+            matcher: function (item) {
+                if (this.query.indexOf('[') > -1) {
+                    this.query = this.query.replace('[', '\[');
+                }
+                // implementation
+                if (item.toLowerCase().indexOf(this.query.toLowerCase()) != -1) {
+                    return true;
+                }
+            },
+            sorter: function (items) {
+                // implementation
+                return items.sort();
+            },
+            highlighter: function (item) {
+                // implementation
+                if (this.query.indexOf('[') > -1) {
+                    this.query = this.query.replace('[', '\\[');
+                }
+                var regex = new RegExp('(' + this.query + ')', 'gi');
+                return item.replace(regex, "<strong>$1</strong>");
+            },
+        });
     });
 </script>

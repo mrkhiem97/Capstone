@@ -9,19 +9,12 @@
 }
 
 <script>
-    var Users = [];
     $(window).load(function () {
-        $('#txtSearchAll').on('keydown', function (e) {
+        $('#txtSearchAll').on('submit', function (e) {
             if (e.which == 13) {
                 $('#search-form-bar').submit();
             }
         });
-
-        $.getJSON("/User/GetUserList/", {}, function (data) {
-            for (var i = 0; i < data.length; i++) {
-                Users.push(data[i]);
-            }
-        })
     });
 </script>
 <style>
@@ -29,7 +22,8 @@
         position: relative;
     }
 
-        .form-search .search-box { padding-left: 30px;
+        .form-search .search-box {
+            padding-left: 30px;
         }
 
         .form-search i {
@@ -44,44 +38,49 @@
 </style>
 
 <script>
-    var substringMatcher = function (strs) {
-        return function findMatches(q, cb) {
-            var matches, substringRegex;
+    $(document).ready(function () {
+        $('#txtSearchAll').typeahead({
+            source: function (query, process) {
 
-            // an array that will be populated with substring matches
-            matches = [];
-
-            // regex used to determine if a string contains the substring `q`
-            substrRegex = new RegExp(q, 'i');
-
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
-            $.each(strs, function (i, str) {
-                if (substrRegex.test(str)) {
-                    // the typeahead jQuery plugin expects suggestions to a
-                    // JavaScript object, refer to typeahead docs for more info
-                    matches.push({ value: str });
+                if (query.indexOf('[') > -1) {
+                    query = query.replace('[', '\[');
                 }
-            });
-
-            cb(matches);
-        };
-    };
-
-    //var states = Trajectories;
-
-    
-
-    $('#txtSearchAll').typeahead({
-        limit: 3,
-        hint: true,
-        highlight: true,
-        minLength: 1,
-
-    },
-    {
-        name: 'states',
-        displayKey: 'value',
-        source: substringMatcher(Users)
+                // implementation
+                var listUsers = [];
+                $.getJSON("/SearchResult/GetUserList/", { query: query }, function (data) {
+                    $.each(data, function (i, user) {
+                        listUsers.push(user);
+                    });
+                    process(listUsers);
+                })
+            },
+            updater: function (item) {
+                // implementation
+                $('#txtSearchAll').attr('value', item);
+                return item;
+            },
+            matcher: function (item) {
+                if (this.query.indexOf('[') > -1) {
+                    this.query = this.query.replace('[', '\[');
+                }
+                // implementation
+                if (item.toLowerCase().indexOf(this.query.toLowerCase()) != -1) {
+                    return true;
+                }
+            },
+            sorter: function (items) {
+                // implementation
+                return items.sort();
+            },
+            highlighter: function (item) {
+                // implementation
+                if (this.query.indexOf('[') > -1) {
+                    this.query = this.query.replace('[', '\\[');
+                }
+                var regex = new RegExp('(' + this.query + ')', 'gi');
+                return item.replace(regex, "<strong>$1</strong>");
+            },
+            autoSelect: false
+        });
     });
 </script>

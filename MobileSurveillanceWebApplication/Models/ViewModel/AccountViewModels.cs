@@ -46,8 +46,8 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     public class RegisterViewModel
     {
         [Required(ErrorMessage = "Username is required")]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 5)]
-        [RegularExpression("^[a-z0-9_-]{1,100}$", ErrorMessage = "Invalid characters")]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 5)]
+        [RegularExpression("^[a-z0-9_-]{1,50}$", ErrorMessage = "Invalid characters")]
         [Remote("ValidateUsername", "Account", ErrorMessage = "This user has already existed")]
         [Display(Name = "User name")]
         public string UserName { get; set; }
@@ -72,6 +72,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Fullname is required")]
+        [RegularExpression("^[^-!$@%^&*()_+|~=`{}\\[\\]:\";'<>?,\\/]*$", ErrorMessage = "Invalid name characters")]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Text)]
         [Display(Name = "Fullname")]

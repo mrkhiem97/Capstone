@@ -548,6 +548,7 @@
     <Content Include="Scripts\amcharts\xy.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\bootstrap3-typeahead.min.js" />
     <Content Include="Scripts\DatePickerScript.js" />
     <Content Include="Scripts\jquery-1.9.1.js" />
     <Content Include="Scripts\jquery-1.9.1.min.js" />
@@ -570,7 +571,6 @@
     <Content Include="Scripts\knockout-2.2.0.js" />
     <Content Include="Scripts\markerwithlabel.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
-    <Content Include="Scripts\typeahead.jquery.js" />
     <Content Include="UserData\admin11\Image\20140419182618.jpg" />
     <Content Include="UserData\admin11\Image\20140419182630.jpg" />
     <Content Include="UserData\admin11\Image\20140419182659.jpg" />

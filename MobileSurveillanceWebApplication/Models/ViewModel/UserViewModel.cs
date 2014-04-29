@@ -15,9 +15,9 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public bool Gender { get; set; }
 
         [Required(ErrorMessage = "Fullname is required")]
+        [RegularExpression("^[^-!$@%^&*()_+|~=`{}\\[\\]:\";'<>?,\\/]*$", ErrorMessage = "Invalid name characters")]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Text)]
-        [Display(Name = "Fullname")]
         public string Fullname { get; set; }
         public DateTime? LastLogin { get; set; }
         public string IsActive { get; set; }
