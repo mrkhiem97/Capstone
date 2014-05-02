@@ -107,7 +107,6 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         [Display(Name = "User name")]
         public string UserName { get; set; }
 
-        [StringLength(255, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.EmailAddress)]
         [RegularExpression(@"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", ErrorMessage = "Invalid email pattern")]
         [Display(Name = "Email")]
@@ -129,7 +128,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
 
         [Required]
         [DataType(DataType.Text)]
-        public string key { get; set; }
+        public string Key { get; set; }
     }
 
 }

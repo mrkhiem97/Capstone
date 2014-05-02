@@ -144,7 +144,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 context.Accounts.Add(account);
                 try
                 {
-                    context.SaveChanges();
+                    this.context.SaveChanges();
                     string validateAccountToken = KeyUltil.GenerateHashKey(account.Username);
                     String url = Request.Url.Scheme + System.Uri.SchemeDelimiter + Request.Url.Host;
                     String host = url + Url.Action("ValidateUserAccount", "Account", new { validateAccountToken = validateAccountToken, username = account.Username });
@@ -197,7 +197,6 @@ namespace MobileSurveillanceWebApplication.Controllers
         [AllowAnonymous]
         public ActionResult RetrievePassword(string email)
         {
-
             if (ModelState.IsValid)
             {
                 var account = this.context.Accounts.SingleOrDefault(x => x.Email.Equals(email.Trim(),
@@ -205,9 +204,9 @@ namespace MobileSurveillanceWebApplication.Controllers
                 if (account != null)
                 {
                     string key = KeyUltil.GenerateNewKey();
-                    string body = "Here is your key from Mobile Surveillance: " + key;
+                    string body = "Here is your reset passwkrd key from Mobile Surveillance: <b>" + key + "</b>";
                     String subject = "Mobile surveillance - Reset Password key";
-                    bool success = EmailUltil.SendMail("mobilesurveillance.group4@gmail.com", account.Email, account.Fullname, subject, body, false);
+                    bool success = EmailUltil.SendMail("mobilesurveillance.group4@gmail.com", account.Email, account.Fullname, subject, body, true);
 
                     if (success)
                     {
@@ -255,7 +254,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                               StringComparison.InvariantCultureIgnoreCase));
                 if (account != null)
                 {
-                    if ((String)model.key == (String)Session["KeyPassword"])
+                    if ((String)model.Key == (String)Session["KeyPassword"])
                     {
                         account.Password = model.Password;
                         context.SaveChanges();
