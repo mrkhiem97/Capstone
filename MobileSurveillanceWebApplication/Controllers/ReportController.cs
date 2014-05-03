@@ -24,31 +24,56 @@ namespace MobileSurveillanceWebApplication.Controllers
         private const String USER_DATA_FOLDER = "UserData";
         private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
 
+        [HttpGet]
+        [AllowAnonymous]
         public ActionResult Report(string trajectoryId)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectoryId, StringComparison.InvariantCultureIgnoreCase)).SingleOrDefault();
+            var listLocation = trajectory.Locations.Where(x => x.IsActive).OrderBy(x => x.CreatedDate).ToList();
             var trajectoryViewModel = new TrajectoryViewModel
             {
-                TrajectoryName = trajectory.TrajectoryName,
+                TrajectoryName = HttpUtility.UrlEncode(trajectory.TrajectoryName),
                 Id = trajectory.Id,
                 CreateDate = trajectory.CreatedDate.ToLongDateString(),
-                TotalLocation = trajectory.Locations.Count(x => x.IsActive)
+                TotalLocation = listLocation.Count,
             };
+            if (listLocation.Count > 0)
+            {
+                trajectoryViewModel.TotalTime = SupportUtility.TotalTime(listLocation.First().CreatedDate, listLocation.Last().CreatedDate);
+            }
+            else
+            {
+                trajectoryViewModel.TotalTime = "";
+            }
             return View(trajectoryViewModel);
         }
 
+        [Authorize]
         public async Task<JsonResult> GetReportData(string trajectoryId)
+        {
+            return await GetReport(trajectoryId);
+        }
+
+        private async Task<JsonResult> GetReport(string trajectoryId)
         {
             var trajectory = this.context.Trajectories.Where(x => x.Id.Equals(trajectoryId, StringComparison.InvariantCultureIgnoreCase)).SingleOrDefault();
             var list = await this.GetListReport(trajectoryId);
             return Json(new
             {
-                TrajectoryName = HttpUtility.JavaScriptStringEncode(trajectory.TrajectoryName),
+                TrajectoryName = trajectory.TrajectoryName,
+                Author = trajectory.Account.Fullname,
                 ChartData = list
             }, JsonRequestBehavior.AllowGet);
         }
 
-        public async Task<ReportViewModel> GetReportViewModel(Location start, Location destination, double cummulativeDistance)
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<JsonResult> GetReportDataForMobile(string trajectoryId)
+        {
+            return await GetReport(trajectoryId);
+        }
+
+        private async Task<ReportViewModel> GetReportViewModel(Location start, Location destination, double cummulativeDistance)
         {
             ReportViewModel retVal = null;
             var locationRoute = this.context.LocationRoutes
@@ -91,7 +116,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <param name="origin"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        public async Task<double> GetDrivingDistanceInKilometers(Location start, Location des)
+        private async Task<double> GetDrivingDistanceInKilometers(Location start, Location des)
         {
             double retVal = 0;
 
@@ -118,7 +143,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return retVal;
         }
 
-        public double Velocity(double distance, DateTime startTime, DateTime desTime)
+        private double Velocity(double distance, DateTime startTime, DateTime desTime)
         {
             double retVal = 0;
             var time = (desTime - startTime).TotalHours;
@@ -182,6 +207,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 
         }
 
+        [AllowAnonymous]
         public async Task<ActionResult> ExcelReport(string trajectoryId)
         {
             String path = String.Format("~/{0}/{1}/{2}", USER_DATA_FOLDER, User.Identity.Name, "Report");

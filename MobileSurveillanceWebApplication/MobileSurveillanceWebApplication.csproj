@@ -982,6 +982,7 @@
     <Content Include="UserData\admin1\Report\240zF3z08zECz33zED20140415101056.xls" />
     <Content Include="UserData\admin1\Report\admin140zF3z08zECz33zED20140329063439.xls" />
     <Content Include="UserData\admin\Report\140zF3z08zECz33zED20140420154653.xls" />
+    <Content Include="Views\Report\ReportPartialMobile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Library\" />

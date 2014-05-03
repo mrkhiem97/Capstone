@@ -33,6 +33,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public double CenterLatitude { get; set; }
         public double CenterLongitude { get; set; }
 
+        public string Author { get; set; }
         public List<Location> LocateList { get; set; }
 
         public String ModalEditId

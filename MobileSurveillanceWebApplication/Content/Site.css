@@ -805,6 +805,20 @@ hr {
     width: 442px;
 }
 
+#report-trajectory-name {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#report-trajectory-author {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
 #total-location {
     display: block;
     font-size: 16px;

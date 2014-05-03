@@ -2,9 +2,34 @@
 
 @{
     ViewBag.Title = "Report";
+    Layout = null;
 }
-<div class="row">
-    @{
-        Html.RenderPartial("~/Views/Report/ReportPartial.cshtml", Model);
-    }
-</div>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Mobile Surveillance - Report</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/jquery")
+
+</head>
+<body id="login-body">
+    <div class="container" id="container">
+        <!-- Main -->
+        <div class="row">
+            @{
+                Html.RenderPartial("~/Views/Report/ReportPartialMobile.cshtml", Model);
+            }
+        </div>
+        <!-- End of main -->
+        <!-- Footer -->
+        <div class="row" id="footer">
+        </div>
+        <!-- End of Footer -->
+    </div>
+    <!-- Javasript here -->
+</body>
+</html>
+

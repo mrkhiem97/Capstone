@@ -40,6 +40,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             model.Description = trajectory.Description;
             model.LastUpdate = trajectory.LastUpdated.ToString("dd/MM/yyyy HH:mm:ss tt");
             model.TotalLocation = listLocation.Count;
+            model.Author = trajectory.Account.Fullname;
             if (listLocation.Count > 0)
             {
                 model.TotalTime = SupportUtility.TotalTime(listLocation.First().CreatedDate, listLocation.Last().CreatedDate);

@@ -14,12 +14,13 @@
 
 <!-- <![endif]-->
 <script type="text/javascript">
+    var chart;
+    var graph;
     $(document).ready(function () {
-        var chart;
-        var graph;
         $("#summary-report").hide();
-        $.getJSON("/Report/GetReportData/", { trajectoryId: '@Model.Id' }, function (responseData) {
+        $.getJSON("/Report/GetReportDataForMobile/", { trajectoryId: '@Model.Id' }, function (responseData) {
             var chartData = responseData.ChartData;
+
             $("#report-trajectory-name").text("Trajectory: " + responseData.TrajectoryName);
             $("#report-trajectory-author").text("Author: " + responseData.Author);
             $("#total-distance").text("Total Distances: " + chartData[chartData.length - 1].TotalDistance + " Kilometers");
@@ -115,14 +116,15 @@
                 menuRight: "20px",
                 backgroundColor: "#efefef",
 
-                menuItemStyle	: {
-                    backgroundColor			: '#EFEFEF',
-                    rollOverBackgroundColor	: '#DDDDDD'},
+                menuItemStyle: {
+                    backgroundColor: '#EFEFEF',
+                    rollOverBackgroundColor: '#DDDDDD'
+                },
 
                 menuItems: [{
                     textAlign: 'center',
                     icon: '@Url.Content("~/Scripts/amcharts/images/export.png")',
-                    onclick:function(){},
+                    onclick: function () { },
                     iconTitle: 'Save chart as an image',
                     items: [{
                         title: 'JPG',
@@ -147,7 +149,7 @@
     });
 </script>
 <div class="col-lg-6 col-md-6 col-sm-12">
-    <div id="summary-report" class="alert alert-info summary-report">
+    <div id="summary-report" class="alert alert-warning summary-report">
         <div id="report-trajectory-name">
         </div>
         <div id="report-trajectory-author">
@@ -161,7 +163,7 @@
     </div>
 </div>
 <div class="col-lg-6 col-md-6 col-sm-12">
-    @using (Html.BeginForm("ExcelReport", "Report", FormMethod.Post, new { enctype = "multipart/form-data", id="report-download-form" }))
+    @using (Html.BeginForm("ExcelReport", "Report", FormMethod.Post, new { enctype = "multipart/form-data", id = "report-download-form" }))
     {
         <input type="hidden" name="trajectoryId" value="@Model.Id" />
         <input class="download-report" type="submit" name="Export" id="Export" value="" />
