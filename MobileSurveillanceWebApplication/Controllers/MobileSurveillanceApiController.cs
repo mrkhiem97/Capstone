@@ -17,14 +17,13 @@ using MobileSurveillanceWebApplication.HttpSupportUtility;
 using IOManagerLibrary;
 using MobileSurveillanceWebApplication.Filters;
 using System.Drawing;
+using MobileSurveillanceWebApplication.Models.ViewModel;
 
 namespace MobileSurveillanceWebApplication.Controllers
 {
     public class MobileSurveillanceApiController : ApiController
     {
         private const String USER_DATA_FOLDER = "UserData";
-        private const string IS_FRIEND = "1";
-        private const string NOT_FRIEND = "0";
 
         private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
 
@@ -259,7 +258,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 listFriendShip = this.context.FriendShips
                     .Where(x => x.MyId == accountId)
-                    .Where(x => x.Status.Equals(IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                    .Where(x => x.Status.Equals(FriendStatus.IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
                     .OrderBy(x => x.Account.Username)
                     .OrderBy(x => x.Account.Fullname)
                     .ToList();
@@ -268,7 +267,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 listFriendShip = this.context.FriendShips
                     .Where(x => x.MyId == accountId)
-                    .Where(x => x.Status.Equals(IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                    .Where(x => x.Status.Equals(FriendStatus.IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
                     .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
                     .OrderBy(x => x.Account.Username)
                     .OrderBy(x => x.Account.Fullname)
@@ -283,7 +282,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 var isBothFriend = this.context.FriendShips
                     .Where(x => x.MyId == myFriendId)
                     .Where(x => x.MyFriendId == myId)
-                    .Where(x => x.Status.Equals(IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                    .Where(x => x.Status.Equals(FriendStatus.IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
                     .Any();
                 if (isBothFriend)
                 {

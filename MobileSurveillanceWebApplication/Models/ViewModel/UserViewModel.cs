@@ -3,9 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace MobileSurveillanceWebApplication.Models.ViewModel
 {
+    public static class FriendStatus
+    {
+        public const string IS_FRIEND = "1";
+        public const string NOT_FRIEND = "0";
+        public const string CONFIRM_NEED = "confirmNeed";
+        public const string REQUEST_SENT = "requestSent";
+        public const string FRIEND = "friend";
+        public const string NOT_YET_FRIEND = "notFriend";
+    }
+
+
     public class UserViewModel
     {
         public long Id { get; set; }
@@ -25,6 +37,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string RoleId { get; set; }
 
         [Display(Name = "Address")]
+        [AllowHtml]
         [DataType(DataType.Text)]
         public string Address { get; set; }
 
@@ -122,6 +135,4 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
 
         public string DateTo { get; set; }
     }
-
-
 }

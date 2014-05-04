@@ -13,13 +13,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class SearchResultController : Controller
     {
-        private const string IS_FRIEND = "1";
-        private const string NOT_FRIEND = "0";
-        private const string CONFIRM_NEED = "confirmNeed";
-        private const string REQUEST_SENT = "requestSent";
-        private const string FRIEND = "friend";
-        private const string NOT_YET_FRIEND = "notFriend";
-        
+       
         //
         // GET: /SearchResult/
         private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
@@ -34,6 +28,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <param name="searchCriteriaViewModel"></param>
         /// <returns></returns>
         [ValidateInput(false)]
+        [System.Web.Mvc.Authorize]
         public ActionResult SearchResult(SearchCriteriaViewModel searchCriteriaViewModel)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
@@ -72,27 +67,27 @@ namespace MobileSurveillanceWebApplication.Controllers
 
                 //CHECKING STATUS OF FRIENDSHIP                    
                 // if me (0) - you (1) --> confirmNeed
-                if (user.FriendShips1.Any(x => x.Account.Id == account.Id) && user.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == IS_FRIEND
-                    && (!account.FriendShips1.Any(x => x.Account.Id == user.Id) || account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == NOT_FRIEND))
+                if (user.FriendShips1.Any(x => x.Account.Id == account.Id) && user.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == FriendStatus.IS_FRIEND
+                    && (!account.FriendShips1.Any(x => x.Account.Id == user.Id) || account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == FriendStatus.NOT_FRIEND))
                 {
-                    friendViewModel.FriendStatus = CONFIRM_NEED;
+                    friendViewModel.FriendStatus = FriendStatus.CONFIRM_NEED;
                 }
                 // if me (1) - you (0) --> requestSent
-                else if ((!user.FriendShips1.Any(x => x.Account.Id == account.Id) || user.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == NOT_FRIEND)
-                    && account.FriendShips1.Any(x => x.Account.Id == user.Id) && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == IS_FRIEND)
+                else if ((!user.FriendShips1.Any(x => x.Account.Id == account.Id) || user.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == FriendStatus.NOT_FRIEND)
+                    && account.FriendShips1.Any(x => x.Account.Id == user.Id) && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == FriendStatus.IS_FRIEND)
                 {
-                    friendViewModel.FriendStatus = REQUEST_SENT;
+                    friendViewModel.FriendStatus = FriendStatus.REQUEST_SENT;
                 }
                 // if me (1) - you (1) --> friend
-                else if (account.FriendShips1.Any(x => x.Account.Id == user.Id) && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == IS_FRIEND
-                    && user.FriendShips1.Any(x => x.Account.Id == account.Id) && user.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == IS_FRIEND)
+                else if (account.FriendShips1.Any(x => x.Account.Id == user.Id) && account.FriendShips1.Where(x => x.Account.Id == user.Id).SingleOrDefault().Status == FriendStatus.IS_FRIEND
+                    && user.FriendShips1.Any(x => x.Account.Id == account.Id) && user.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == FriendStatus.IS_FRIEND)
                 {
-                    friendViewModel.FriendStatus = FRIEND;
+                    friendViewModel.FriendStatus = FriendStatus.FRIEND;
                 }
                 // other cases is notFriend
                 else
                 {
-                    friendViewModel.FriendStatus = NOT_YET_FRIEND;
+                    friendViewModel.FriendStatus = FriendStatus.NOT_YET_FRIEND;
                 }
 
                 listFriendViewModel.ListFriend.Add(friendViewModel);               
@@ -112,12 +107,12 @@ namespace MobileSurveillanceWebApplication.Controllers
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
 
             //check if there are friendId
-            if (account.FriendShips1.Any(x => x.Account.Id == friendId))
+            var friendShipAccount = account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault();
+            if (friendShipAccount != null)
             {
                 //change friendship status to 1
-                account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = IS_FRIEND;
-                account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().FriendDate = DateTime.Now;
-
+                friendShipAccount.Status = FriendStatus.IS_FRIEND;
+                friendShipAccount.FriendDate = DateTime.Now;
             }
             else
             {
@@ -125,7 +120,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 var frienship = new FriendShip();
                 frienship.MyFriendId = friendId;
                 frienship.MyId = account.Id;
-                frienship.Status = IS_FRIEND;
+                frienship.Status = FriendStatus.IS_FRIEND;
                 frienship.FriendDate = DateTime.Now;
                 account.FriendShips1.Add(frienship);
             }
@@ -177,7 +172,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             //change status to 0 
-            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = NOT_FRIEND;
+            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = FriendStatus.NOT_FRIEND;
             int result = this.context.SaveChanges();
             if (result > 0)
             {
@@ -205,8 +200,8 @@ namespace MobileSurveillanceWebApplication.Controllers
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             var friendAccount = this.context.Accounts.Where(x => x.Id == friendId).SingleOrDefault();
             //change status to 0 
-            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = NOT_FRIEND;
-            friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status = NOT_FRIEND;
+            account.FriendShips1.Where(x => x.Account.Id == friendId).SingleOrDefault().Status = FriendStatus.NOT_FRIEND;
+            friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status = FriendStatus.NOT_FRIEND;
             int result = this.context.SaveChanges();
             if (result > 0)
             {
@@ -233,7 +228,6 @@ namespace MobileSurveillanceWebApplication.Controllers
             }
         }
 
-
         /// <summary>
         /// Deny Request friend
         /// </summary>
@@ -245,7 +239,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
             var friendAccount = this.context.Accounts.Where(x => x.Id.Equals(friendId)).SingleOrDefault();
             //change status to 0 
-            friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status = NOT_FRIEND;
+            friendAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status = FriendStatus.NOT_FRIEND;
             int result = this.context.SaveChanges();
             if (result > 0)
             {

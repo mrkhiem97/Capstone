@@ -7,7 +7,8 @@
 
 <script>
     function onSuccess(response, status, data) {
-        window.location = "?SearchKeyword=" + response.SearchKeyword + "&PageNumber=" + response.PageNumber + "&PageCount=" + response.PageCount;
+        window.location.href = window.location.href;
+        //window.location = "?SearchKeyword=" + response.SearchKeyword + "&PageNumber=" + response.PageNumber + "&PageCount=" + response.PageCount;
     }
 
     function onFailure() {
@@ -160,7 +161,7 @@ else
                         <h5>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h5>
                     </div>
                     <div class="col-md-1">
-                        @Ajax.ActionLink("Add Friend", "AddFriend", "SearchResult", new { friendId = item.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
+                        @Ajax.ActionLink("Add Friend", "AddFriend", "SearchResult", new { friendId = item.Id, requestType = "addFriend", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                     {
                                         HttpMethod = "POST",
                                         OnSuccess = "onSuccess",

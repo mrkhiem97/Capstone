@@ -16,6 +16,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         //
         // GET: /User/
         private readonly MobileSurveillanceContext context = new MobileSurveillanceContext();
+
         public ActionResult Index()
         {
             return View();
@@ -25,15 +26,14 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// ListFriend redirect to ListUser
         /// </summary>
         /// <returns></returns>
+        [Authorize]
         public ActionResult ListFriend()
         {
             return RedirectToAction("ListUser", new { SearchKeyword = "", PageNumber = 1, PageCount = 0 });
         }
 
-
-
-
         [HttpGet]
+        [Authorize]
         [ValidateInput(false)]
         public JsonResult GetListFriend(string query)
         {
@@ -76,7 +76,6 @@ namespace MobileSurveillanceWebApplication.Controllers
                     listResult.Add(listFriendShip.ElementAt(i).Account.Fullname);
                 }
             }
-
             return Json(listResult, JsonRequestBehavior.AllowGet);
         }
 
@@ -85,6 +84,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <returns></returns>
         [ValidateInput(false)]
+        [Authorize]
         public ActionResult ListUser(SearchCriteriaViewModel searchUserModel)
         {
             int pageSize = 12;
@@ -146,6 +146,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <param name="friendID"></param>
         /// <returns></returns>
+        [Authorize]
         public ActionResult ListFriendTrajectory(long friendId)
         {
             return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = friendId, DateFrom = " ", DateTo = " " });
@@ -193,6 +194,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <param name="friendId"></param>
         /// <returns></returns>
+        [Authorize]
         public ActionResult MakeFriendRequest(long friendId)
         {
             return RedirectToAction("ListTrajectory", "Trajectory", new { SearchKeyword = " ", PageNumber = 1, PageCount = 0, UserId = friendId, DateFrom = " ", DateTo = " " });
@@ -201,6 +203,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <summary>
         /// List all Inbox for confirm Request
         /// </summary>
+        [Authorize]
         public ActionResult ListInbox(SearchCriteriaViewModel searchUserModel)
         {
             var listUserModel = new ListUserViewModel();
@@ -314,6 +317,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <param name="friendId"></param>
         /// <returns></returns>
+        [Authorize]
         public JsonResult LoadMutualFriend(long friendId)
         {
             var account = this.context.Accounts.Where(x => x.Username.Equals(User.Identity.Name)).SingleOrDefault();
@@ -366,6 +370,5 @@ namespace MobileSurveillanceWebApplication.Controllers
             listMutualFriendViewModel = listMutualFriendViewModel.OrderBy(x => x.Fullname).ToList();
             return Json(listMutualFriendViewModel, JsonRequestBehavior.AllowGet);
         }
-
     }
 }

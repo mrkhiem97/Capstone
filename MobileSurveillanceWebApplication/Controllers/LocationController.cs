@@ -63,7 +63,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return View(listImages);
         }
 
-
+        [Authorize]
         public JsonResult DeleteLocation(string locationId)
         {
             var location = this.context.Locations.SingleOrDefault(x => x.Id.Equals(locationId, StringComparison.InvariantCultureIgnoreCase));
@@ -94,6 +94,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             }
         }
 
+        [Authorize]
         public JsonResult DeleteImage(long imageId, String locationId, int index)
         {
             var location = this.context.Locations.SingleOrDefault(x => x.Id.Equals(locationId, StringComparison.InvariantCultureIgnoreCase));

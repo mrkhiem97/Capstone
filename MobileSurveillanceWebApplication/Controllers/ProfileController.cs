@@ -30,6 +30,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [Authorize]
         public ActionResult UserProfile()
         {
             string username;
@@ -46,6 +47,7 @@ namespace MobileSurveillanceWebApplication.Controllers
         /// <param name="avatar"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize]
         public ActionResult SaveProfile(UserViewModel model, HttpPostedFileBase avatar)
         {
             var account = this.context.Accounts.SingleOrDefault(x => x.Username.Equals(User.Identity.Name, StringComparison.InvariantCultureIgnoreCase));
@@ -121,7 +123,5 @@ namespace MobileSurveillanceWebApplication.Controllers
                     return false;
             }
         }
-
-
     }
 }

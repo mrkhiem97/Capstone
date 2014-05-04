@@ -16,8 +16,6 @@ namespace MobileSurveillanceWebApplication.Controllers
 {
     public class TrajectoryController : Controller
     {
-        private const string IS_FRIEND = "1";
-        private const string NOT_FRIEND = "0";
         private const String USER_DATA_FOLDER = "/UserData/";
         //
         // GET: /Trajectory/
@@ -205,14 +203,14 @@ namespace MobileSurveillanceWebApplication.Controllers
             if (account.Id != myAccount.Id)
             {
                 //check friend condition
-                if (account.FriendShips1.Where(x => x.Account.Id == myAccount.Id).Any() && account.FriendShips1.Where(x => x.Account.Id == myAccount.Id).SingleOrDefault().Status == IS_FRIEND
-                        && myAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() && myAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == IS_FRIEND)
+                if (account.FriendShips1.Where(x => x.Account.Id == myAccount.Id).Any() && account.FriendShips1.Where(x => x.Account.Id == myAccount.Id).SingleOrDefault().Status == FriendStatus.IS_FRIEND
+                        && myAccount.FriendShips1.Where(x => x.Account.Id == account.Id).Any() && myAccount.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == FriendStatus.IS_FRIEND)
                 {
-                    userModel.FriendStatus = IS_FRIEND;
+                    userModel.FriendStatus = FriendStatus.IS_FRIEND;
                 }
                 else
                 {
-                    userModel.FriendStatus = NOT_FRIEND;
+                    userModel.FriendStatus = FriendStatus.NOT_FRIEND;
                 }
             }
 

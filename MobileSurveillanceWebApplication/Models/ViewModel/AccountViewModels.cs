@@ -12,17 +12,21 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     public class LocalPasswordViewModel
     {
         [Required]
+        [AllowHtml]
         [DataType(DataType.Password)]
         [Display(Name = "Current password")]
         public string OldPassword { get; set; }
 
+
         [Required]
+        [AllowHtml]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "New password")]
         public string NewPassword { get; set; }
 
         [DataType(DataType.Password)]
+        [AllowHtml]
         [Display(Name = "Confirm new password")]
         [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
@@ -31,10 +35,12 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     public class LoginViewModel
     {
         [Required]
+        [AllowHtml]
         [Display(Name = "User name")]
         public string UserName { get; set; }
 
         [Required]
+        [AllowHtml]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -47,18 +53,20 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     {
         [Required(ErrorMessage = "Username is required")]
         [StringLength(50, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 5)]
-        [RegularExpression("^[a-z0-9_-]{1,50}$", ErrorMessage = "Invalid characters")]
+        [RegularExpression("^[a-z0-9_-]{1,50}$", ErrorMessage = "Invalid characters. Only a-z 0-9 is allowed")]
         [Remote("ValidateUsername", "Account", ErrorMessage = "This user has already existed")]
         [Display(Name = "User name")]
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "Password is required")]
+        [AllowHtml]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
+        [AllowHtml]
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
@@ -84,6 +92,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public DateTime Birthday { get; set; }
 
         [Display(Name = "Address")]
+        [AllowHtml]
         [StringLength(1000)]
         [DataType(DataType.Text)]
         public String Address
@@ -116,17 +125,20 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
     public class ResetPasswordModel
     {
         [Required]
+        [AllowHtml]
         [Display(Name = "New Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
         [Required]
+        [AllowHtml]
         [Display(Name = "Confirm Password")]
         [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "New password and confirmation does not match.")]
         public string ConfirmPassword { get; set; }
 
         [Required]
+        [AllowHtml]
         [DataType(DataType.Text)]
         public string Key { get; set; }
     }
