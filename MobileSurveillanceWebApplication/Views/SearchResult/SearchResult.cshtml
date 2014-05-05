@@ -37,39 +37,33 @@
                     <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
                 </div>
                 <div class="row" align="center">
-                    @if (item.MyId == item.Id)
-                    {
-                        <h4>
-                            @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-success" })
-                        </h4>
-                    }
-                    else
-                    {
-                        if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.NOT_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                    <h4 id="@item.ModelSearchId">
+                        @if (item.MyId == item.Id)
                         {
-                            <h4>
+                            @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-success" })
+                        }
+                        else
+                        {
+                            if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.NOT_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                            {
                                 @Ajax.ActionLink("Add Friend", "AddFriend", new { friendId = item.Id, requestType = "addFriend", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                     {
                                         HttpMethod = "POST",
                                         OnSuccess = "onSuccess",
                                         OnFailure = "",
                                     }, new { @class = "label label-primary" })
-                            </h4>
-                        }
-                        else if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.REQUEST_SENT, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            <h4>
+                            }
+                            else if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.REQUEST_SENT, StringComparison.InvariantCultureIgnoreCase))
+                            {
                                 @Ajax.ActionLink("Cancel Request", "CancelRequest", new { friendId = item.Id, SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                     {
                                         HttpMethod = "POST",
                                         OnSuccess = "onSuccess",
                                         OnFailure = "",
                                     }, new { @class = "label label-danger" })
-                            </h4>
-                        }
-                        else if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.CONFIRM_NEED, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            <h4>
+                            }
+                            else if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.CONFIRM_NEED, StringComparison.InvariantCultureIgnoreCase))
+                            {
                                 @Ajax.ActionLink("Accept Request", "AddFriend", new { friendId = item.Id, requestType = "confirmRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                    {
                                        HttpMethod = "POST",
@@ -83,26 +77,22 @@
                                        OnSuccess = "onSuccess",
                                        OnFailure = "",
                                    }, new { @class = "label label-warning" })
-                            </h4>
-                        }
-                        else if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.NOT_YET_FRIEND, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            <h4>
+                            }
+                            else if (item.FriendStatus.Equals(MobileSurveillanceWebApplication.Models.ViewModel.FriendStatus.NOT_YET_FRIEND, StringComparison.InvariantCultureIgnoreCase))
+                            {
                                 @Ajax.ActionLink("Add Friend", "AddFriend", new { friendId = item.Id, requestType = "addFriend", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                                     {
                                         HttpMethod = "POST",
                                         OnSuccess = "onSuccess",
                                         OnFailure = "",
                                     }, new { @class = "label label-primary" })
-                            </h4>
-                        }
-                        else
-                        {
-                            <h4>
+                            }
+                            else
+                            {
                                 @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-success" })
-                            </h4>
+                            }
                         }
-                    }
+                    </h4>
                 </div>
             </div>
         </div>

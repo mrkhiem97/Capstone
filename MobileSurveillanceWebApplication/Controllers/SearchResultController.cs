@@ -64,7 +64,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 friendViewModel.Birthday = user.Birthday;
                 friendViewModel.Address = user.Address;
                 friendViewModel.MyId = account.Id;
-
+                friendViewModel.ModelSearchId = String.Format("model-search-{0}-{1}", account.Id, user.Id);
                 //CHECKING STATUS OF FRIENDSHIP                    
                 // if me (0) - you (1) --> confirmNeed
                 if (user.FriendShips1.Any(x => x.Account.Id == account.Id) && user.FriendShips1.Where(x => x.Account.Id == account.Id).SingleOrDefault().Status == FriendStatus.IS_FRIEND
@@ -135,10 +135,15 @@ namespace MobileSurveillanceWebApplication.Controllers
                     if (requestType.Equals("addFriend", StringComparison.InvariantCultureIgnoreCase))
                     {
                         signalRContext.Clients.Client(connectionId).notifyAddFriendRequest(account.Fullname + " has sent you friend request!");
+                        String url1 = Url.Action("AddFriend", "SearchResult", new { friendId = account.Id, requestType = "confirmRequest", PageNumber = searchCriteriaViewModel.PageNumber, PageCount = searchCriteriaViewModel.PageCount });
+                        String url2 = Url.Action("DenyRequest", "SearchResult", new { friendId = account.Id, requestType = "denyRequest", PageNumber = searchCriteriaViewModel.PageNumber, PageCount = searchCriteriaViewModel.PageCount });
+                        signalRContext.Clients.Client(connectionId).changeAddFriendRequest(String.Format("model-search-{0}-{1}", friendAccount.Id, account.Id), url1, url2);
                     }
                     else if (requestType.Equals("confirmRequest", StringComparison.InvariantCultureIgnoreCase))
                     {
                         signalRContext.Clients.Client(connectionId).notifyAcceptFriendRequest(account.Fullname + " has accepted you friend request!");
+                        String url = Url.Action("ListFriendTrajectory", "User", new { friendId = account.Id });
+                        signalRContext.Clients.Client(connectionId).changeAcceptFriendRequest(String.Format("model-search-{0}-{1}", friendAccount.Id, account.Id), url);
                     }
                 }
                 return ReturnJsonResult(searchCriteriaViewModel);
@@ -181,6 +186,9 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     var signalRContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
                     signalRContext.Clients.Client(connectionId).notifyCancelFriendRequest();
+                    String url = Url.Action("AddFriend", "SearchResult", new { friendId = account.Id, requestType = "addFriend", PageNumber = searchCriteriaViewModel.PageNumber, PageCount = searchCriteriaViewModel.PageCount });
+                    signalRContext.Clients.Client(connectionId).changeDenyFriendRequest(String.Format("model-search-{0}-{1}", friendAccount.Id, account.Id), url);
+                    signalRContext.Clients.Client(connectionId).changeInboxRequest(String.Format("model-listInbox-{0}-{1}", friendAccount.Id, account.Id), String.Format("model-listUser-{0}-{1}", friendAccount.Id, account.Id));
                 }
                 return ReturnJsonResult(searchCriteriaViewModel);
             }
@@ -218,6 +226,9 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     var signalRContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
                     signalRContext.Clients.Client(connectionId).notifyCancelFriendRequest();
+                    String url = Url.Action("AddFriend", "SearchResult", new { friendId = account.Id, requestType = "addFriend", PageNumber = searchCriteriaViewModel.PageNumber, PageCount = searchCriteriaViewModel.PageCount });
+                    signalRContext.Clients.Client(connectionId).changeDenyFriendRequest(String.Format("model-search-{0}-{1}", friendAccount.Id, account.Id), url);
+                    signalRContext.Clients.Client(connectionId).changeInboxRequest(String.Format("model-listInbox-{0}-{1}", friendAccount.Id, account.Id), String.Format("model-listUser-{0}-{1}", friendAccount.Id, account.Id));
                 }
                 return Json(returnJson, JsonRequestBehavior.AllowGet);
             }
@@ -247,6 +258,9 @@ namespace MobileSurveillanceWebApplication.Controllers
                 {
                     var signalRContext = GlobalHost.ConnectionManager.GetHubContext<NotificationHub>();
                     signalRContext.Clients.Client(connectionId).notifyDenyFriendRequest();
+                    String url = Url.Action("AddFriend", "SearchResult", new { friendId = account.Id, requestType = "addFriend", PageNumber = searchCriteriaViewModel.PageNumber, PageCount = searchCriteriaViewModel.PageCount });
+                    signalRContext.Clients.Client(connectionId).changeDenyFriendRequest(String.Format("model-search-{0}-{1}", friendAccount.Id, account.Id), url);
+                    signalRContext.Clients.Client(connectionId).changeInboxRequest(String.Format("model-listInbox-{0}-{1}", friendAccount.Id, account.Id), String.Format("model-listUser-{0}-{1}", friendAccount.Id, account.Id));
                 }
                 return ReturnJsonResult(searchCriteriaViewModel);
             }

@@ -74,7 +74,7 @@ else
                             <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
                         </div>
                         <div class="row" align="center">
-                            <h4> @Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-primary " })</h4>
+                            <h4 id="@item.ModelListUserId">@Html.ActionLink("Track User", "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "label label-primary " })</h4>
                         </div>
                     </div>
                 </div>

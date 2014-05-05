@@ -130,7 +130,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 userViewModel.Fullname = user.Account.Fullname;
                 userViewModel.Address = user.Account.Address;
                 userViewModel.Birthday = user.Account.Birthday;
-
+                userViewModel.ModelListUserId = String.Format("model-listUser-{0}-{1}", account.Id, user.Account.Id);
                 listUserModel.ListUser.Add(userViewModel);
             }
             listUserModel.ListUser = listUserModel.ListUser.OrderBy(x => x.Fullname).ToList();
@@ -231,7 +231,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 userViewModel.Username = user.Account1.Username;
                 userViewModel.Avatar = user.Account1.Avatar;
                 userViewModel.Fullname = user.Account1.Fullname;
-
+                userViewModel.ModelListInboxId = String.Format("model-listInbox-{0}-{1}", account.Id, user.Account1.Id);
                 listUserModel.ListUser.Add(userViewModel);
             }
             ViewBag.SearchCriteriaViewModel = searchUserModel;

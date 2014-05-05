@@ -32,7 +32,6 @@
             var notificationHub = $.connection.notificationHub;
             notificationHub.client.notifyAddFriendRequest = function (message) {
                 refreshInbox();
-
                 $.bootstrapGrowl(message, {
                     type: 'danger',
                     align: 'right',
@@ -61,6 +60,24 @@
             };
             notificationHub.client.notifyDenyFriendRequest = function () {
                 refreshInbox();
+            };
+
+            notificationHub.client.changeAddFriendRequest = function (modelId, url1, url2) {
+                $("#" + modelId).empty();
+                $("#" + modelId).append("<a class='label label-primary' data-ajax='true' data-ajax-method='POST' data-ajax-success='onSuccess' href='" + url1 + "'>Accept Request</a>");
+                $("#" + modelId).append("<a class='label label-warning' data-ajax='true' data-ajax-method='POST' data-ajax-success='onSuccess' href='" + url2 + "'>Deny Request</a>");
+            };
+            notificationHub.client.changeAcceptFriendRequest = function (modelId, url) {
+                $("#" + modelId).empty();
+                $("#" + modelId).append("<a class='label label-success' href='" + url + "'>Track User</a>");
+            };
+            notificationHub.client.changeDenyFriendRequest = function (modelId, url) {
+                $("#" + modelId).empty();
+                $("#" + modelId).append("<a class='label label-primary' data-ajax='true' data-ajax-method='POST' data-ajax-success='onSuccess' href='" + url + "'>Add Friend</a>");
+            };
+            notificationHub.client.changeInboxRequest = function (modelListInboxId, modelListUserId) {
+                $("#" + modelListInboxId).parent().parent().parent().remove();
+                $("#" + modelListUserId).parent().parent().parent().remove();
             };
             $.connection.hub.start().done(function () {
             });

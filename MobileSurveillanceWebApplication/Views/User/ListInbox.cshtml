@@ -42,7 +42,7 @@ else
                 <h4>@Html.ActionLink(item.Fullname, "ListFriendTrajectory", "User", new { friendId = @item.Id }, htmlAttributes: new { @class = "" })</h4>
             </div>
             <div class="row" align="center">
-                <h4>
+                <h4 id="@item.ModelListInboxId">
                     @Ajax.ActionLink("Accept Request", "AddFriend", "SearchResult", new { friendId = @item.Id, requestType = "confirmRequest", SearchKeyword = searchUserModel.SearchKeyword, PageNumber = searchUserModel.PageNumber, PageCount = searchUserModel.PageCount }, new AjaxOptions()
                {
                    HttpMethod = "POST",

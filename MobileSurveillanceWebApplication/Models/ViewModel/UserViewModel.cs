@@ -48,6 +48,12 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public int CountMutualFriend { get; set; }
 
         public int CountTrajectory { get; set; }
+
+        public string ModelListInboxId { get; set; }
+
+        public string ModelSearchId { get; set; }
+
+        public string ModelListUserId { get; set; }
     }
 
     public class FriendViewModel : UserViewModel
@@ -55,6 +61,8 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         public string FriendStatus { get; set; }
         public long MyId { get; set; }
         public long MyFriendId { get; set; }
+
+        
     }
 
     /// <summary>
