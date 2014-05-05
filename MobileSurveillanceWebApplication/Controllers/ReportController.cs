@@ -122,9 +122,7 @@ namespace MobileSurveillanceWebApplication.Controllers
 
             String origin = String.Format("{0:0.0000000},{1:0.0000000}", start.Latitude, start.Longitude);
             String destination = String.Format("{0:0.0000000},{1:0.0000000}", des.Latitude, des.Longitude);
-            string url = @"http://maps.googleapis.com/maps/api/distancematrix/xml?origins=" +
-              origin + "&destinations=" + destination +
-              "&mode=driving&sensor=true&language=en-EN";
+            string url = String.Format("http://maps.googleapis.com/maps/api/distancematrix/xml?origins={0}&destinations={1}&mode=driving&sensor=true&language=en-EN&departure_time={2}", origin, destination, start.CreatedDate.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
 
             var task = Task.Factory.StartNew(async delegate
             {
