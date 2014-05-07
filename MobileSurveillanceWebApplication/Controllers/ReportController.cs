@@ -137,7 +137,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                 return ParseDistance(responsereader);
             });
             retVal = await task.Result;
-
+            if (retVal == 0)
+            {
+                retVal = SupportUtility.Distance(start.Latitude, start.Longitude, des.Latitude, des.Longitude, DistanceUnit.Kilometer);
+            }
             return retVal;
         }
 
@@ -160,7 +163,6 @@ namespace MobileSurveillanceWebApplication.Controllers
         {
             XmlDocument xmldoc = new XmlDocument();
             xmldoc.LoadXml(responsereader);
-
 
             if (xmldoc.GetElementsByTagName("status")[0].ChildNodes[0].InnerText == "OK")
             {

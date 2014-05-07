@@ -436,10 +436,11 @@ namespace MobileSurveillanceWebApplication.Controllers
             try
             {
                 await Request.Content.ReadAsMultipartAsync(provider);
-                var imageLocationApiModel = await GetImageLocation(provider, ((BasicAuthenticationIdentity)User.Identity).Name);
+                var imageLocationApiModel = GetImageLocation(provider, ((BasicAuthenticationIdentity)User.Identity).Name);
                 var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(imageLocationApiModel.TrajectoryId, StringComparison.InvariantCultureIgnoreCase));
                 if (trajectory != null && trajectory.IsActive)
                 {
+                    
                     // Check if any distance calculation
                     // Get list location, sort by date
                     // Note that checking active of location
@@ -453,12 +454,12 @@ namespace MobileSurveillanceWebApplication.Controllers
                         }
                         else
                         {
-                            retVal = this.RegisterNewLocation(imageLocationApiModel);
+                            retVal = await this.RegisterNewLocation(imageLocationApiModel);
                         }
                     }
                     else
                     {
-                        retVal = this.RegisterNewLocation(imageLocationApiModel);
+                        retVal = await this.RegisterNewLocation(imageLocationApiModel);
                     }
                 }
                 else
@@ -476,9 +477,9 @@ namespace MobileSurveillanceWebApplication.Controllers
                     retVal = Request.CreateResponse(HttpStatusCode.Forbidden, trajectoryApiModel, Configuration.Formatters.JsonFormatter);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                retVal = new HttpResponseMessage(HttpStatusCode.BadRequest);
+                retVal = Request.CreateResponse(HttpStatusCode.BadRequest, ex.Message, Configuration.Formatters.JsonFormatter);
             }
 
             return retVal;
@@ -523,25 +524,25 @@ namespace MobileSurveillanceWebApplication.Controllers
             var listLocation = this.context.Locations
                 .Where(x => x.IsActive)
                 .Where(x => x.TrajectoryId.Equals(imageLocationApiModel.TrajectoryId, StringComparison.InvariantCultureIgnoreCase))
-                .OrderBy(x => x.CreatedDate).ToList();
-            var minDistance = double.MaxValue;
+                .OrderByDescending(x => x.CreatedDate).ToList();
             Location bestLocation = null;
             for (int i = 0; i < listLocation.Count; i++)
             {
                 var location = listLocation[i];
                 var distance = SupportUtility.Distance(imageLocationApiModel.Latitude, imageLocationApiModel.Longitude, location.Latitude, location.Longitude, DistanceUnit.Meter);
-                if (distance <= imageLocationApiModel.CompactDistance && distance <= minDistance)
+                if (distance <= imageLocationApiModel.CompactDistance)
                 {
-                    minDistance = distance;
                     bestLocation = location;
+                    break;
                 }
             }
             return bestLocation;
         }
 
-        private HttpResponseMessage RegisterNewLocation(ImageLocationApiModel imageLocationApiModel)
+        private async Task<HttpResponseMessage> RegisterNewLocation(ImageLocationApiModel imageLocationApiModel)
         {
             HttpResponseMessage retVal = null;
+            imageLocationApiModel.Address = await ReverseGeoCoding.GetAddress(imageLocationApiModel.Latitude, imageLocationApiModel.Longitude);
             // Check for existed location
             var location = this.context.Locations
                 .Where(x => x.Id.Equals(imageLocationApiModel.LocationId, StringComparison.InvariantCultureIgnoreCase))
@@ -614,7 +615,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             return retVal;
         }
 
-        private static async Task<ImageLocationApiModel> GetImageLocation(ExtendMultipartFormDataStreamProvider provider, String username)
+        private static ImageLocationApiModel GetImageLocation(ExtendMultipartFormDataStreamProvider provider, String username)
         {
             ImageLocationApiModel imageLocationApiModel = new ImageLocationApiModel();
 
@@ -662,7 +663,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                     }
                 }
             }
-            imageLocationApiModel.Address = await ReverseGeoCoding.GetAddress(imageLocationApiModel.Latitude, imageLocationApiModel.Longitude);
+            
             // This illustrates how to get the file names for uploaded files.
             foreach (var file in provider.FileData)
             {

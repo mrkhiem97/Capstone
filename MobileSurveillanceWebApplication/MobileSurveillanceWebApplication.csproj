@@ -915,10 +915,6 @@
     <Content Include="UserData\admin\Avatar\57.jpg" />
     <Content Include="UserData\admin\Avatar\68.JPG" />
     <Content Include="UserData\admin\Avatar\Avatar.png" />
-    <Content Include="UserData\admin\Image\20140402131113.jpg" />
-    <Content Include="UserData\admin\Image\20140402131116.jpg" />
-    <Content Include="UserData\admin\Image\20140402131249.jpg" />
-    <Content Include="UserData\admin\Image\20140402131252.jpg" />
     <Content Include="UserData\binhdc\Avatar\doanchibinh.jpg" />
     <Content Include="UserData\khiemdm\Avatar\131.jpg" />
     <Content Include="UserData\phuonglhk\Avatar\09.jpg" />
