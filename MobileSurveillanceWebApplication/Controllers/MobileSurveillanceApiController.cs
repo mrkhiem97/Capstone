@@ -329,14 +329,12 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 listAccount = this.context.Accounts
                     .Where(x => x.IsActive)
-                    .Where(x => x.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Fullname.ToLower().Contains(pagingModel.SearchQuery))
+                    .Where(x => x.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Fullname.ToLower().Contains(pagingModel.SearchQuery) || x.Email.ToLower().Contains(pagingModel.SearchQuery))
                     .OrderBy(x => x.Username)
                     .OrderBy(x => x.Fullname)
                     .Skip(page * pageSize).Take(pageSize)
                     .ToList();
-
             }
-
             for (int i = 0; i < listAccount.Count; i++)
             {
                 var accountFriendApiModel = new AccountFriendApiModel();
@@ -439,7 +437,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                 var trajectory = this.context.Trajectories.SingleOrDefault(x => x.Id.Equals(imageLocationApiModel.TrajectoryId, StringComparison.InvariantCultureIgnoreCase));
                 if (trajectory != null && trajectory.IsActive)
                 {
-                    
+
                     // Check if any distance calculation
                     // Get list location, sort by date
                     // Note that checking active of location
@@ -662,7 +660,7 @@ namespace MobileSurveillanceWebApplication.Controllers
                     }
                 }
             }
-            
+
             // This illustrates how to get the file names for uploaded files.
             foreach (var file in provider.FileData)
             {
