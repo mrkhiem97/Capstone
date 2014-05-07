@@ -39,7 +39,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             //condition (list all user match searchkeyword except current user)
             if (!String.IsNullOrEmpty(searchCriteriaViewModel.SearchKeyword.Trim()) && !String.IsNullOrWhiteSpace(searchCriteriaViewModel.SearchKeyword.Trim()))
             {
-                listUser = this.context.Accounts.Where(x => x.Username.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower()) || x.Fullname.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower())).ToList();
+                listUser = this.context.Accounts.Where(x => x.Username.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower()) || x.Fullname.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower()) || x.Email.Contains(searchCriteriaViewModel.SearchKeyword.Trim().ToLower())).ToList();
                 //listUser.Remove(account);
             }
             else
@@ -160,11 +160,13 @@ namespace MobileSurveillanceWebApplication.Controllers
         public JsonResult GetUserList(string query)
         {
             query = HttpUtility.UrlDecode(query);
-            var accounts = this.context.Accounts.Where(x => x.IsActive).Where(x => x.Fullname.ToLower().Contains(query.ToLower())).ToList();
+            var accounts = this.context.Accounts.Where(x => x.IsActive).Where(x => x.Fullname.ToLower().Contains(query.ToLower()) || x.Username.ToLower().Contains(query.ToLower()) || x.Email.ToLower().Contains(query.ToLower())).ToList();
             var listResult = new List<string>();
             foreach (var item in accounts)
             {
                 listResult.Add(item.Fullname);
+                listResult.Add(item.Username);
+                listResult.Add(item.Email);
             }
             return Json(listResult, JsonRequestBehavior.AllowGet);
         }

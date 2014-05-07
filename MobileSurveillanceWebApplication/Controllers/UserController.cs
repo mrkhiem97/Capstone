@@ -55,11 +55,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                 listFriendShip = this.context.FriendShips
                     .Where(x => x.MyId == accountId)
                     .Where(x => x.Status.Equals(IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
-                    .Where(x => x.Account.Username.ToLower().Contains(query) || x.Account.Fullname.ToLower().Contains(query))
+                    .Where(x => x.Account.Fullname.ToLower().Contains(query.ToLower()) || x.Account.Username.ToLower().Contains(query.ToLower()) || x.Account.Email.ToLower().Contains(query.ToLower()))
                     .OrderBy(x => x.Account.Username)
                     .OrderBy(x => x.Account.Fullname)
                     .ToList();
-
             }
             var listResult = new List<string>();
             for (int i = 0; i < listFriendShip.Count; i++)
@@ -74,6 +73,8 @@ namespace MobileSurveillanceWebApplication.Controllers
                 if (isBothFriend)
                 {
                     listResult.Add(listFriendShip.ElementAt(i).Account.Fullname);
+                    listResult.Add(listFriendShip.ElementAt(i).Account.Username);
+                    listResult.Add(listFriendShip.ElementAt(i).Account.Email);
                 }
             }
             return Json(listResult, JsonRequestBehavior.AllowGet);

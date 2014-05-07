@@ -268,11 +268,10 @@ namespace MobileSurveillanceWebApplication.Controllers
                 listFriendShip = this.context.FriendShips
                     .Where(x => x.MyId == accountId)
                     .Where(x => x.Status.Equals(FriendStatus.IS_FRIEND, StringComparison.InvariantCultureIgnoreCase))
-                    .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery))
+                    .Where(x => x.Account.Username.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Fullname.ToLower().Contains(pagingModel.SearchQuery) || x.Account.Email.ToLower().Contains(pagingModel.SearchQuery))
                     .OrderBy(x => x.Account.Username)
                     .OrderBy(x => x.Account.Fullname)
                     .ToList();
-
             }
 
             for (int i = 0; i < listFriendShip.Count; i++)
