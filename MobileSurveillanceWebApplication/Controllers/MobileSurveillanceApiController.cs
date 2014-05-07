@@ -533,6 +533,19 @@ namespace MobileSurveillanceWebApplication.Controllers
                     break;
                 }
             }
+            if (bestLocation == null)
+            {
+                for (int i = 0; i < listLocation.Count; i++)
+                {
+                    var location = listLocation[i];
+                    var distance = SupportUtility.Distance(imageLocationApiModel.Latitude, imageLocationApiModel.Longitude, location.Latitude, location.Longitude, DistanceUnit.Meter);
+                    if (distance <= imageLocationApiModel.CompactDistance)
+                    {
+                        bestLocation = location;
+                        break;
+                    }
+                }
+            }
             return bestLocation;
         }
 
