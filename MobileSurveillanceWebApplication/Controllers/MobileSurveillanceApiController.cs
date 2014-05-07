@@ -527,7 +527,7 @@ namespace MobileSurveillanceWebApplication.Controllers
             {
                 var location = listLocation[i];
                 var distance = SupportUtility.Distance(imageLocationApiModel.Latitude, imageLocationApiModel.Longitude, location.Latitude, location.Longitude, DistanceUnit.Meter);
-                if (distance <= imageLocationApiModel.CompactDistance)
+                if (distance <= imageLocationApiModel.CompactDistance && imageLocationApiModel.CreatedDate > location.CreatedDate)
                 {
                     bestLocation = location;
                     break;
