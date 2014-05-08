@@ -14,7 +14,7 @@ namespace MobileSurveillanceWebApplication.Models.ViewModel
         [Required(ErrorMessage = "Trajectory name is required")]
         [StringLength(800, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Text)]
-        [Display(Name = "Trajectory Name")]
+        [Display(Name = "Trajectory Name (*)")]
         public string TrajectoryName { get; set; }
         public string CreateDate { get; set; }
         public string LastUpdate { get; set; }

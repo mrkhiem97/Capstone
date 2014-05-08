@@ -78,9 +78,7 @@ var datetimeController = {
 
                                     locationFilter(fromDate, toDate);
                                 }
-
                         }
-
                 tempDate = dateText;
             },
             beforeShowDay: function (date) {
@@ -95,9 +93,6 @@ var datetimeController = {
                     return [true, (date2 && date <= date1 && date >= date2) || (date >= date1 && date <= date2) || (date1 && date1.getTime() == date.getTime()) ? "dp-highlight" : ""];
                     status = 0;
                 }
-
-
-
             }
         });
 
